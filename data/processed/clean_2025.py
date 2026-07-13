@@ -69,13 +69,12 @@ df_final = df_final[[
 
 df_final = df_final.reset_index(drop=True)
 
-
-print("=" * 80)
-print(f"TOPLAM TEMİZ KAYIT SAYISI: {len(df_final)}")
-print("=" * 80)
-print(df_final.head(20))
-print(df_final.tail(10))
-
+df_final["BULTEN_TARIHI"] = pd.to_datetime(
+    df_final["BULTEN_TARIHI"],
+    format="%d.%m.%Y",
+    errors="coerce"
+)
+df_final["BULTEN_TARIHI"] = df_final["BULTEN_TARIHI"].dt.strftime("%m/%d/%Y")
 
 df_final.to_csv(
     "data/processed/cleaned_2025.csv",

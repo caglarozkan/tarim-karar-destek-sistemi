@@ -13,9 +13,9 @@ dosyalar = [
     "data/raw_data/marketplace_data/izbb-sebzemeyve-hal-fiyatlari_2021.csv",
     "data/raw_data/marketplace_data/izbb-sebzemeyve-hal-fiyatlari_2022.csv",
     "data/raw_data/marketplace_data/izbb-sebzemeyve-hal-fiyatlari_2023.csv",
-    "data/processed/cleaned_2024.csv",
-    "data/processed/cleaned_2025.csv"
+    "data/processed/cleaned_2024.csv"
 ]
+dosyalar2=["data/processed/cleaned_2025.csv"]
 
 HEDEF_KOLONLAR = [
     "TARIH",
@@ -92,20 +92,100 @@ def kolonlari_duzenle(df):
     df = df.rename(columns={
         "ASGARI_UCRET": "ASGARI_FIYAT",
         "ASGARI_FIYATI": "ASGARI_FIYAT",
+        "ASGARI_FIYAT": "ASGARI_FIYAT",
+
         "AZAMI_UCRET": "AZAMI_FIYAT",
         "AZAMI_FIYATI": "AZAMI_FIYAT",
+        "AZAMI_FIYAT": "AZAMI_FIYAT",
+
         "ORTALAMA_UCRET": "ORTALAMA_FIYAT",
-        "ORT_FIYAT": "ORTALAMA_FIYAT",
         "ORTALAMA_FIYATI": "ORTALAMA_FIYAT",
+        "ORTALAMA_FIYAT": "ORTALAMA_FIYAT",
+        "ORT_FIYAT": "ORTALAMA_FIYAT",
+
         "MAL_ADI": "URUN_ADI",
         "URUN_ADI": "URUN_ADI",
+
         "BULTEN_TARIHI": "TARIH",
+        "TARIH": "TARIH",
+
         "MAL_TIPI": "MAL_TURU",
         "MAL_TURU": "MAL_TURU",
-        "BIRIMI": "BIRIM"
+
+        "BIRIMI": "BIRIM",
+        "BIRIM": "BIRIM"
     })
 
     return df
+
+
+def tarih_duzenle(s):
+    s = s.astype(str).str.strip()
+    tarih = pd.to_datetime(
+        s,
+        errors="coerce",
+        format="%m/%d/%Y"
+    )
+
+    mask = tarih.isna()
+    tarih.loc[mask] = pd.to_datetime(
+        s.loc[mask],
+        errors="coerce",
+        format="%m/%d/%Y %H:%M:%S"
+    )
+
+    mask = tarih.isna()
+    tarih.loc[mask] = pd.to_datetime(
+        s.loc[mask],
+        errors="coerce",
+        dayfirst=False
+    )
+
+    return tarih
+
+
+
+def tarih_duzenle_2025_sonrasi(df):
+    
+    df["TARIH"] = pd.to_datetime(
+        df["TARIH"],
+        format="%d/%m/%Y",        
+        errors="coerce"
+    )
+
+    df["YIL"] = df["TARIH"].dt.year
+    df["AY"] = df["TARIH"].dt.month
+
+    def sezon_bul(ay):
+        if pd.isna(ay):
+            return pd.NA
+        elif ay in [12, 1, 2]:
+            return "Winter"
+        elif ay in [3, 4, 5]:
+            return "Spring"
+        elif ay in [6, 7, 8]:
+            return "Summer"
+        else:
+            return "Fall"
+
+    df["SEZON"] = df["AY"].apply(sezon_bul)
+
+    return df
+    
+def sezon_bul(ay):
+    if pd.isna(ay):
+        return pd.NA
+
+    ay = int(ay)
+
+    if ay in [12, 1, 2]:
+        return "Winter"
+    elif ay in [3, 4, 5]:
+        return "Spring"
+    elif ay in [6, 7, 8]:
+        return "Summer"
+    else:
+        return "Fall"
 
 
 def dosya_temizle(dosya):
@@ -115,7 +195,6 @@ def dosya_temizle(dosya):
         return None
 
     df = kolonlari_duzenle(df)
-
     df = df.dropna(how="all").reset_index(drop=True)
 
     yil = yil_bul(dosya)
@@ -130,6 +209,8 @@ def dosya_temizle(dosya):
     df = df[df["URUN_ADI"].notna()]
     df = df[df["URUN_ADI"].astype(str).str.upper() != "URUN_ADI"]
 
+    df["TARIH"] = tarih_duzenle(df["TARIH"])
+
     for kolon in ["ASGARI_FIYAT", "AZAMI_FIYAT", "ORTALAMA_FIYAT"]:
         df[kolon] = (
             df[kolon]
@@ -138,9 +219,12 @@ def dosya_temizle(dosya):
         )
         df[kolon] = pd.to_numeric(df[kolon], errors="coerce")
 
-    df["TARIH"] = pd.to_datetime(df["TARIH"], errors="coerce", dayfirst=True)
+    df["AY"] = df["TARIH"].dt.month
+    df["SEZON"] = df["AY"].apply(sezon_bul)
 
     return df.reset_index(drop=True)
+
+
 tum_dosyalar = []
 
 for dosya in dosyalar:
@@ -149,8 +233,20 @@ for dosya in dosyalar:
     if df is not None and not df.empty:
         tum_dosyalar.append(df)
         print(dosya, "eklendi:", df.shape)
+        print("NaT sayısı:", df["TARIH"].isna().sum())
     else:
         print(dosya, "boş veya okunamadı")
+        
+for dosya in dosyalar2:
+    df = dosya_temizle(dosya)
 
+    if df is not None and not df.empty:
+        tum_dosyalar.append(df)
+        print(dosya, "eklendi:", df.shape)
+        print("NaT sayısı:", df["TARIH"].isna().sum())
+    else:
+        print(dosya, "boş veya okunamadı")
+        
 df_final = pd.concat(tum_dosyalar, ignore_index=True)
+
 df_final.to_csv("data/processed/cleaned_all_marketplace.csv")
