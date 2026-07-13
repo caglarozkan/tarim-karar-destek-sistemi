@@ -27,52 +27,118 @@ def get_db():
     finally:
         db.close()
 
-# ==========================================
-# 1. KULLANICI KAYIT (Ad, Soyad, Email, Şifre Alıp DB'ye Ekler)
-# ==========================================
-@router.post("/kullanici/kayit", response_model=schemas.KullaniciResponse, status_code=status.HTTP_201_CREATED)
-def kullanici_kayit(kullanici: schemas.KullaniciCreate, db: Session = Depends(get_db)):
-    # Aynı email var mı kontrolü
-    db_kullanici = db.query(models.Kullanici).filter(models.Kullanici.email == kullanici.email).first()
-    if db_kullanici:
-        raise HTTPException(status_code=400, detail="Bu email sistemde zaten kayıtlı!")
 
-    # Şifreyi hash'le ve yeni kullanıcıyı oluştur
-    yeni_kullanici = models.Kullanici(
+#KULLANICI KAYIT ENDPOINT i
+@router.post("/kullanici/kayit",response_model=schemas.KullaniciResponse)
+
+def kullanici_kayit(kullanici:schemas.KullaniciCreate,db:Session=Depends(get_db)):
+
+    kontrol=db.query(models.Kullanici).filter(models.Kullanici.email==kullanici.email).first()
+
+    if kontrol:
+        raise HTTPException(
+            status_code=400,
+            detail="Bu email zaten kayıtlı."
+        )
+
+    yeni=models.Kullanici(
         ad_soyad=kullanici.ad_soyad,
         email=kullanici.email,
-        sifre_hash=get_password_hash(kullanici.sifre)
+        sifre_hash=get_password_hash(kullanici.sifre),
+        yas=kullanici.yas,
+        cinsiyet=kullanici.cinsiyet,
+        telefon=kullanici.telefon
+
     )
-    db.add(yeni_kullanici)
-    #db.commit()
-    #db.refresh(yeni_kullanici)  # MySQL'in otomatik verdiği kullanici_id'yi çeker
-    return yeni_kullanici
+
+    db.add(yeni)
+    db.commit()
+    db.refresh(yeni)
+    return yeni
 
 
-# ==========================================
-# 2. GİRİŞ YAP VE AKTİVİTE LOGU TUT
-# ==========================================
+#KULLANICI GİRİŞ ENDPOINT i
 @router.post("/kullanici/giris")
-def kullanici_giris(kullanici: schemas.KullaniciLogin, db: Session = Depends(get_db)):
-    db_kullanici = db.query(models.Kullanici).filter(models.Kullanici.email == kullanici.email).first()
-    if not db_kullanici or not verify_password(kullanici.sifre, db_kullanici.sifre_hash):
-        raise HTTPException(status_code=401, detail="Email veya şifre hatalı!")
 
-    # GİRİŞ BAŞARILI: Hemen kullanici_aktivite_log tablosuna yazıyoruz
-    yeni_log = models.KullaniciAktiviteLog(
-        kullanici_id=db_kullanici.kullanici_id,
-        islem_tipi="Sisteme Başarılı Giriş Yapıldı"
+def giris(kullanici:schemas.KullaniciLogin,db:Session=Depends(get_db)):
+
+    dbUser=db.query(models.Kullanici).filter(models.Kullanici.email==kullanici.email).first()
+
+    if not dbUser:
+        raise HTTPException(
+            status_code=401,
+            detail="Email veya şifre yanlış."
+        )
+
+    if not verify_password(kullanici.sifre,dbUser.sifre_hash):
+        raise HTTPException(
+            status_code=401,
+            detail="Email veya şifre yanlış."
+        )
+
+    log=models.KullaniciAktiviteLog(
+        kullanici_id=dbUser.kullanici_id,
+        islem_tipi="Giriş Yapıldı"
+
     )
-    db.add(yeni_log)
-    #db.commit()
+    db.add(log)
+    db.commit()
 
-    return {
-        "mesaj": "Giriş başarılı, hoş geldin!",
-        "kullanici_id": db_kullanici.kullanici_id,
-        "ad_soyad": db_kullanici.ad_soyad
+    return{
+          "kullanici_id": dbUser.kullanici_id,
+          "ad_soyad": dbUser.ad_soyad,
+          "yas": dbUser.yas,
+          "cinsiyet": dbUser.cinsiyet,
+          "telefon": dbUser.telefon
+
+    }
+
+#kullanıcı bilgilerini getirir
+@router.get("/kullanici/{kullanici_id}")
+
+def kullanici_getir(kullanici_id:int,db:Session=Depends(get_db)):
+
+    user=db.query(models.Kullanici).filter(models.Kullanici.kullanici_id==kullanici_id).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="Kullanıcı bulunamadı."
+        )
+
+    return{
+        "ad":user.ad_soyad,
+        "email":user.email,
+        "yas":user.yas,
+        "cinsiyet":user.cinsiyet,
+        "telefon":user.telefon
     }
 
 
+#kullanıcı bilgilerini günceller ( kişisel bilgilerim sayfasından)
+@router.put("/kullanici/guncelle")
+
+def kullanici_guncelle(veri:schemas.KullaniciUpdate,db:Session=Depends(get_db)):
+    user=db.query(models.Kullanici).filter(models.Kullanici.kullanici_id==veri.kullanici_id).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="Kullanıcı bulunamadı."
+        )
+
+    user.ad_soyad=veri.ad_soyad
+    user.yas=veri.yas
+    user.cinsiyet=veri.cinsiyet
+    user.telefon=veri.telefon
+
+    db.commit()
+
+    return{
+        "mesaj":"Bilgiler güncellendi."
+    }
+
+"""
 # ==========================================
 # 3. TARLA EKLEME (Kullanıcı ID'sine göre Tarla ekler, otomatik tarla_id üretir)
 # ==========================================
@@ -88,9 +154,9 @@ def tarla_ekle(tarla: schemas.TarlaCreate, aktif_kullanici_id: int, db: Session 
     #db.commit()
     #db.refresh(yeni_tarla)  # Otomatik üretilen tarla_id'yi alır
     return yeni_tarla
+"""
 
-
-# ==========================================
+"""# ==========================================
 # 4. RİSK ANALİZİ LOG KAYDI (Hesaplanan verileri DB'ye zımbalar)
 # ==========================================
 @router.post("/risk-analiz/log")
@@ -104,5 +170,29 @@ def risk_analiz_log_kaydet(sorgu: schemas.RiskAnalizRequest, kullanici_id: int, 
         donen_risk_orani=hesaplanan_risk
     )
     db.add(yeni_log)
-    #db.commit()
+    # db.commit()
     return {"mesaj": "Risk analizi verileri başarıyla loglandı."}
+"""
+
+""" ==========================================
+# 5. KOTA BİLGİSİ GETİRME (Dinamik İlçe ve Ürün Sorgusu)
+# ==========================================
+@router.get("/kota/durum")
+def kota_durumunu_getir(gelen_ilce: str, gelen_urun_id: int, db: Session = Depends(get_db)):
+
+    kota_sorgusu = db.query(models.Kota).filter(
+        models.Kota.ilce == gelen_ilce,
+        models.Kota.urun_id == gelen_urun_id
+    ).first()
+
+    # Eğer veritabanında o ilçeye ait öyle bir kayıt yoksa hata döndür
+    if not kota_sorgusu:
+        raise HTTPException(status_code=404, detail="Seçtiğiniz ilçe ve ürün için kota bilgisi bulunamadı.")
+
+    # Kayıt varsa, arayüze (frontend'e) sadece istediğimiz verileri paketleyip gönderiyoruz
+    return {
+        "ilce": kota_sorgusu.ilce,
+        "urun_id": kota_sorgusu.urun_id,
+        "kullanilan_kota": kota_sorgusu.kullanilan_kota,
+        "maksimum_kota": kota_sorgusu.maksimum_kota
+    }"""

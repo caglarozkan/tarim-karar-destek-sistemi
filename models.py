@@ -12,13 +12,16 @@ class DurumEnum(str, enum.Enum):
 
 # kullanıcı modeli
 class Kullanici(Base):
-    __tablename__ = "kullanici"
+    __tablename__="kullanici"
 
-    kullanici_id = Column(Integer, primary_key=True, autoincrement=True)
-    ad_soyad = Column(String(100), nullable=False)
-    email = Column(String(100), unique=True, nullable=False)
-    sifre_hash = Column(String(255), nullable=False)
-    kayit_tarihi = Column(DateTime, server_default=func.now())
+    kullanici_id=Column(Integer,primary_key=True,index=True,autoincrement=True)
+    ad_soyad=Column(String(100),nullable=False)
+    email=Column(String(100),unique=True,nullable=False)
+    sifre_hash=Column(String(255),nullable=False)
+    yas=Column(Integer,nullable=True)
+    cinsiyet=Column(String(20),nullable=True)
+    telefon=Column(String(20),nullable=True)
+    kayit_tarihi=Column(DateTime,server_default=func.now())
 
 #ürün modeli
 class Urun(Base):
@@ -34,8 +37,21 @@ class Tarla(Base):
     tarla_id = Column(Integer, primary_key=True, autoincrement=True)
     kullanici_id = Column(Integer, ForeignKey("kullanici.kullanici_id", ondelete="CASCADE"), nullable=False)
     tarla_adi = Column(String(100))
-    toplam_donum = Column(Float, nullable=False)
     ilce = Column(String(50), nullable=False)
+
+class TarlaUrun(Base):
+    __tablename__="tarla_urun"
+
+    tarla_urun_id=Column(Integer,primary_key=True,autoincrement=True)
+    tarla_id=Column(
+        Integer,
+        ForeignKey("tarla.tarla_id",ondelete="CASCADE")
+    )
+    urun_id=Column(
+        Integer,
+        ForeignKey("urun.urun_id",ondelete="CASCADE")
+    )
+    donum=Column(Float,nullable=False)
 
 # kota modeli
 class Kota(Base):
