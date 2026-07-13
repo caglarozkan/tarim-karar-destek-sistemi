@@ -47,8 +47,6 @@ district_headers["RawProduct"] = (
     .transform(lambda s: s.ffill().bfill())
 )
 
-# Örnek metin:
-# Ekilen Alan ve 01.13.21.00.00. (Karpuz) - Dekar
 product_parts = district_headers["RawProduct"].str.extract(
     r"^(?P<Metric>.*?)\s+ve\s+(?P<ProductCode>[\d.]+)\s+\((?P<ProductName>.*?)\)\s*-\s*(?P<Unit>.*)$"
 )
@@ -69,5 +67,11 @@ df_long=df_long.drop(columns=["ProductCode"])
 df_long = df_long.sort_values(
     by=["ProductName", "Year", "District"]
 ).reset_index(drop=True)
-
-df_long.to_csv("data/processed/clean_tuik.csv", index=False)
+df_long=df_long.pivot(
+    index=["ProductName","Year","District"],
+    columns="Metric",
+    values="Value"
+).reset_index()
+df_long.columns.name = None
+print(df_long.head(2))
+df_long.to_csv("data/processed/data_files/clean_tuik.csv")
