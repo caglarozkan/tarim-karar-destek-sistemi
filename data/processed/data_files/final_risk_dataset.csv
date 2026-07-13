@@ -1,0 +1,505 @@
+,product_name,year,district,planted_area,production_amount,fuel_price,fertilizer_price
+0,Biber (Sivri),2014,İzmir(Bayındır),2300.0,7360.0,4.3825,886.0
+1,Biber (Sivri),2014,İzmir(Bergama),1500.0,1500.0,4.3825,886.0
+2,Biber (Sivri),2014,İzmir(Menderes),1020.0,1900.0,4.3825,886.0
+3,Biber (Sivri),2014,İzmir(Tire),1400.0,2100.0,4.3825,886.0
+4,Biber (Sivri),2014,İzmir(Torbalı),1967.0,4926.0,4.3825,886.0
+5,Biber (Sivri),2014,İzmir(Ödemiş),1500.0,4500.0,4.3825,886.0
+6,Biber (Sivri),2015,İzmir(Bayındır),1800.0,5760.0,3.8325,903.33
+7,Biber (Sivri),2015,İzmir(Bergama),1500.0,1500.0,3.8325,903.33
+8,Biber (Sivri),2015,İzmir(Menderes),2014.0,4474.0,3.8325,903.33
+9,Biber (Sivri),2015,İzmir(Tire),1350.0,2025.0,3.8325,903.33
+10,Biber (Sivri),2015,İzmir(Torbalı),1667.0,5495.0,3.8325,903.33
+11,Biber (Sivri),2015,İzmir(Ödemiş),1500.0,4500.0,3.8325,903.33
+12,Biber (Sivri),2016,İzmir(Bayındır),1800.0,5749.0,3.8325,822.67
+13,Biber (Sivri),2016,İzmir(Bergama),1500.0,1497.0,3.8325,822.67
+14,Biber (Sivri),2016,İzmir(Menderes),2064.0,4600.0,3.8325,822.67
+15,Biber (Sivri),2016,İzmir(Tire),1350.0,2021.0,3.8325,822.67
+16,Biber (Sivri),2016,İzmir(Torbalı),1570.0,5164.0,3.8325,822.67
+17,Biber (Sivri),2016,İzmir(Ödemiş),1500.0,4491.0,3.8325,822.67
+18,Biber (Sivri),2017,İzmir(Bayındır),800.0,2560.0,4.6675,906.33
+19,Biber (Sivri),2017,İzmir(Bergama),1500.0,1500.0,4.6675,906.33
+20,Biber (Sivri),2017,İzmir(Menderes),2320.0,5011.0,4.6675,906.33
+21,Biber (Sivri),2017,İzmir(Tire),1200.0,1800.0,4.6675,906.33
+22,Biber (Sivri),2017,İzmir(Torbalı),1560.0,5065.0,4.6675,906.33
+23,Biber (Sivri),2017,İzmir(Ödemiş),1500.0,4499.0,4.6675,906.33
+24,Biber (Sivri),2018,İzmir(Bayındır),800.0,2560.0,5.7524999999999995,1217.33
+25,Biber (Sivri),2018,İzmir(Bergama),1500.0,1500.0,5.7524999999999995,1217.33
+26,Biber (Sivri),2018,İzmir(Menderes),2320.0,5006.0,5.7524999999999995,1217.33
+27,Biber (Sivri),2018,İzmir(Tire),1000.0,1500.0,5.7524999999999995,1217.33
+28,Biber (Sivri),2018,İzmir(Torbalı),1703.0,5529.0,5.7524999999999995,1217.33
+29,Biber (Sivri),2018,İzmir(Ödemiş),1750.0,5248.0,5.7524999999999995,1217.33
+30,Biber (Sivri),2019,İzmir(Bayındır),800.0,2560.0,6.3925,1486.33
+31,Biber (Sivri),2019,İzmir(Bergama),1500.0,1500.0,6.3925,1486.33
+32,Biber (Sivri),2019,İzmir(Menderes),2170.0,4616.0,6.3925,1486.33
+33,Biber (Sivri),2019,İzmir(Tire),1000.0,1500.0,6.3925,1486.33
+34,Biber (Sivri),2019,İzmir(Torbalı),1795.0,6095.0,6.3925,1486.33
+35,Biber (Sivri),2019,İzmir(Ödemiş),2000.0,6000.0,6.3925,1486.33
+36,Biber (Sivri),2020,İzmir(Bayındır),2300.0,9200.0,6.075,2226.67
+37,Biber (Sivri),2020,İzmir(Bergama),1500.0,1500.0,6.075,2226.67
+38,Biber (Sivri),2020,İzmir(Menderes),2170.0,5764.0,6.075,2226.67
+39,Biber (Sivri),2020,İzmir(Tire),315.0,473.0,6.075,2226.67
+40,Biber (Sivri),2020,İzmir(Torbalı),1660.0,5558.0,6.075,2226.67
+41,Biber (Sivri),2020,İzmir(Ödemiş),1500.0,6000.0,6.075,2226.67
+42,Biber (Sivri),2021,İzmir(Bayındır),1900.0,7600.0,7.53,6709.0
+43,Biber (Sivri),2021,İzmir(Bergama),108.0,108.0,7.53,6709.0
+44,Biber (Sivri),2021,İzmir(Menderes),2170.0,5764.0,7.53,6709.0
+45,Biber (Sivri),2021,İzmir(Tire),379.0,569.0,7.53,6709.0
+46,Biber (Sivri),2021,İzmir(Torbalı),1758.0,5712.0,7.53,6709.0
+47,Biber (Sivri),2021,İzmir(Ödemiş),500.0,2000.0,7.53,6709.0
+48,Biber (Sivri),2022,İzmir(Bayındır),1515.0,6060.0,22.6475,15353.33
+49,Biber (Sivri),2022,İzmir(Bergama),127.0,127.0,22.6475,15353.33
+50,Biber (Sivri),2022,İzmir(Menderes),2170.0,5764.0,22.6475,15353.33
+51,Biber (Sivri),2022,İzmir(Tire),,,22.6475,15353.33
+52,Biber (Sivri),2022,İzmir(Torbalı),1781.0,6234.0,22.6475,15353.33
+53,Biber (Sivri),2022,İzmir(Ödemiş),500.0,2000.0,22.6475,15353.33
+54,Biber (Sivri),2023,İzmir(Bayındır),1450.0,4640.0,29.4175,10488.0
+55,Biber (Sivri),2023,İzmir(Bergama),194.0,194.0,29.4175,10488.0
+56,Biber (Sivri),2023,İzmir(Menderes),1929.0,5342.0,29.4175,10488.0
+57,Biber (Sivri),2023,İzmir(Tire),,,29.4175,10488.0
+58,Biber (Sivri),2023,İzmir(Torbalı),1460.0,4380.0,29.4175,10488.0
+59,Biber (Sivri),2023,İzmir(Ödemiş),1500.0,6000.0,29.4175,10488.0
+60,Biber (Sivri),2024,İzmir(Bayındır),1400.0,4480.0,43.305,11266.67
+61,Biber (Sivri),2024,İzmir(Bergama),719.0,719.0,43.305,11266.67
+62,Biber (Sivri),2024,İzmir(Menderes),1361.0,3152.0,43.305,11266.67
+63,Biber (Sivri),2024,İzmir(Tire),,,43.305,11266.67
+64,Biber (Sivri),2024,İzmir(Torbalı),1845.0,5535.0,43.305,11266.67
+65,Biber (Sivri),2024,İzmir(Ödemiş),1500.0,5250.0,43.305,11266.67
+66,Biber (Sivri),2025,İzmir(Bayındır),1521.0,4867.0,51.51,14550.0
+67,Biber (Sivri),2025,İzmir(Bergama),779.0,779.0,51.51,14550.0
+68,Biber (Sivri),2025,İzmir(Menderes),810.0,1944.0,51.51,14550.0
+69,Biber (Sivri),2025,İzmir(Tire),,,51.51,14550.0
+70,Biber (Sivri),2025,İzmir(Torbalı),1900.0,5700.0,51.51,14550.0
+71,Biber (Sivri),2025,İzmir(Ödemiş),1000.0,3500.0,51.51,14550.0
+72,Domates (Sofralık),2014,İzmir(Bayındır),2200.0,15224.0,4.3825,886.0
+73,Domates (Sofralık),2014,İzmir(Bergama),11779.0,84121.0,4.3825,886.0
+74,Domates (Sofralık),2014,İzmir(Menderes),1383.0,5045.0,4.3825,886.0
+75,Domates (Sofralık),2014,İzmir(Tire),550.0,2239.0,4.3825,886.0
+76,Domates (Sofralık),2014,İzmir(Torbalı),6485.0,42987.0,4.3825,886.0
+77,Domates (Sofralık),2014,İzmir(Ödemiş),3052.0,23413.0,4.3825,886.0
+78,Domates (Sofralık),2015,İzmir(Bayındır),2000.0,13726.0,3.8325,903.33
+79,Domates (Sofralık),2015,İzmir(Bergama),11864.0,85315.0,3.8325,903.33
+80,Domates (Sofralık),2015,İzmir(Menderes),1393.0,5028.0,3.8325,903.33
+81,Domates (Sofralık),2015,İzmir(Tire),550.0,2727.0,3.8325,903.33
+82,Domates (Sofralık),2015,İzmir(Torbalı),4862.0,31456.0,3.8325,903.33
+83,Domates (Sofralık),2015,İzmir(Ödemiş),3052.0,22833.0,3.8325,903.33
+84,Domates (Sofralık),2016,İzmir(Bayındır),2000.0,14202.0,3.8325,822.67
+85,Domates (Sofralık),2016,İzmir(Bergama),10664.0,103170.0,3.8325,822.67
+86,Domates (Sofralık),2016,İzmir(Menderes),1503.0,6750.0,3.8325,822.67
+87,Domates (Sofralık),2016,İzmir(Tire),600.0,3135.0,3.8325,822.67
+88,Domates (Sofralık),2016,İzmir(Torbalı),4530.0,30563.0,3.8325,822.67
+89,Domates (Sofralık),2016,İzmir(Ödemiş),5052.0,39316.0,3.8325,822.67
+90,Domates (Sofralık),2017,İzmir(Bayındır),2000.0,13882.0,4.6675,906.33
+91,Domates (Sofralık),2017,İzmir(Bergama),10935.0,103441.0,4.6675,906.33
+92,Domates (Sofralık),2017,İzmir(Menderes),1200.0,5668.0,4.6675,906.33
+93,Domates (Sofralık),2017,İzmir(Tire),600.0,3034.0,4.6675,906.33
+94,Domates (Sofralık),2017,İzmir(Torbalı),3400.0,22625.0,4.6675,906.33
+95,Domates (Sofralık),2017,İzmir(Ödemiş),6052.0,46028.0,4.6675,906.33
+96,Domates (Sofralık),2018,İzmir(Bayındır),1000.0,6954.0,5.7524999999999995,1217.33
+97,Domates (Sofralık),2018,İzmir(Bergama),8934.0,89351.0,5.7524999999999995,1217.33
+98,Domates (Sofralık),2018,İzmir(Menderes),1000.0,3669.0,5.7524999999999995,1217.33
+99,Domates (Sofralık),2018,İzmir(Tire),1000.0,5066.0,5.7524999999999995,1217.33
+100,Domates (Sofralık),2018,İzmir(Torbalı),1875.0,12434.0,5.7524999999999995,1217.33
+101,Domates (Sofralık),2018,İzmir(Ödemiş),6558.0,49971.0,5.7524999999999995,1217.33
+102,Domates (Sofralık),2019,İzmir(Bayındır),1000.0,6954.0,6.3925,1486.33
+103,Domates (Sofralık),2019,İzmir(Bergama),8787.0,87380.0,6.3925,1486.33
+104,Domates (Sofralık),2019,İzmir(Menderes),1550.0,5910.0,6.3925,1486.33
+105,Domates (Sofralık),2019,İzmir(Tire),1000.0,5050.0,6.3925,1486.33
+106,Domates (Sofralık),2019,İzmir(Torbalı),810.0,6075.0,6.3925,1486.33
+107,Domates (Sofralık),2019,İzmir(Ödemiş),6552.0,49266.0,6.3925,1486.33
+108,Domates (Sofralık),2020,İzmir(Bayındır),700.0,3500.0,6.075,2226.67
+109,Domates (Sofralık),2020,İzmir(Bergama),8854.0,85810.0,6.075,2226.67
+110,Domates (Sofralık),2020,İzmir(Menderes),4611.0,15010.0,6.075,2226.67
+111,Domates (Sofralık),2020,İzmir(Tire),400.0,2020.0,6.075,2226.67
+112,Domates (Sofralık),2020,İzmir(Torbalı),1165.0,7678.0,6.075,2226.67
+113,Domates (Sofralık),2020,İzmir(Ödemiş),6000.0,45000.0,6.075,2226.67
+114,Domates (Sofralık),2021,İzmir(Bayındır),500.0,2500.0,7.53,6709.0
+115,Domates (Sofralık),2021,İzmir(Bergama),1854.0,34068.0,7.53,6709.0
+116,Domates (Sofralık),2021,İzmir(Menderes),3833.0,12559.0,7.53,6709.0
+117,Domates (Sofralık),2021,İzmir(Tire),796.0,4020.0,7.53,6709.0
+118,Domates (Sofralık),2021,İzmir(Torbalı),1680.0,8963.0,7.53,6709.0
+119,Domates (Sofralık),2021,İzmir(Ödemiş),2000.0,14000.0,7.53,6709.0
+120,Domates (Sofralık),2022,İzmir(Bayındır),300.0,1507.0,22.6475,15353.33
+121,Domates (Sofralık),2022,İzmir(Bergama),1839.0,34754.0,22.6475,15353.33
+122,Domates (Sofralık),2022,İzmir(Menderes),2077.0,7057.0,22.6475,15353.33
+123,Domates (Sofralık),2022,İzmir(Tire),1165.0,5970.0,22.6475,15353.33
+124,Domates (Sofralık),2022,İzmir(Torbalı),1005.0,6138.0,22.6475,15353.33
+125,Domates (Sofralık),2022,İzmir(Ödemiş),3000.0,22606.0,22.6475,15353.33
+126,Domates (Sofralık),2023,İzmir(Bayındır),300.0,1507.0,29.4175,10488.0
+127,Domates (Sofralık),2023,İzmir(Bergama),1894.0,23954.0,29.4175,10488.0
+128,Domates (Sofralık),2023,İzmir(Menderes),1080.0,3790.0,29.4175,10488.0
+129,Domates (Sofralık),2023,İzmir(Tire),950.0,4845.0,29.4175,10488.0
+130,Domates (Sofralık),2023,İzmir(Torbalı),1305.0,6625.0,29.4175,10488.0
+131,Domates (Sofralık),2023,İzmir(Ödemiş),3500.0,35000.0,29.4175,10488.0
+132,Domates (Sofralık),2024,İzmir(Bayındır),1000.0,5000.0,43.305,11266.67
+133,Domates (Sofralık),2024,İzmir(Bergama),11969.0,90970.0,43.305,11266.67
+134,Domates (Sofralık),2024,İzmir(Menderes),1070.0,4680.0,43.305,11266.67
+135,Domates (Sofralık),2024,İzmir(Tire),850.0,4335.0,43.305,11266.67
+136,Domates (Sofralık),2024,İzmir(Torbalı),3276.0,18109.0,43.305,11266.67
+137,Domates (Sofralık),2024,İzmir(Ödemiş),2000.0,16000.0,43.305,11266.67
+138,Domates (Sofralık),2025,İzmir(Bayındır),785.0,5107.0,51.51,14550.0
+139,Domates (Sofralık),2025,İzmir(Bergama),11268.0,90043.0,51.51,14550.0
+140,Domates (Sofralık),2025,İzmir(Menderes),610.0,2457.0,51.51,14550.0
+141,Domates (Sofralık),2025,İzmir(Tire),1650.0,10732.0,51.51,14550.0
+142,Domates (Sofralık),2025,İzmir(Torbalı),6580.0,39597.0,51.51,14550.0
+143,Domates (Sofralık),2025,İzmir(Ödemiş),2000.0,15010.0,51.51,14550.0
+144,Hıyar (Sofralık),2014,İzmir(Bayındır),5000.0,21500.0,4.3825,886.0
+145,Hıyar (Sofralık),2014,İzmir(Bergama),1404.0,2404.0,4.3825,886.0
+146,Hıyar (Sofralık),2014,İzmir(Menderes),6337.0,152088.0,4.3825,886.0
+147,Hıyar (Sofralık),2014,İzmir(Tire),600.0,1200.0,4.3825,886.0
+148,Hıyar (Sofralık),2014,İzmir(Torbalı),395.0,2250.0,4.3825,886.0
+149,Hıyar (Sofralık),2014,İzmir(Ödemiş),5070.0,6400.0,4.3825,886.0
+150,Hıyar (Sofralık),2015,İzmir(Bayındır),5000.0,21500.0,3.8325,903.33
+151,Hıyar (Sofralık),2015,İzmir(Bergama),1404.0,2404.0,3.8325,903.33
+152,Hıyar (Sofralık),2015,İzmir(Menderes),4691.0,112584.0,3.8325,903.33
+153,Hıyar (Sofralık),2015,İzmir(Tire),600.0,1200.0,3.8325,903.33
+154,Hıyar (Sofralık),2015,İzmir(Torbalı),513.0,2708.0,3.8325,903.33
+155,Hıyar (Sofralık),2015,İzmir(Ödemiş),5070.0,6400.0,3.8325,903.33
+156,Hıyar (Sofralık),2016,İzmir(Bayındır),3000.0,12900.0,3.8325,822.67
+157,Hıyar (Sofralık),2016,İzmir(Bergama),1404.0,2404.0,3.8325,822.67
+158,Hıyar (Sofralık),2016,İzmir(Menderes),4871.0,116904.0,3.8325,822.67
+159,Hıyar (Sofralık),2016,İzmir(Tire),600.0,1200.0,3.8325,822.67
+160,Hıyar (Sofralık),2016,İzmir(Torbalı),385.0,2170.0,3.8325,822.67
+161,Hıyar (Sofralık),2016,İzmir(Ödemiş),3070.0,5210.0,3.8325,822.67
+162,Hıyar (Sofralık),2017,İzmir(Bayındır),2000.0,8600.0,4.6675,906.33
+163,Hıyar (Sofralık),2017,İzmir(Bergama),1226.0,2196.0,4.6675,906.33
+164,Hıyar (Sofralık),2017,İzmir(Menderes),5039.0,120936.0,4.6675,906.33
+165,Hıyar (Sofralık),2017,İzmir(Tire),600.0,1200.0,4.6675,906.33
+166,Hıyar (Sofralık),2017,İzmir(Torbalı),505.0,2710.0,4.6675,906.33
+167,Hıyar (Sofralık),2017,İzmir(Ödemiş),3070.0,5900.0,4.6675,906.33
+168,Hıyar (Sofralık),2018,İzmir(Bayındır),1500.0,6450.0,5.7524999999999995,1217.33
+169,Hıyar (Sofralık),2018,İzmir(Bergama),1026.0,1856.0,5.7524999999999995,1217.33
+170,Hıyar (Sofralık),2018,İzmir(Menderes),5079.0,101580.0,5.7524999999999995,1217.33
+171,Hıyar (Sofralık),2018,İzmir(Tire),300.0,600.0,5.7524999999999995,1217.33
+172,Hıyar (Sofralık),2018,İzmir(Torbalı),378.0,2138.0,5.7524999999999995,1217.33
+173,Hıyar (Sofralık),2018,İzmir(Ödemiş),2080.0,4600.0,5.7524999999999995,1217.33
+174,Hıyar (Sofralık),2019,İzmir(Bayındır),1000.0,4300.0,6.3925,1486.33
+175,Hıyar (Sofralık),2019,İzmir(Bergama),1018.0,1844.0,6.3925,1486.33
+176,Hıyar (Sofralık),2019,İzmir(Menderes),4930.0,98600.0,6.3925,1486.33
+177,Hıyar (Sofralık),2019,İzmir(Tire),300.0,600.0,6.3925,1486.33
+178,Hıyar (Sofralık),2019,İzmir(Torbalı),285.0,1623.0,6.3925,1486.33
+179,Hıyar (Sofralık),2019,İzmir(Ödemiş),2070.0,4400.0,6.3925,1486.33
+180,Hıyar (Sofralık),2020,İzmir(Bayındır),145.0,508.0,6.075,2226.67
+181,Hıyar (Sofralık),2020,İzmir(Bergama),1011.0,1788.0,6.075,2226.67
+182,Hıyar (Sofralık),2020,İzmir(Menderes),4930.0,98600.0,6.075,2226.67
+183,Hıyar (Sofralık),2020,İzmir(Tire),120.0,240.0,6.075,2226.67
+184,Hıyar (Sofralık),2020,İzmir(Torbalı),250.0,1331.0,6.075,2226.67
+185,Hıyar (Sofralık),2020,İzmir(Ödemiş),1000.0,4500.0,6.075,2226.67
+186,Hıyar (Sofralık),2021,İzmir(Bayındır),100.0,350.0,7.53,6709.0
+187,Hıyar (Sofralık),2021,İzmir(Bergama),99.0,1432.0,7.53,6709.0
+188,Hıyar (Sofralık),2021,İzmir(Menderes),4930.0,98600.0,7.53,6709.0
+189,Hıyar (Sofralık),2021,İzmir(Tire),118.0,236.0,7.53,6709.0
+190,Hıyar (Sofralık),2021,İzmir(Torbalı),275.0,1225.0,7.53,6709.0
+191,Hıyar (Sofralık),2021,İzmir(Ödemiş),100.0,450.0,7.53,6709.0
+192,Hıyar (Sofralık),2022,İzmir(Bayındır),100.0,350.0,22.6475,15353.33
+193,Hıyar (Sofralık),2022,İzmir(Bergama),75.0,1583.0,22.6475,15353.33
+194,Hıyar (Sofralık),2022,İzmir(Menderes),4930.0,98600.0,22.6475,15353.33
+195,Hıyar (Sofralık),2022,İzmir(Tire),207.0,414.0,22.6475,15353.33
+196,Hıyar (Sofralık),2022,İzmir(Torbalı),205.0,948.0,22.6475,15353.33
+197,Hıyar (Sofralık),2022,İzmir(Ödemiş),100.0,450.0,22.6475,15353.33
+198,Hıyar (Sofralık),2023,İzmir(Bayındır),100.0,350.0,29.4175,10488.0
+199,Hıyar (Sofralık),2023,İzmir(Bergama),34.0,244.0,29.4175,10488.0
+200,Hıyar (Sofralık),2023,İzmir(Menderes),4950.0,99000.0,29.4175,10488.0
+201,Hıyar (Sofralık),2023,İzmir(Tire),186.0,372.0,29.4175,10488.0
+202,Hıyar (Sofralık),2023,İzmir(Torbalı),168.0,900.0,29.4175,10488.0
+203,Hıyar (Sofralık),2023,İzmir(Ödemiş),2000.0,9000.0,29.4175,10488.0
+204,Hıyar (Sofralık),2024,İzmir(Bayındır),100.0,350.0,43.305,11266.67
+205,Hıyar (Sofralık),2024,İzmir(Bergama),231.0,579.0,43.305,11266.67
+206,Hıyar (Sofralık),2024,İzmir(Menderes),5400.0,108000.0,43.305,11266.67
+207,Hıyar (Sofralık),2024,İzmir(Tire),160.0,320.0,43.305,11266.67
+208,Hıyar (Sofralık),2024,İzmir(Torbalı),193.0,1035.0,43.305,11266.67
+209,Hıyar (Sofralık),2024,İzmir(Ödemiş),1500.0,6750.0,43.305,11266.67
+210,Hıyar (Sofralık),2025,İzmir(Bayındır),124.0,436.0,51.51,14550.0
+211,Hıyar (Sofralık),2025,İzmir(Bergama),204.0,349.0,51.51,14550.0
+212,Hıyar (Sofralık),2025,İzmir(Menderes),4400.0,88439.0,51.51,14550.0
+213,Hıyar (Sofralık),2025,İzmir(Tire),2100.0,9480.0,51.51,14550.0
+214,Hıyar (Sofralık),2025,İzmir(Torbalı),180.0,894.0,51.51,14550.0
+215,Hıyar (Sofralık),2025,İzmir(Ödemiş),1000.0,4510.0,51.51,14550.0
+216,Kabak (Sakız),2014,İzmir(Bayındır),1000.0,3500.0,4.3825,886.0
+217,Kabak (Sakız),2014,İzmir(Bergama),400.0,680.0,4.3825,886.0
+218,Kabak (Sakız),2014,İzmir(Menderes),350.0,700.0,4.3825,886.0
+219,Kabak (Sakız),2014,İzmir(Tire),450.0,1125.0,4.3825,886.0
+220,Kabak (Sakız),2014,İzmir(Torbalı),450.0,1575.0,4.3825,886.0
+221,Kabak (Sakız),2014,İzmir(Ödemiş),210.0,660.0,4.3825,886.0
+222,Kabak (Sakız),2015,İzmir(Bayındır),800.0,2800.0,3.8325,903.33
+223,Kabak (Sakız),2015,İzmir(Bergama),400.0,680.0,3.8325,903.33
+224,Kabak (Sakız),2015,İzmir(Menderes),355.0,710.0,3.8325,903.33
+225,Kabak (Sakız),2015,İzmir(Tire),450.0,1125.0,3.8325,903.33
+226,Kabak (Sakız),2015,İzmir(Torbalı),330.0,1155.0,3.8325,903.33
+227,Kabak (Sakız),2015,İzmir(Ödemiş),210.0,660.0,3.8325,903.33
+228,Kabak (Sakız),2016,İzmir(Bayındır),800.0,2800.0,3.8325,822.67
+229,Kabak (Sakız),2016,İzmir(Bergama),400.0,680.0,3.8325,822.67
+230,Kabak (Sakız),2016,İzmir(Menderes),355.0,710.0,3.8325,822.67
+231,Kabak (Sakız),2016,İzmir(Tire),400.0,980.0,3.8325,822.67
+232,Kabak (Sakız),2016,İzmir(Torbalı),300.0,1050.0,3.8325,822.67
+233,Kabak (Sakız),2016,İzmir(Ödemiş),220.0,711.0,3.8325,822.67
+234,Kabak (Sakız),2017,İzmir(Bayındır),800.0,2800.0,4.6675,906.33
+235,Kabak (Sakız),2017,İzmir(Bergama),400.0,680.0,4.6675,906.33
+236,Kabak (Sakız),2017,İzmir(Menderes),390.0,780.0,4.6675,906.33
+237,Kabak (Sakız),2017,İzmir(Tire),400.0,1000.0,4.6675,906.33
+238,Kabak (Sakız),2017,İzmir(Torbalı),405.0,1418.0,4.6675,906.33
+239,Kabak (Sakız),2017,İzmir(Ödemiş),220.0,722.0,4.6675,906.33
+240,Kabak (Sakız),2018,İzmir(Bayındır),800.0,2800.0,5.7524999999999995,1217.33
+241,Kabak (Sakız),2018,İzmir(Bergama),400.0,680.0,5.7524999999999995,1217.33
+242,Kabak (Sakız),2018,İzmir(Menderes),390.0,780.0,5.7524999999999995,1217.33
+243,Kabak (Sakız),2018,İzmir(Tire),300.0,750.0,5.7524999999999995,1217.33
+244,Kabak (Sakız),2018,İzmir(Torbalı),265.0,927.0,5.7524999999999995,1217.33
+245,Kabak (Sakız),2018,İzmir(Ödemiş),155.0,502.0,5.7524999999999995,1217.33
+246,Kabak (Sakız),2019,İzmir(Bayındır),600.0,2100.0,6.3925,1486.33
+247,Kabak (Sakız),2019,İzmir(Bergama),400.0,680.0,6.3925,1486.33
+248,Kabak (Sakız),2019,İzmir(Menderes),390.0,780.0,6.3925,1486.33
+249,Kabak (Sakız),2019,İzmir(Tire),300.0,750.0,6.3925,1486.33
+250,Kabak (Sakız),2019,İzmir(Torbalı),250.0,875.0,6.3925,1486.33
+251,Kabak (Sakız),2019,İzmir(Ödemiş),110.0,375.0,6.3925,1486.33
+252,Kabak (Sakız),2020,İzmir(Bayındır),200.0,311.0,6.075,2226.67
+253,Kabak (Sakız),2020,İzmir(Bergama),400.0,705.0,6.075,2226.67
+254,Kabak (Sakız),2020,İzmir(Menderes),390.0,809.0,6.075,2226.67
+255,Kabak (Sakız),2020,İzmir(Tire),68.0,176.0,6.075,2226.67
+256,Kabak (Sakız),2020,İzmir(Torbalı),180.0,607.0,6.075,2226.67
+257,Kabak (Sakız),2020,İzmir(Ödemiş),80.0,415.0,6.075,2226.67
+258,Kabak (Sakız),2021,İzmir(Bayındır),200.0,300.0,7.53,6709.0
+259,Kabak (Sakız),2021,İzmir(Bergama),17.0,30.0,7.53,6709.0
+260,Kabak (Sakız),2021,İzmir(Menderes),380.0,760.0,7.53,6709.0
+261,Kabak (Sakız),2021,İzmir(Tire),42.0,109.0,7.53,6709.0
+262,Kabak (Sakız),2021,İzmir(Torbalı),185.0,555.0,7.53,6709.0
+263,Kabak (Sakız),2021,İzmir(Ödemiş),25.0,125.0,7.53,6709.0
+264,Kabak (Sakız),2022,İzmir(Bayındır),200.0,500.0,22.6475,15353.33
+265,Kabak (Sakız),2022,İzmir(Bergama),13.0,23.0,22.6475,15353.33
+266,Kabak (Sakız),2022,İzmir(Menderes),380.0,760.0,22.6475,15353.33
+267,Kabak (Sakız),2022,İzmir(Tire),,,22.6475,15353.33
+268,Kabak (Sakız),2022,İzmir(Torbalı),135.0,439.0,22.6475,15353.33
+269,Kabak (Sakız),2022,İzmir(Ödemiş),25.0,125.0,22.6475,15353.33
+270,Kabak (Sakız),2023,İzmir(Bayındır),150.0,375.0,29.4175,10488.0
+271,Kabak (Sakız),2023,İzmir(Bergama),11.0,20.0,29.4175,10488.0
+272,Kabak (Sakız),2023,İzmir(Menderes),380.0,760.0,29.4175,10488.0
+273,Kabak (Sakız),2023,İzmir(Tire),,,29.4175,10488.0
+274,Kabak (Sakız),2023,İzmir(Torbalı),110.0,330.0,29.4175,10488.0
+275,Kabak (Sakız),2023,İzmir(Ödemiş),,,29.4175,10488.0
+276,Kabak (Sakız),2024,İzmir(Bayındır),150.0,375.0,43.305,11266.67
+277,Kabak (Sakız),2024,İzmir(Bergama),162.0,287.0,43.305,11266.67
+278,Kabak (Sakız),2024,İzmir(Menderes),380.0,760.0,43.305,11266.67
+279,Kabak (Sakız),2024,İzmir(Tire),,,43.305,11266.67
+280,Kabak (Sakız),2024,İzmir(Torbalı),157.0,473.0,43.305,11266.67
+281,Kabak (Sakız),2024,İzmir(Ödemiş),50.0,175.0,43.305,11266.67
+282,Kabak (Sakız),2025,İzmir(Bayındır),132.0,330.0,51.51,14550.0
+283,Kabak (Sakız),2025,İzmir(Bergama),172.0,304.0,51.51,14550.0
+284,Kabak (Sakız),2025,İzmir(Menderes),330.0,660.0,51.51,14550.0
+285,Kabak (Sakız),2025,İzmir(Tire),,,51.51,14550.0
+286,Kabak (Sakız),2025,İzmir(Torbalı),124.0,376.0,51.51,14550.0
+287,Kabak (Sakız),2025,İzmir(Ödemiş),50.0,175.0,51.51,14550.0
+288,Karpuz,2014,İzmir(Bayındır),4000.0,20000.0,4.3825,886.0
+289,Karpuz,2014,İzmir(Bergama),1400.0,3080.0,4.3825,886.0
+290,Karpuz,2014,İzmir(Menderes),4860.0,19440.0,4.3825,886.0
+291,Karpuz,2014,İzmir(Tire),14000.0,56000.0,4.3825,886.0
+292,Karpuz,2014,İzmir(Torbalı),4500.0,19125.0,4.3825,886.0
+293,Karpuz,2014,İzmir(Ödemiş),15000.0,97500.0,4.3825,886.0
+294,Karpuz,2015,İzmir(Bayındır),4000.0,20028.0,3.8325,903.33
+295,Karpuz,2015,İzmir(Bergama),1400.0,3084.0,3.8325,903.33
+296,Karpuz,2015,İzmir(Menderes),4860.0,19469.0,3.8325,903.33
+297,Karpuz,2015,İzmir(Tire),13450.0,53881.0,3.8325,903.33
+298,Karpuz,2015,İzmir(Torbalı),2240.0,10096.0,3.8325,903.33
+299,Karpuz,2015,İzmir(Ödemiş),15000.0,97635.0,3.8325,903.33
+300,Karpuz,2016,İzmir(Bayındır),4000.0,20000.0,3.8325,822.67
+301,Karpuz,2016,İzmir(Bergama),1400.0,3080.0,3.8325,822.67
+302,Karpuz,2016,İzmir(Menderes),4860.0,19440.0,3.8325,822.67
+303,Karpuz,2016,İzmir(Tire),13000.0,39000.0,3.8325,822.67
+304,Karpuz,2016,İzmir(Torbalı),1850.0,8325.0,3.8325,822.67
+305,Karpuz,2016,İzmir(Ödemiş),15000.0,97500.0,3.8325,822.67
+306,Karpuz,2017,İzmir(Bayındır),4000.0,20000.0,4.6675,906.33
+307,Karpuz,2017,İzmir(Bergama),1250.0,2750.0,4.6675,906.33
+308,Karpuz,2017,İzmir(Menderes),4660.0,18640.0,4.6675,906.33
+309,Karpuz,2017,İzmir(Tire),13000.0,39000.0,4.6675,906.33
+310,Karpuz,2017,İzmir(Torbalı),1160.0,5220.0,4.6675,906.33
+311,Karpuz,2017,İzmir(Ödemiş),15000.0,97500.0,4.6675,906.33
+312,Karpuz,2018,İzmir(Bayındır),4000.0,20000.0,5.7524999999999995,1217.33
+313,Karpuz,2018,İzmir(Bergama),1250.0,2750.0,5.7524999999999995,1217.33
+314,Karpuz,2018,İzmir(Menderes),4660.0,18640.0,5.7524999999999995,1217.33
+315,Karpuz,2018,İzmir(Tire),5000.0,15000.0,5.7524999999999995,1217.33
+316,Karpuz,2018,İzmir(Torbalı),1130.0,5085.0,5.7524999999999995,1217.33
+317,Karpuz,2018,İzmir(Ödemiş),12000.0,78000.0,5.7524999999999995,1217.33
+318,Karpuz,2019,İzmir(Bayındır),2200.0,11000.0,6.3925,1486.33
+319,Karpuz,2019,İzmir(Bergama),1250.0,2750.0,6.3925,1486.33
+320,Karpuz,2019,İzmir(Menderes),4660.0,18640.0,6.3925,1486.33
+321,Karpuz,2019,İzmir(Tire),4750.0,14250.0,6.3925,1486.33
+322,Karpuz,2019,İzmir(Torbalı),930.0,4092.0,6.3925,1486.33
+323,Karpuz,2019,İzmir(Ödemiş),11000.0,71500.0,6.3925,1486.33
+324,Karpuz,2020,İzmir(Bayındır),1450.0,6525.0,6.075,2226.67
+325,Karpuz,2020,İzmir(Bergama),1250.0,2750.0,6.075,2226.67
+326,Karpuz,2020,İzmir(Menderes),1200.0,4800.0,6.075,2226.67
+327,Karpuz,2020,İzmir(Tire),850.0,2550.0,6.075,2226.67
+328,Karpuz,2020,İzmir(Torbalı),1130.0,4803.0,6.075,2226.67
+329,Karpuz,2020,İzmir(Ödemiş),2000.0,9000.0,6.075,2226.67
+330,Karpuz,2021,İzmir(Bayındır),1408.0,6336.0,7.53,6709.0
+331,Karpuz,2021,İzmir(Bergama),214.0,471.0,7.53,6709.0
+332,Karpuz,2021,İzmir(Menderes),1103.0,4412.0,7.53,6709.0
+333,Karpuz,2021,İzmir(Tire),773.0,2319.0,7.53,6709.0
+334,Karpuz,2021,İzmir(Torbalı),1250.0,5313.0,7.53,6709.0
+335,Karpuz,2021,İzmir(Ödemiş),2500.0,11250.0,7.53,6709.0
+336,Karpuz,2022,İzmir(Bayındır),1450.0,6525.0,22.6475,15353.33
+337,Karpuz,2022,İzmir(Bergama),99.0,218.0,22.6475,15353.33
+338,Karpuz,2022,İzmir(Menderes),1103.0,4412.0,22.6475,15353.33
+339,Karpuz,2022,İzmir(Tire),1155.0,3465.0,22.6475,15353.33
+340,Karpuz,2022,İzmir(Torbalı),1200.0,5400.0,22.6475,15353.33
+341,Karpuz,2022,İzmir(Ödemiş),5000.0,22500.0,22.6475,15353.33
+342,Karpuz,2023,İzmir(Bayındır),1500.0,6750.0,29.4175,10488.0
+343,Karpuz,2023,İzmir(Bergama),57.0,126.0,29.4175,10488.0
+344,Karpuz,2023,İzmir(Menderes),1103.0,4412.0,29.4175,10488.0
+345,Karpuz,2023,İzmir(Tire),1026.0,3078.0,29.4175,10488.0
+346,Karpuz,2023,İzmir(Torbalı),1250.0,5000.0,29.4175,10488.0
+347,Karpuz,2023,İzmir(Ödemiş),2500.0,11250.0,29.4175,10488.0
+348,Karpuz,2024,İzmir(Bayındır),1500.0,6750.0,43.305,11266.67
+349,Karpuz,2024,İzmir(Bergama),201.0,443.0,43.305,11266.67
+350,Karpuz,2024,İzmir(Menderes),1103.0,4412.0,43.305,11266.67
+351,Karpuz,2024,İzmir(Tire),1350.0,4050.0,43.305,11266.67
+352,Karpuz,2024,İzmir(Torbalı),1685.0,6740.0,43.305,11266.67
+353,Karpuz,2024,İzmir(Ödemiş),2500.0,11250.0,43.305,11266.67
+354,Karpuz,2025,İzmir(Bayındır),2415.0,10868.0,51.51,14550.0
+355,Karpuz,2025,İzmir(Bergama),222.0,489.0,51.51,14550.0
+356,Karpuz,2025,İzmir(Menderes),1500.0,6000.0,51.51,14550.0
+357,Karpuz,2025,İzmir(Tire),2100.0,9450.0,51.51,14550.0
+358,Karpuz,2025,İzmir(Torbalı),2550.0,11475.0,51.51,14550.0
+359,Karpuz,2025,İzmir(Ödemiş),2500.0,12500.0,51.51,14550.0
+360,Patlıcan,2014,İzmir(Bayındır),2000.0,6600.0,4.3825,886.0
+361,Patlıcan,2014,İzmir(Bergama),1400.0,2520.0,4.3825,886.0
+362,Patlıcan,2014,İzmir(Menderes),410.0,1046.0,4.3825,886.0
+363,Patlıcan,2014,İzmir(Tire),1500.0,4500.0,4.3825,886.0
+364,Patlıcan,2014,İzmir(Torbalı),519.0,1555.0,4.3825,886.0
+365,Patlıcan,2014,İzmir(Ödemiş),1500.0,6000.0,4.3825,886.0
+366,Patlıcan,2015,İzmir(Bayındır),1000.0,3300.0,3.8325,903.33
+367,Patlıcan,2015,İzmir(Bergama),1400.0,2520.0,3.8325,903.33
+368,Patlıcan,2015,İzmir(Menderes),420.0,1076.0,3.8325,903.33
+369,Patlıcan,2015,İzmir(Tire),1480.0,4440.0,3.8325,903.33
+370,Patlıcan,2015,İzmir(Torbalı),250.0,748.0,3.8325,903.33
+371,Patlıcan,2015,İzmir(Ödemiş),1500.0,6000.0,3.8325,903.33
+372,Patlıcan,2016,İzmir(Bayındır),1000.0,3300.0,3.8325,822.67
+373,Patlıcan,2016,İzmir(Bergama),1400.0,2520.0,3.8325,822.67
+374,Patlıcan,2016,İzmir(Menderes),530.0,1451.0,3.8325,822.67
+375,Patlıcan,2016,İzmir(Tire),1500.0,4575.0,3.8325,822.67
+376,Patlıcan,2016,İzmir(Torbalı),355.0,1063.0,3.8325,822.67
+377,Patlıcan,2016,İzmir(Ödemiş),1500.0,6000.0,3.8325,822.67
+378,Patlıcan,2017,İzmir(Bayındır),1000.0,3300.0,4.6675,906.33
+379,Patlıcan,2017,İzmir(Bergama),1200.0,2160.0,4.6675,906.33
+380,Patlıcan,2017,İzmir(Menderes),861.0,2234.0,4.6675,906.33
+381,Patlıcan,2017,İzmir(Tire),1500.0,4500.0,4.6675,906.33
+382,Patlıcan,2017,İzmir(Torbalı),385.0,1153.0,4.6675,906.33
+383,Patlıcan,2017,İzmir(Ödemiş),1900.0,7600.0,4.6675,906.33
+384,Patlıcan,2018,İzmir(Bayındır),1000.0,3300.0,5.7524999999999995,1217.33
+385,Patlıcan,2018,İzmir(Bergama),1200.0,2160.0,5.7524999999999995,1217.33
+386,Patlıcan,2018,İzmir(Menderes),961.0,2584.0,5.7524999999999995,1217.33
+387,Patlıcan,2018,İzmir(Tire),500.0,1500.0,5.7524999999999995,1217.33
+388,Patlıcan,2018,İzmir(Torbalı),331.0,990.0,5.7524999999999995,1217.33
+389,Patlıcan,2018,İzmir(Ödemiş),2000.0,8000.0,5.7524999999999995,1217.33
+390,Patlıcan,2019,İzmir(Bayındır),800.0,2640.0,6.3925,1486.33
+391,Patlıcan,2019,İzmir(Bergama),1200.0,2160.0,6.3925,1486.33
+392,Patlıcan,2019,İzmir(Menderes),1501.0,4153.0,6.3925,1486.33
+393,Patlıcan,2019,İzmir(Tire),520.0,1560.0,6.3925,1486.33
+394,Patlıcan,2019,İzmir(Torbalı),455.0,1318.0,6.3925,1486.33
+395,Patlıcan,2019,İzmir(Ödemiş),2000.0,8000.0,6.3925,1486.33
+396,Patlıcan,2020,İzmir(Bayındır),300.0,1200.0,6.075,2226.67
+397,Patlıcan,2020,İzmir(Bergama),1200.0,2160.0,6.075,2226.67
+398,Patlıcan,2020,İzmir(Menderes),2150.0,7800.0,6.075,2226.67
+399,Patlıcan,2020,İzmir(Tire),185.0,555.0,6.075,2226.67
+400,Patlıcan,2020,İzmir(Torbalı),180.0,504.0,6.075,2226.67
+401,Patlıcan,2020,İzmir(Ödemiş),1500.0,6000.0,6.075,2226.67
+402,Patlıcan,2021,İzmir(Bayındır),400.0,1600.0,7.53,6709.0
+403,Patlıcan,2021,İzmir(Bergama),77.0,139.0,7.53,6709.0
+404,Patlıcan,2021,İzmir(Menderes),2150.0,7800.0,7.53,6709.0
+405,Patlıcan,2021,İzmir(Tire),168.0,504.0,7.53,6709.0
+406,Patlıcan,2021,İzmir(Torbalı),245.0,704.0,7.53,6709.0
+407,Patlıcan,2021,İzmir(Ödemiş),150.0,600.0,7.53,6709.0
+408,Patlıcan,2022,İzmir(Bayındır),350.0,1401.0,22.6475,15353.33
+409,Patlıcan,2022,İzmir(Bergama),52.0,94.0,22.6475,15353.33
+410,Patlıcan,2022,İzmir(Menderes),2150.0,7802.0,22.6475,15353.33
+411,Patlıcan,2022,İzmir(Tire),,,22.6475,15353.33
+412,Patlıcan,2022,İzmir(Torbalı),176.0,536.0,22.6475,15353.33
+413,Patlıcan,2022,İzmir(Ödemiş),150.0,600.0,22.6475,15353.33
+414,Patlıcan,2023,İzmir(Bayındır),350.0,1401.0,29.4175,10488.0
+415,Patlıcan,2023,İzmir(Bergama),46.0,83.0,29.4175,10488.0
+416,Patlıcan,2023,İzmir(Menderes),2155.0,7830.0,29.4175,10488.0
+417,Patlıcan,2023,İzmir(Tire),,,29.4175,10488.0
+418,Patlıcan,2023,İzmir(Torbalı),128.0,324.0,29.4175,10488.0
+419,Patlıcan,2023,İzmir(Ödemiş),700.0,2800.0,29.4175,10488.0
+420,Patlıcan,2024,İzmir(Bayındır),400.0,1600.0,43.305,11266.67
+421,Patlıcan,2024,İzmir(Bergama),457.0,826.0,43.305,11266.67
+422,Patlıcan,2024,İzmir(Menderes),2405.0,12150.0,43.305,11266.67
+423,Patlıcan,2024,İzmir(Tire),,,43.305,11266.67
+424,Patlıcan,2024,İzmir(Torbalı),280.0,716.0,43.305,11266.67
+425,Patlıcan,2024,İzmir(Ödemiş),700.0,2800.0,43.305,11266.67
+426,Patlıcan,2025,İzmir(Bayındır),352.0,1408.0,51.51,14550.0
+427,Patlıcan,2025,İzmir(Bergama),389.0,703.0,51.51,14550.0
+428,Patlıcan,2025,İzmir(Menderes),1900.0,8500.0,51.51,14550.0
+429,Patlıcan,2025,İzmir(Tire),,,51.51,14550.0
+430,Patlıcan,2025,İzmir(Torbalı),240.0,616.0,51.51,14550.0
+431,Patlıcan,2025,İzmir(Ödemiş),500.0,2000.0,51.51,14550.0
+432,Soğan (Kuru),2014,İzmir(Bayındır),,,4.3825,886.0
+433,Soğan (Kuru),2014,İzmir(Bergama),950.0,1805.0,4.3825,886.0
+434,Soğan (Kuru),2014,İzmir(Menderes),,,4.3825,886.0
+435,Soğan (Kuru),2014,İzmir(Tire),,,4.3825,886.0
+436,Soğan (Kuru),2014,İzmir(Torbalı),,,4.3825,886.0
+437,Soğan (Kuru),2014,İzmir(Ödemiş),50.0,100.0,4.3825,886.0
+438,Soğan (Kuru),2015,İzmir(Bayındır),,,3.8325,903.33
+439,Soğan (Kuru),2015,İzmir(Bergama),950.0,1805.0,3.8325,903.33
+440,Soğan (Kuru),2015,İzmir(Menderes),,,3.8325,903.33
+441,Soğan (Kuru),2015,İzmir(Tire),,,3.8325,903.33
+442,Soğan (Kuru),2015,İzmir(Torbalı),,,3.8325,903.33
+443,Soğan (Kuru),2015,İzmir(Ödemiş),50.0,100.0,3.8325,903.33
+444,Soğan (Kuru),2016,İzmir(Bayındır),,,3.8325,822.67
+445,Soğan (Kuru),2016,İzmir(Bergama),1000.0,1900.0,3.8325,822.67
+446,Soğan (Kuru),2016,İzmir(Menderes),,,3.8325,822.67
+447,Soğan (Kuru),2016,İzmir(Tire),,,3.8325,822.67
+448,Soğan (Kuru),2016,İzmir(Torbalı),,,3.8325,822.67
+449,Soğan (Kuru),2016,İzmir(Ödemiş),30.0,60.0,3.8325,822.67
+450,Soğan (Kuru),2017,İzmir(Bayındır),,,4.6675,906.33
+451,Soğan (Kuru),2017,İzmir(Bergama),900.0,1701.0,4.6675,906.33
+452,Soğan (Kuru),2017,İzmir(Menderes),,,4.6675,906.33
+453,Soğan (Kuru),2017,İzmir(Tire),,,4.6675,906.33
+454,Soğan (Kuru),2017,İzmir(Torbalı),,,4.6675,906.33
+455,Soğan (Kuru),2017,İzmir(Ödemiş),,,4.6675,906.33
+456,Soğan (Kuru),2018,İzmir(Bayındır),,,5.7524999999999995,1217.33
+457,Soğan (Kuru),2018,İzmir(Bergama),800.0,1520.0,5.7524999999999995,1217.33
+458,Soğan (Kuru),2018,İzmir(Menderes),,,5.7524999999999995,1217.33
+459,Soğan (Kuru),2018,İzmir(Tire),,,5.7524999999999995,1217.33
+460,Soğan (Kuru),2018,İzmir(Torbalı),,,5.7524999999999995,1217.33
+461,Soğan (Kuru),2018,İzmir(Ödemiş),,,5.7524999999999995,1217.33
+462,Soğan (Kuru),2019,İzmir(Bayındır),,,6.3925,1486.33
+463,Soğan (Kuru),2019,İzmir(Bergama),1000.0,1800.0,6.3925,1486.33
+464,Soğan (Kuru),2019,İzmir(Menderes),,,6.3925,1486.33
+465,Soğan (Kuru),2019,İzmir(Tire),,,6.3925,1486.33
+466,Soğan (Kuru),2019,İzmir(Torbalı),,,6.3925,1486.33
+467,Soğan (Kuru),2019,İzmir(Ödemiş),,,6.3925,1486.33
+468,Soğan (Kuru),2020,İzmir(Bayındır),,,6.075,2226.67
+469,Soğan (Kuru),2020,İzmir(Bergama),22.0,35.0,6.075,2226.67
+470,Soğan (Kuru),2020,İzmir(Menderes),,,6.075,2226.67
+471,Soğan (Kuru),2020,İzmir(Tire),,,6.075,2226.67
+472,Soğan (Kuru),2020,İzmir(Torbalı),,,6.075,2226.67
+473,Soğan (Kuru),2020,İzmir(Ödemiş),,,6.075,2226.67
+474,Soğan (Kuru),2021,İzmir(Bayındır),,,7.53,6709.0
+475,Soğan (Kuru),2021,İzmir(Bergama),18.0,25.0,7.53,6709.0
+476,Soğan (Kuru),2021,İzmir(Menderes),,,7.53,6709.0
+477,Soğan (Kuru),2021,İzmir(Tire),,,7.53,6709.0
+478,Soğan (Kuru),2021,İzmir(Torbalı),,,7.53,6709.0
+479,Soğan (Kuru),2021,İzmir(Ödemiş),,,7.53,6709.0
+480,Soğan (Kuru),2022,İzmir(Bayındır),,,22.6475,15353.33
+481,Soğan (Kuru),2022,İzmir(Bergama),45.0,65.0,22.6475,15353.33
+482,Soğan (Kuru),2022,İzmir(Menderes),,,22.6475,15353.33
+483,Soğan (Kuru),2022,İzmir(Tire),,,22.6475,15353.33
+484,Soğan (Kuru),2022,İzmir(Torbalı),,,22.6475,15353.33
+485,Soğan (Kuru),2022,İzmir(Ödemiş),,,22.6475,15353.33
+486,Soğan (Kuru),2023,İzmir(Bayındır),,,29.4175,10488.0
+487,Soğan (Kuru),2023,İzmir(Bergama),65.0,80.0,29.4175,10488.0
+488,Soğan (Kuru),2023,İzmir(Menderes),,,29.4175,10488.0
+489,Soğan (Kuru),2023,İzmir(Tire),,,29.4175,10488.0
+490,Soğan (Kuru),2023,İzmir(Torbalı),,,29.4175,10488.0
+491,Soğan (Kuru),2023,İzmir(Ödemiş),,,29.4175,10488.0
+492,Soğan (Kuru),2024,İzmir(Bayındır),,,43.305,11266.67
+493,Soğan (Kuru),2024,İzmir(Bergama),86.0,106.0,43.305,11266.67
+494,Soğan (Kuru),2024,İzmir(Menderes),,,43.305,11266.67
+495,Soğan (Kuru),2024,İzmir(Tire),,,43.305,11266.67
+496,Soğan (Kuru),2024,İzmir(Torbalı),,,43.305,11266.67
+497,Soğan (Kuru),2024,İzmir(Ödemiş),,,43.305,11266.67
+498,Soğan (Kuru),2025,İzmir(Bayındır),,,51.51,14550.0
+499,Soğan (Kuru),2025,İzmir(Bergama),53.0,57.0,51.51,14550.0
+500,Soğan (Kuru),2025,İzmir(Menderes),,,51.51,14550.0
+501,Soğan (Kuru),2025,İzmir(Tire),,,51.51,14550.0
+502,Soğan (Kuru),2025,İzmir(Torbalı),,,51.51,14550.0
+503,Soğan (Kuru),2025,İzmir(Ödemiş),,,51.51,14550.0
