@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-market = pd.read_csv("data/processed/cleaned_all_marketplace.csv")
+market = pd.read_csv("data/processed/data_files/cleaned_all_marketplace.csv")
 
 market["TARIH"] = pd.to_datetime(
     market["TARIH"],
@@ -39,4 +39,10 @@ market=market.iloc[:,3:]
 market=market.drop(columns=["AY","ASGARI_FIYAT","AZAMI_FIYAT","BIRIM"])
 market=market[market["URUN_ADI"].isin(["DOMATES  SALKIM","SALATALIK  SİLOR","KABAK  SAKIZ","KARPUZ","SOGAN  KURU"])]
 market=market.reset_index(drop=True)
-market.to_csv("data/processed/final_price_dataset.csv")
+market =market.rename(columns={
+    "URUN_ADI": "product_name",
+    "ORTALAMA_FIYAT": "average_price",
+    "YIL": "year",
+    "SEZON": "season"
+})
+market.to_csv("data/processed/data_files/final_price_dataset.csv")

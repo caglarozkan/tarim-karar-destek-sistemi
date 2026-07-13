@@ -249,4 +249,4 @@ for dosya in dosyalar2:
         
 df_final = pd.concat(tum_dosyalar, ignore_index=True)
 
-df_final.to_csv("data/processed/cleaned_all_marketplace.csv")
+df_final.to_csv("data/processed/data_files/cleaned_all_marketplace.csv")

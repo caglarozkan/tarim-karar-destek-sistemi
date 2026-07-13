@@ -145,4 +145,4 @@ season_df = pd.concat(
     ignore_index=True
 )
 print(season_df.info())
-season_df.to_csv("data/processed/seasonal_fuel_prices.csv", index=False)
+season_df.to_csv("data/processed/data_files/seasonal_fuel_prices.csv", index=False)
