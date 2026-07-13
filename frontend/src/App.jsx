@@ -1,72 +1,21 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import Login from "./pages/Login.jsx";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import PriceAnalysis from "./pages/PriceAnalysis";
+import ProfitAnalysis from "./pages/ProfitAnalysis";
+import RiskAnalysis from "./pages/RiskAnalysis";
+import Recommendations from "./pages/Recommendations";
+import Profile from "./pages/Profile";
+import Farms from "./pages/Farms";
 import "./App.css";
 
-function Home() {
-  const features = [
-    {
-      title: "Fiyat Tahmini",
-      text: "Geçmiş hal fiyatlarına göre ürünlerin olası fiyat değişimini analiz eder.",
-    },
-    {
-      title: "Kâr Hesabı",
-      text: "Mazot, gübre, sulama ve işçilik maliyetlerine göre tahmini kârlılığı hesaplar.",
-    },
-    {
-      title: "Risk Skoru",
-      text: "Ürünün arz, fiyat dalgalanması ve tarlada kalma riskini değerlendirir.",
-    },
-    {
-      title:"Öneri Sistemi",
-      text:"Dönüm bilgisine göre en uygun ekim planını sunar."
-    }
-  ];
-
+function Layout({ children }) {
   return (
-    <div className="page">
-      <header className="navbar">
-        <div className="brand">
-          <h2>Tarım Analiz Sistemi</h2>
-        </div>
-
-        <nav className="nav-links">
-          <Link to="/">Ana Sayfa</Link>
-          <a href="#analysis">Analiz</a>
-          <a href="#recommendations">Öneriler</a>
-          <Link to="/login">Giriş</Link>
-        </nav>
-      </header>
-
-      <main>
-        <section className="hero" id="home">
-          <div className="hero-content">
-            <span className="hero-label">Veriye dayalı üretim kararı</span>
-
-            <h1>Akıllı Tarım Ürün Öneri Platformu</h1>
-
-            <p>
-              Bölge, ürün, maliyet ve hal fiyatı verilerine göre daha doğru
-              üretim kararları alın.
-            </p>
-
-            <div className="hero-actions">
-              <button type="button" className="primary-button">
-                Analize Başla
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section className="cards" id="analysis">
-          {features.map((feature) => (
-            <article className="card" key={feature.title}>
-              <h3>{feature.title}</h3>
-              <p>{feature.text}</p>
-            </article>
-          ))}
-        </section>
-      </main>
-    </div>
+    <>
+      <Navbar />
+      {children}
+    </>
   );
 }
 
@@ -74,8 +23,63 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <Layout>
+              <Home />
+            </Layout>
+          }
+        />
+        <Route
+          path="/fiyat-tahmini"
+          element={
+            <Layout>
+              <PriceAnalysis />
+            </Layout>
+          }
+        />
+        <Route
+          path="/kar-hesabi"
+          element={
+            <Layout>
+              <ProfitAnalysis />
+            </Layout>
+          }
+        />
+        <Route
+          path="/risk-analizi"
+          element={
+            <Layout>
+              <RiskAnalysis />
+            </Layout>
+          }
+        />
+        <Route
+          path="/oneriler"
+          element={
+            <Layout>
+              <Recommendations />
+            </Layout>
+          }
+        />
+        <Route
+          path="/bilgilerim"
+          element={
+            <Layout>
+              <Profile />
+            </Layout>
+          }
+        />
+        <Route
+          path="/tarlalarim"
+          element={
+            <Layout>
+              <Farms />
+            </Layout>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
