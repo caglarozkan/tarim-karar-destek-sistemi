@@ -7,6 +7,9 @@ df = pd.read_csv("data/processed/data_files/cleaned_tuik.csv")
 print(df.head())
 print(df.isnull().sum())
 
+df["District"] = df["District"].str.replace("İzmir(", "", regex=False)
+df["District"] = df["District"].str.replace(")", "", regex=False)
+
 #ekilan alan eksik olan degerleri ortalama ile doldurma
 for i in range(len(df)):
     if pd.isnull(df.loc[i, "Ekilen Alan"]):

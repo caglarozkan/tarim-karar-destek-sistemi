@@ -30,6 +30,13 @@ class Urun(Base):
     urun_id = Column(Integer, primary_key=True, autoincrement=True)
     urun_adi = Column(String(50), nullable=False)
 
+#ilce modeli
+class Ilce(Base):
+    __tablename__ = "ilce"
+
+    ilce_id = Column(Integer, primary_key=True, autoincrement=True)
+    ilce_adi = Column(String(50), unique=True, nullable=False)
+
 # tarla modeli
 class Tarla(Base):
     __tablename__ = "tarla"
@@ -37,7 +44,7 @@ class Tarla(Base):
     tarla_id = Column(Integer, primary_key=True, autoincrement=True)
     kullanici_id = Column(Integer, ForeignKey("kullanici.kullanici_id", ondelete="CASCADE"), nullable=False)
     tarla_adi = Column(String(100))
-    ilce = Column(String(50), nullable=False)
+    ilce_id = Column(Integer,ForeignKey("ilce.ilce_id"), nullable=False)
 
 class TarlaUrun(Base):
     __tablename__="tarla_urun"
@@ -59,8 +66,8 @@ class Kota(Base):
 
     kota_id = Column(Integer, primary_key=True, autoincrement=True)
     urun_id = Column(Integer, ForeignKey("urun.urun_id", ondelete="CASCADE"), nullable=False)
-    ilce = Column(String(50), nullable=False)
-    maksimum_kota = Column(Float, nullable=False)
+    ilce_id = Column(Integer, ForeignKey("ilce.ilce_id"),nullable=False)
+    maksimum_kota = Column(Float,ForeignKey("ilce.ilce_id"), nullable=False)
     kullanilan_kota = Column(Float, default=0)
 
 # öneri paketi modeli
