@@ -40,24 +40,19 @@ class KullaniciResponse(KullaniciBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-
-"""# TARLA ŞEMALARI (Tarla Ekleme İçin)
-class TarlaBase(BaseModel):
-    tarla_adi: Optional[str] = None
-    toplam_donum: float = Field(..., gt=0, description="Dönüm sıfırdan büyük olmalı")
-    ilce: str
+class TarlaUrunCreate(BaseModel):
+    urun_id: int
+    donum: float
 
 
-class TarlaCreate(TarlaBase):
-    pass
-
-class TarlaResponse(TarlaBase):
-    tarla_id: int
+class TarlaCreate(BaseModel):
     kullanici_id: int
+    tarla_adi: str
+    ilce_id: int
 
-    model_config = ConfigDict(from_attributes=True)
+    urunler: list[TarlaUrunCreate] #kullanıcı aynı tarlaya birden fazla ürün ekebilir o yüzden bunları liste olarak tutmak laızm
 
-# RİSK ANALİZİ ŞEMASI (Hesaplama Logu İçin)
+""""# RİSK ANALİZİ ŞEMASI (Hesaplama Logu İçin)
 
 class RiskAnalizRequest(BaseModel):
     sorgulanan_ilce: str

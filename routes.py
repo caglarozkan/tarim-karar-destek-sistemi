@@ -30,11 +30,8 @@ def get_db():
 
 #KULLANICI KAYIT ENDPOINT i
 @router.post("/kullanici/kayit",response_model=schemas.KullaniciResponse)
-
 def kullanici_kayit(kullanici:schemas.KullaniciCreate,db:Session=Depends(get_db)):
-
     kontrol=db.query(models.Kullanici).filter(models.Kullanici.email==kullanici.email).first()
-
     if kontrol:
         raise HTTPException(
             status_code=400,
@@ -59,9 +56,7 @@ def kullanici_kayit(kullanici:schemas.KullaniciCreate,db:Session=Depends(get_db)
 
 #KULLANICI GİRİŞ ENDPOINT i
 @router.post("/kullanici/giris")
-
 def giris(kullanici:schemas.KullaniciLogin,db:Session=Depends(get_db)):
-
     dbUser=db.query(models.Kullanici).filter(models.Kullanici.email==kullanici.email).first()
 
     if not dbUser:
@@ -95,9 +90,7 @@ def giris(kullanici:schemas.KullaniciLogin,db:Session=Depends(get_db)):
 
 #kullanıcı bilgilerini getirir
 @router.get("/kullanici/{kullanici_id}")
-
 def kullanici_getir(kullanici_id:int,db:Session=Depends(get_db)):
-
     user=db.query(models.Kullanici).filter(models.Kullanici.kullanici_id==kullanici_id).first()
 
     if not user:
@@ -117,7 +110,6 @@ def kullanici_getir(kullanici_id:int,db:Session=Depends(get_db)):
 
 #kullanıcı bilgilerini günceller ( kişisel bilgilerim sayfasından)
 @router.put("/kullanici/guncelle")
-
 def kullanici_guncelle(veri:schemas.KullaniciUpdate,db:Session=Depends(get_db)):
     user=db.query(models.Kullanici).filter(models.Kullanici.kullanici_id==veri.kullanici_id).first()
 
@@ -138,24 +130,76 @@ def kullanici_guncelle(veri:schemas.KullaniciUpdate,db:Session=Depends(get_db)):
         "mesaj":"Bilgiler güncellendi."
     }
 
-"""
-# ==========================================
-# 3. TARLA EKLEME (Kullanıcı ID'sine göre Tarla ekler, otomatik tarla_id üretir)
-# ==========================================
-@router.post("/tarla/ekle", response_model=schemas.TarlaResponse)
-def tarla_ekle(tarla: schemas.TarlaCreate, aktif_kullanici_id: int, db: Session = Depends(get_db)):
+#ilçe listesi select için
+@router.get("/ilce/liste")
+def ilce_liste(db: Session = Depends(get_db)):
+    return db.query(models.Ilce).all()
+
+#formdaki select için ürün list
+@router.get("/urun/liste")
+def urun_liste(db: Session = Depends(get_db)):
+    return db.query(models.Urun).all()
+
+#tarla ekleme
+@router.post("/tarla/ekle")
+def tarla_ekle(veri: schemas.TarlaCreate, db: Session = Depends(get_db)):
     yeni_tarla = models.Tarla(
-        kullanici_id=aktif_kullanici_id,
-        tarla_adi=tarla.tarla_adi,
-        toplam_donum=tarla.toplam_donum,
-        ilce=tarla.ilce
+        kullanici_id=veri.kullanici_id,
+        tarla_adi=veri.tarla_adi,
+        ilce_id=veri.ilce_id
     )
     db.add(yeni_tarla)
-    #db.commit()
-    #db.refresh(yeni_tarla)  # Otomatik üretilen tarla_id'yi alır
-    return yeni_tarla
-"""
+    db.commit()
+    db.refresh(yeni_tarla)
 
+    for satir in veri.urunler:
+        db.add(models.TarlaUrun(
+            tarla_id=yeni_tarla.tarla_id,
+            urun_id=satir.urun_id,
+            donum=satir.donum
+        ))
+    db.commit()
+    return {"mesaj": "Tarla başarıyla eklendi."}
+
+#tarla listeleme
+@router.get("/tarla/liste")
+def tarla_liste(kullanici_id: int, db: Session = Depends(get_db)):
+    tarlalar = db.query(models.Tarla).filter(models.Tarla.kullanici_id == kullanici_id).all()
+
+    sonuc = []
+    for t in tarlalar:
+        ilce = db.query(models.Ilce).filter(models.Ilce.ilce_id == t.ilce_id).first()
+        urun_kayitlari = db.query(models.TarlaUrun).filter(models.TarlaUrun.tarla_id == t.tarla_id).all()
+
+        urunler = []
+        for u in urun_kayitlari:
+            urun_bilgisi = db.query(models.Urun).filter(models.Urun.urun_id == u.urun_id).first()
+            urunler.append({
+                "urun_adi": urun_bilgisi.urun_adi,
+                "donum": u.donum
+            })
+
+        sonuc.append({
+            "tarla_id": t.tarla_id,
+            "tarla_adi": t.tarla_adi,
+            "ilce_adi": ilce.ilce_adi,
+            "urunler": urunler
+        })
+    return sonuc
+
+#tarla silme
+@router.delete("/tarla/sil/{tarla_id}")
+def tarla_sil(tarla_id: int, db: Session = Depends(get_db)):
+    tarla = db.query(models.Tarla).filter(models.Tarla.tarla_id == tarla_id).first()
+    if not tarla:
+        raise HTTPException(status_code=404, detail="Tarla bulunamadı.")
+
+    # önce bu tarlaya bağlı ürün kayıtlarını sil, sonra tarlayı sil
+    db.query(models.TarlaUrun).filter(models.TarlaUrun.tarla_id == tarla_id).delete()
+    db.delete(tarla)
+    db.commit()
+
+    return {"mesaj": "Tarla silindi."}
 """# ==========================================
 # 4. RİSK ANALİZİ LOG KAYDI (Hesaplanan verileri DB'ye zımbalar)
 # ==========================================
