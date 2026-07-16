@@ -124,3 +124,8 @@ model.fit(veri[["Year"]],veri["Ekilen Alan"])
 pred = model.predict([[2026]])
 
 print("\n2026 Tahmini :", round(pred[0], 2))"""
+
+# Sonuçları csv olarak kaydet
+kota_df.to_csv("kota_sonuclari.csv", index=False)
+
+print("Kota tahminleri oluşturuldu.")
