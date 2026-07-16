@@ -73,5 +73,26 @@ df_long=df_long.pivot(
     values="Value"
 ).reset_index()
 df_long.columns.name = None
-print(df_long.head(2))
-df_long.to_csv("data/processed/data_files/clean_tuik.csv")
+df_long =df_long.rename(columns={
+    "ProductName": "product_name",
+    "Year": "year",
+    "District": "district",
+    "Ekilen Alan": "planted_area",
+    "Üretim Miktarı": "production_amount",
+    "FUEL_PRICE": "fuel_price",
+    "Ortalama_Gubre_Maliyeti_Ton_TL": "fertilizer_price",
+    "URUN_ADI": "product_name",
+    "ORTALAMA_FIYAT": "average_price",
+    "YIL": "year",
+    "SEZON": "season"
+})
+df_long["product_name"] = df_long["product_name"].replace({
+    "Hıyar (Sofralık)": "SALATALIK SİLOR",
+    "Soğan (Kuru)": "SOGAN KURU",
+    "Patlıcan": "PATLICAN UZUN",
+    "Karpuz": "KARPUZ",
+    "Kabak (Sakız)": "KABAK TAZE",
+    "Domates (Sofralık)": "DOMATES SALKIM",
+    "Biber (Sivri)":"BIBER SIVRI"
+})
+df_long.to_csv("data/processed/data_files/cleaned_tuik.csv")
