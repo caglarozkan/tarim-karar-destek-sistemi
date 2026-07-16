@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
 
-const ILCELER = ["Bayındır", "Ödemiş", "Tire", "Kiraz", "Bergama"];
-const URUNLER = ["Domates", "Patates", "Soğan", "Biber", "Salatalık"];
+const ILCELER = ["Bayındır","Bergama","Menderes","Tire","Torbalı","Ödemiş"];
+const URUNLER = ["Biber (Sivri)","Domates (Sofralık)","Hıyar (Sofralık)","Kabak (Sakız)","Karpuz","Patlıcan","Soğan (Kuru)"];
 
 function Farms() {
   const navigate = useNavigate();

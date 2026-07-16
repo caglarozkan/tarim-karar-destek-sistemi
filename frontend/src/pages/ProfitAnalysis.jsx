@@ -1,9 +1,9 @@
 import { useState } from "react";
 import "../App.css";
 
-const ILCELER = ["Bayındır", "Ödemiş", "Tire", "Kiraz", "Bergama"];
+const ILCELER = ["Bayındır","Bergama","Menderes","Tire","Torbalı","Ödemiş"];
+const URUNLER = ["Biber (Sivri)","Domates (Sofralık)","Hıyar (Sofralık)","Kabak (Sakız)","Karpuz","Patlıcan","Soğan (Kuru)"];
 const SEZONLAR = ["İlkbahar", "Yaz", "Sonbahar", "Kış"];
-const URUNLER = ["Domates", "Patates", "Soğan", "Biber", "Salatalık"];
 
 function ProfitAnalysis() {
   const [form, setForm] = useState({
