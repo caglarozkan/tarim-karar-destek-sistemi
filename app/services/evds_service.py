@@ -56,6 +56,9 @@ class EVDSService:
         season_order = ["Winter", "Spring", "Summer", "Fall"]
 
         df["season"] = df["date"].dt.month.map(season_map)
+        df["year"] = df["date"].dt.year
+
+        df.loc[df["date"].dt.month == 12, "year"] += 1
 
         value_columns = [
             col for col in df.columns
@@ -104,7 +107,7 @@ class EVDSService:
             columns={value_columns[0]: "inflation_index"}
         )
 
-        seasonal_df["annual_inflation_pct"] = (
+        seasonal_df["annual_inflation"] = (
             seasonal_df
             .groupby("season", observed=True)["inflation_index"]
             .pct_change() * 100.
@@ -198,3 +201,4 @@ if __name__ == "__main__":
 
     print(seasonal_inflation.head(20))
     print(seasonal_inflation.tail(20))
+    

@@ -2,9 +2,7 @@ import os
 import joblib
 import pandas as pd
 import numpy as np
-
 from xgboost import XGBRegressor
-
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.pipeline import Pipeline
@@ -14,7 +12,6 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 DATA_PATH = "data/processed/data_files/final_price_dataset.csv"
 MODEL_PATH = "app/models/price_model.pkl"
-
 
 def load_price_data():
     df = pd.read_csv(DATA_PATH)
