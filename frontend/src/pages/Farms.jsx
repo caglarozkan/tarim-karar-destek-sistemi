@@ -182,7 +182,7 @@ function Farms() {
                 <input
                   type="number"
                   min="0"
-                  step="0.1"
+                  step="any"
                   value={satir.donum}
                   onChange={(e) => satirGuncelle(index, "donum", e.target.value)}
                 />

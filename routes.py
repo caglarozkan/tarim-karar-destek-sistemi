@@ -6,6 +6,8 @@ import models
 import schemas
 from database import SessionLocal
 
+from risk import FIYAT_HARITASI, kota_doluluk_hesapla, cv_hesapla, genel_risk_hesapla, risk_seviyesi_belirle
+
 # İşlem yollarını ayıran Router objemiz
 router = APIRouter()
 
@@ -158,6 +160,15 @@ def tarla_ekle(veri: schemas.TarlaCreate, db: Session = Depends(get_db)):
             urun_id=satir.urun_id,
             donum=satir.donum
         ))
+
+        # O ilçe ürün için kota kaydı varsa, kullanılan kotayı arttır
+        kota_kaydi = db.query(models.Kota).filter(
+            models.Kota.ilce_id == veri.ilce_id,
+            models.Kota.urun_id == satir.urun_id
+        ).first()
+
+        if kota_kaydi:
+            kota_kaydi.kullanilan_kota = (kota_kaydi.kullanilan_kota or 0) + satir.donum
     db.commit()
     return {"mesaj": "Tarla başarıyla eklendi."}
 
@@ -194,7 +205,19 @@ def tarla_sil(tarla_id: int, db: Session = Depends(get_db)):
     if not tarla:
         raise HTTPException(status_code=404, detail="Tarla bulunamadı.")
 
-    # önce bu tarlaya bağlı ürün kayıtlarını sil, sonra tarlayı sil
+    # Bu tarlaya bağlı ürün kayıtlarını al
+    urun_kayitlari = db.query(models.TarlaUrun).filter(models.TarlaUrun.tarla_id == tarla_id).all()
+
+    # Silmeden önce, her ürün için kullanılan kotayı geri düş
+    for u in urun_kayitlari:
+        kota_kaydi = db.query(models.Kota).filter(
+            models.Kota.ilce_id == tarla.ilce_id,
+            models.Kota.urun_id == u.urun_id
+        ).first()
+        if kota_kaydi:
+            kota_kaydi.kullanilan_kota = max(0, (kota_kaydi.kullanilan_kota or 0) - u.donum)
+
+    # Sonra ürün kayıtlarını ve tarlayı sil
     db.query(models.TarlaUrun).filter(models.TarlaUrun.tarla_id == tarla_id).delete()
     db.delete(tarla)
     db.commit()
