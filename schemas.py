@@ -52,9 +52,8 @@ class TarlaCreate(BaseModel):
 
     urunler: list[TarlaUrunCreate] #kullanıcı aynı tarlaya birden fazla ürün ekebilir o yüzden bunları liste olarak tutmak laızm
 
-""""# RİSK ANALİZİ ŞEMASI (Hesaplama Logu İçin)
-
-class RiskAnalizRequest(BaseModel):
-    sorgulanan_ilce: str
-    urun_id: int
-    girilen_donum: float = Field(..., gt=0)"""
+class RiskTahminRequest(BaseModel):
+    ilce: str
+    urun: str
+    donum: float = Field(..., gt=0)
+    sezon: str | None = None

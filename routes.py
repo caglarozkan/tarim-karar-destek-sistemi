@@ -223,43 +223,43 @@ def tarla_sil(tarla_id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"mesaj": "Tarla silindi."}
-"""# ==========================================
-# 4. RİSK ANALİZİ LOG KAYDI (Hesaplanan verileri DB'ye zımbalar)
-# ==========================================
-@router.post("/risk-analiz/log")
-def risk_analiz_log_kaydet(sorgu: schemas.RiskAnalizRequest, kullanici_id: int, hesaplanan_risk: float,
-                           db: Session = Depends(get_db)):
-    yeni_log = models.RiskAnalizLog(
-        kullanici_id=kullanici_id,
-        sorgulanan_ilce=sorgu.sorgulanan_ilce,
-        urun_id=sorgu.urun_id,
-        girilen_donum=sorgu.girilen_donum,
-        donen_risk_orani=hesaplanan_risk
-    )
-    db.add(yeni_log)
-    # db.commit()
-    return {"mesaj": "Risk analizi verileri başarıyla loglandı."}
-"""
 
-""" ==========================================
-# 5. KOTA BİLGİSİ GETİRME (Dinamik İlçe ve Ürün Sorgusu)
-# ==========================================
-@router.get("/kota/durum")
-def kota_durumunu_getir(gelen_ilce: str, gelen_urun_id: int, db: Session = Depends(get_db)):
+#risk tahmini
+@router.post("/tahmin/risk")
+def tahmin_risk(veri: schemas.RiskTahminRequest, db: Session = Depends(get_db)):
 
-    kota_sorgusu = db.query(models.Kota).filter(
-        models.Kota.ilce == gelen_ilce,
-        models.Kota.urun_id == gelen_urun_id
+    ilce_kaydi = db.query(models.Ilce).filter(models.Ilce.ilce_adi == veri.ilce).first()
+    urun_kaydi = db.query(models.Urun).filter(models.Urun.urun_adi == veri.urun).first()
+
+    if not ilce_kaydi or not urun_kaydi:
+        raise HTTPException(status_code=404, detail="İlçe veya ürün bulunamadı.")
+
+    kota_kaydi = db.query(models.Kota).filter(
+        models.Kota.ilce_id == ilce_kaydi.ilce_id,
+        models.Kota.urun_id == urun_kaydi.urun_id
     ).first()
 
-    # Eğer veritabanında o ilçeye ait öyle bir kayıt yoksa hata döndür
-    if not kota_sorgusu:
-        raise HTTPException(status_code=404, detail="Seçtiğiniz ilçe ve ürün için kota bilgisi bulunamadı.")
+    if not kota_kaydi:
+        raise HTTPException(status_code=404, detail="Bu ilçe ve ürün için kota kaydı bulunamadı.")
 
-    # Kayıt varsa, arayüze (frontend'e) sadece istediğimiz verileri paketleyip gönderiyoruz
+    kota_doluluk = kota_doluluk_hesapla(
+        kullanilan_kota=kota_kaydi.kullanilan_kota or 0,
+        girilen_donum=veri.donum,
+        maksimum_kota=kota_kaydi.maksimum_kota
+    )
+
+    fiyatlar = FIYAT_HARITASI.get(veri.urun)
+    if not fiyatlar or len(fiyatlar) < 2:
+        raise HTTPException(status_code=404, detail="Bu ürün için fiyat geçmişi bulunamadı.")
+
+    cv, ortalama, std = cv_hesapla(fiyatlar)
+    genel_risk = genel_risk_hesapla(kota_doluluk, cv)
+    seviye, emoji = risk_seviyesi_belirle(genel_risk)
+
     return {
-        "ilce": kota_sorgusu.ilce,
-        "urun_id": kota_sorgusu.urun_id,
-        "kullanilan_kota": kota_sorgusu.kullanilan_kota,
-        "maksimum_kota": kota_sorgusu.maksimum_kota
-    }"""
+        "kota_doluluk": round(kota_doluluk, 2),
+        "cv": round(cv, 2),
+        "genel_risk": round(genel_risk, 2),
+        "risk_seviyesi": seviye,
+        "risk_emoji": emoji
+    }
