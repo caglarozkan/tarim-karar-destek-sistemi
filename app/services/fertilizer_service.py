@@ -14,8 +14,6 @@ def load_cache():
         with open(CACHE_FILE, "r", encoding="utf-8") as file:
             return json.load(file)
     return {}
-
-
 def save_cache(cache):
     with open(CACHE_FILE, "w", encoding="utf-8") as file:
         json.dump(cache, file, ensure_ascii=False, indent=4)
@@ -74,4 +72,3 @@ def get_commodity_price(commodity):
 
 
 price = get_commodity_price("urea")
-print(price)
