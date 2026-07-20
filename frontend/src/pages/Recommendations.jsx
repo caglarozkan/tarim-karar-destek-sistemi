@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "../App.css";
 
-const ILCELER = ["Bayındır", "Ödemiş", "Tire", "Kiraz", "Bergama"];
+const ILCELER = ["Bayındır","Bergama","Menderes","Tire","Torbalı","Ödemiş"];
 
 function Recommendations() {
   const kayit = localStorage.getItem("kullanici");

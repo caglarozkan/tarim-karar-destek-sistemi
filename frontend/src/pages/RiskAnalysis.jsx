@@ -1,9 +1,9 @@
 import { useState } from "react";
 import "../App.css";
 
-const ILCELER = ["Bayındır", "Ödemiş", "Tire", "Kiraz", "Bergama"];
+const ILCELER = ["Bayındır","Bergama","Menderes","Tire","Torbalı","Ödemiş"];
+const URUNLER = ["Biber (Sivri)","Domates (Sofralık)","Hıyar (Sofralık)","Kabak (Sakız)","Karpuz","Patlıcan","Soğan (Kuru)","Bos"];
 const SEZONLAR = ["İlkbahar", "Yaz", "Sonbahar", "Kış"];
-const URUNLER = ["Domates", "Patates", "Soğan", "Biber", "Salatalık"];
 
 function RiskAnalysis() {
   const [form, setForm] = useState({ ilce: "", urun: "", donum: "", sezon: "" });
@@ -83,7 +83,7 @@ function RiskAnalysis() {
             <input
               type="number"
               min="0"
-              step="0.1"
+              step="any"
               name="donum"
               placeholder="Örn. 5"
               value={form.donum}
@@ -114,18 +114,17 @@ function RiskAnalysis() {
           {sonuc ? (
             <>
               <div className="result-card">
-                <div className="label">Risk Oranı</div>
-                <div className="value">%{sonuc.risk_orani}</div>
+                <div className="label">{sonuc.risk_emoji} {sonuc.risk_seviyesi}</div>
+                <div className="value">%{sonuc.genel_risk}</div>
                 <div className="risk-gauge">
                   <div
                     className="risk-gauge-fill"
-                    style={{ width: `${Math.min(sonuc.risk_orani, 100)}%` }}
+                    style={{ width: `${Math.min(sonuc.genel_risk, 100)}%` }}
                   />
                 </div>
               </div>
               <div className="result-note">
-                {sonuc.aciklama ||
-                  `Bölgedeki kalan doluluk oranının %${sonuc.doluluk_orani ?? "-"} olması bu skoru etkiliyor.`}
+                Kota Doluluk: %{sonuc.kota_doluluk} &nbsp;|&nbsp; Fiyat Oynaklığı (CV): %{sonuc.cv}
               </div>
             </>
           ) : (

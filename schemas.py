@@ -3,6 +3,9 @@ from typing import Optional
 from datetime import datetime
 
 
+# ==========================================
+# KULLANICI ŞEMALARI (Kayıt ve Giriş İçin)
+# ==========================================
 class KullaniciBase(BaseModel):
     ad_soyad: str
     email: EmailStr
@@ -18,11 +21,15 @@ class KullaniciLogin(BaseModel):
 
 
 class KullaniciResponse(KullaniciBase):
-    kullanici_id: int
-    kayit_tarihi: datetime
+    kullanici_id: int<
+    kayit_tarihi: datetime>
 
     model_config = ConfigDict(from_attributes=True)
 
+
+# ==========================================
+# TARLA ŞEMALARI (Tarla Ekleme İçin)
+# ==========================================
 class TarlaBase(BaseModel):
     tarla_adi: Optional[str] = None
     toplam_donum: float = Field(..., gt=0, description="Dönüm sıfırdan büyük olmalı")
