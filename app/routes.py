@@ -1,12 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 
 import models
-import schemas
-from database import SessionLocal
+from app import schemas
+from app.database import SessionLocal
 
-from risk import FIYAT_HARITASI, kota_doluluk_hesapla, cv_hesapla, genel_risk_hesapla, risk_seviyesi_belirle
+from app.services.risk import FIYAT_HARITASI, kota_doluluk_hesapla, cv_hesapla, genel_risk_hesapla, risk_seviyesi_belirle
 
 # İşlem yollarını ayıran Router objemiz
 router = APIRouter()
@@ -31,8 +31,8 @@ def get_db():
 
 
 #KULLANICI KAYIT ENDPOINT i
-@router.post("/kullanici/kayit",response_model=schemas.KullaniciResponse)
-def kullanici_kayit(kullanici:schemas.KullaniciCreate,db:Session=Depends(get_db)):
+@router.post("/kullanici/kayit", response_model=schemas.KullaniciResponse)
+def kullanici_kayit(kullanici: schemas.KullaniciCreate, db:Session=Depends(get_db)):
     kontrol=db.query(models.Kullanici).filter(models.Kullanici.email==kullanici.email).first()
     if kontrol:
         raise HTTPException(
@@ -58,7 +58,7 @@ def kullanici_kayit(kullanici:schemas.KullaniciCreate,db:Session=Depends(get_db)
 
 #KULLANICI GİRİŞ ENDPOINT i
 @router.post("/kullanici/giris")
-def giris(kullanici:schemas.KullaniciLogin,db:Session=Depends(get_db)):
+def giris(kullanici: schemas.KullaniciLogin, db:Session=Depends(get_db)):
     dbUser=db.query(models.Kullanici).filter(models.Kullanici.email==kullanici.email).first()
 
     if not dbUser:
@@ -112,7 +112,7 @@ def kullanici_getir(kullanici_id:int,db:Session=Depends(get_db)):
 
 #kullanıcı bilgilerini günceller ( kişisel bilgilerim sayfasından)
 @router.put("/kullanici/guncelle")
-def kullanici_guncelle(veri:schemas.KullaniciUpdate,db:Session=Depends(get_db)):
+def kullanici_guncelle(veri: schemas.KullaniciUpdate, db:Session=Depends(get_db)):
     user=db.query(models.Kullanici).filter(models.Kullanici.kullanici_id==veri.kullanici_id).first()
 
     if not user:

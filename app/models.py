@@ -1,8 +1,7 @@
 import enum
 from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, DateTime, Enum
-from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from database import Base
+from app.database import Base
 
 # Ekim kaydındaki durum alanı için Python Enum yapısı
 class DurumEnum(str, enum.Enum):
