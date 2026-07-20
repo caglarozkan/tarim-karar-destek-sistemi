@@ -404,10 +404,3 @@ def predict_all_products(
 
 if __name__ == "__main__":
     metrics = train_price_model()
-    print("Model egitildi:", metrics)
-
-    result = predict_products(
-        product_name="BIBER SIVRI",
-        target_season="Summer",
-    )
-    print(result)
