@@ -57,3 +57,24 @@ class RiskTahminRequest(BaseModel):
     urun: str
     donum: float = Field(..., gt=0)
     sezon: str | None = None
+    kullanici_id:int
+
+class RiskLogResponse(BaseModel):
+    log_id: int
+    sorgulanan_ilce: str
+    sorgulanan_urun: str
+    sezon: str
+    girilen_donum: float
+    kota_doluluk: float | None
+    cv_fiyat: float | None
+    mazot_tahmini: float | None
+    mazot_riski: float | None
+    enflasyon_tahmini: float | None
+    enflasyon_riski: float | None
+    gubre_guncel: float | None
+    gubre_riski: float | None
+    genel_risk: float | None
+    risk_seviyesi: str | None
+    sorgu_tarihi: datetime
+
+    model_config = ConfigDict(from_attributes=True)

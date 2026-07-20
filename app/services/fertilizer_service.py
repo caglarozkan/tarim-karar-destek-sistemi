@@ -1,7 +1,7 @@
 import re
 import requests
 from bs4 import BeautifulSoup
-from get_usd import get_usd_try
+from app.services.get_usd import get_usd_try
 
 usd_try =float(get_usd_try())
 

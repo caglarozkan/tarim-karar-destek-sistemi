@@ -1,19 +1,19 @@
 from fastapi import FastAPI
-import models
-from database import engine
-import routes
+from app import models
+from app.database import engine
+import app.routes
 
 
-models.Base.metadata.create_all(bind=engine)
+app.models.Base.metadata.create_all(bind=engine)
 # Uygulamayı başlatıyoruz
-app = FastAPI(
+app_tarim = FastAPI(
     title="Tarımsal Karar ve Risk Analiz Sistemi",
     description="Çiftçiler için risk analizi ve arazi optimizasyonu sağlayan backend servisi.",
     version="1.0.0"
 )
 
 # Ana sayfa (Root) uç noktası
-@app.get("/")
+@app_tarim.get("/")
 def baslangic():
     return {
         "mesaj": "Backend API sorunsuz çalışıyor!",
@@ -29,7 +29,7 @@ origins = [
     "http://localhost:3000",
 ]
 
-app.add_middleware(
+app_tarim.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
@@ -37,4 +37,4 @@ app.add_middleware(
     allow_headers=["*"], # Bütün veri başlıklarına izin ver
 )
 
-app.include_router(routes.router)
+app_tarim.include_router(app.routes.router)
