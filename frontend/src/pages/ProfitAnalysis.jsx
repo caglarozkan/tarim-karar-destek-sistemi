@@ -33,7 +33,7 @@ function ProfitAnalysis() {
     setYukleniyor(true);
     setSonuc(null);
     try {
-      const res = await fetch("http://localhost:8000/tahmin/kar", {
+      const res = await fetch("http://localhost:8000/kar/hesapla", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

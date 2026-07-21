@@ -14,7 +14,6 @@ class KullaniciBase(BaseModel):
 
 
 class KullaniciCreate(KullaniciBase):
-
     sifre:str
 
 
@@ -78,3 +77,13 @@ class RiskLogResponse(BaseModel):
     sorgu_tarihi: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+class KarHesabiRequest(BaseModel):
+    kullanici_id: int
+    ilce: str
+    urun: str
+    donum: float = Field(..., gt=0)
+    sezon: str
+    sulama_maliyeti: float | None = None
+    iscilik_maliyeti: float | None = None
+    tohum_maliyeti: float | None = None

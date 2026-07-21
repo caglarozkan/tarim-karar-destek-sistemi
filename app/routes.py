@@ -7,7 +7,11 @@ from app import schemas
 from app.database import SessionLocal
 
 from app.services.risk import (FIYAT_HARITASI, REFERANS,kota_doluluk_hesapla, cv_hesapla, sapma_riski_hesapla,genel_risk_hesapla, risk_seviyesi_belirle,mazot_tahmini_al, enflasyon_tahmini_al, guncel_gubre_fiyati_getir,)
-
+from app.services.risk import URUN_ESLESTIRME, sezon_cevir, hedef_yil_belirle
+from app.services.profit_service import kar_hesapla_tam
+URUN_ESLESTIRME_TERS = {}
+for csv_adi, sistem_adi in URUN_ESLESTIRME.items():
+    URUN_ESLESTIRME_TERS[sistem_adi] = csv_adi
 # İşlem yollarını ayıran Router objemiz
 router = APIRouter()
 
@@ -332,4 +336,39 @@ def risk_gecmisi(kullanici_id: int, db: Session = Depends(get_db)):
             "risk_seviyesi": k.risk_seviyesi,
             "sorgu_tarihi": k.sorgu_tarihi,
         })
+    return sonuc
+
+@router.post("/kar/hesapla")
+def kar_hesapla(veri: schemas.KarHesabiRequest, db: Session = Depends(get_db)):
+    ilce_kaydi = db.query(models.Ilce).filter(models.Ilce.ilce_adi == veri.ilce).first()
+    urun_kaydi = db.query(models.Urun).filter(models.Urun.urun_adi == veri.urun).first()
+
+    if not ilce_kaydi or not urun_kaydi:
+        raise HTTPException(status_code=404, detail="İlçe veya ürün bulunamadı.")
+
+    urun_adi_csv = URUN_ESLESTIRME_TERS.get(veri.urun)
+    if not urun_adi_csv:
+        raise HTTPException(status_code=404, detail="Bu ürün için eşleştirme bulunamadı.")
+
+    hedef_yil = hedef_yil_belirle()
+    hedef_sezon = sezon_cevir(veri.sezon)
+
+    try:
+        sonuc = kar_hesapla_tam(
+            db=db,
+            ilce_id=ilce_kaydi.ilce_id,
+            urun_id=urun_kaydi.urun_id,
+            ilce_adi=veri.ilce,
+            urun_sistem_adi=veri.urun,
+            urun_adi_csv=urun_adi_csv,
+            donum=veri.donum,
+            hedef_yil=hedef_yil,
+            hedef_sezon=hedef_sezon,
+            sulama_maliyeti=veri.sulama_maliyeti,
+            iscilik_maliyeti=veri.iscilik_maliyeti,
+            tohum_maliyeti=veri.tohum_maliyeti,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
     return sonuc
