@@ -5,9 +5,9 @@ from typing import Any
 
 import joblib
 import pandas as pd
-from fertilizer_service import get_commodity_price
-from fuel_service import predict_fuel_price
-from inflation_service import predict_inflation
+from app.services.fertilizer_service import get_commodity_price
+from app.services.fuel_service import predict_fuel_price
+from app.services.inflation_service import predict_inflation
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.impute import SimpleImputer

@@ -13,8 +13,8 @@ from pathlib import Path
 
 import pandas as pd
 #diger modellerin hesaplama fonksiyonları
-from app.services.train_fuel import predict_fuel_price
-from app.services.train_inflation import predict_inflation
+from app.services.fuel_service import predict_fuel_price
+from app.services.inflation_service import predict_inflation
 from app.services.fertilizer_service import get_commodity_price
 
 #dizin işlemleri
