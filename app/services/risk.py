@@ -48,6 +48,21 @@ AGIRLIKLAR = {
     "enflasyon": 0.08,
 }
 
+# Takvim mevsimlerinin sırası (ay bazlı)
+MEVSIM_SIRASI = {
+    "Winter": 1,
+    "Spring": 2,
+    "Summer": 3,
+    "Fall": 4,
+}
+
+# Hangi ay hangi mevsime denk geliyor
+AY_MEVSIM_HARITASI = {
+    12: "Winter", 1: "Winter", 2: "Winter",
+    3: "Spring", 4: "Spring", 5: "Spring",
+    6: "Summer", 7: "Summer", 8: "Summer",
+    9: "Fall", 10: "Fall", 11: "Fall",
+}
 
 def veri_haritalarini_olustur(referans_yil_sayisi:int):
     df = pd.read_csv(CSV_PATH)
@@ -140,8 +155,19 @@ def risk_seviyesi_belirle(risk: float) -> tuple[str, str]:
 
 
 #hesaplama için kullanılacak dış modeller ve hesaplamalar
-def hedef_yil_belirle() -> int:
-    return datetime.now().year + 1
+def hedef_yil_belirle(turkce_sezon) -> int:
+    """eger analiz yapılan aydan sonraki mevsim o yıl içinde var ise hala önümüzdeki yıl için degil bulundugumuz yıla göre tahmin yapıyor"""
+    simdi = datetime.now()
+    su_anki_mevsim = AY_MEVSIM_HARITASI[simdi.month]
+    su_anki_sira = MEVSIM_SIRASI[su_anki_mevsim]
+
+    hedef_sezon_ingilizce = sezon_cevir(turkce_sezon)
+    hedef_sira = MEVSIM_SIRASI[hedef_sezon_ingilizce]
+
+    if hedef_sira > su_anki_sira:
+        return simdi.year
+    else:
+        return simdi.year + 1
 
 #diger modellerde ingilizce oldugu için translate
 def sezon_cevir(turkce_sezon: str) -> str:
@@ -152,13 +178,13 @@ def sezon_cevir(turkce_sezon: str) -> str:
 
 
 def mazot_tahmini_al(turkce_sezon: str) -> float:
-    hedef_yil = hedef_yil_belirle()
+    hedef_yil = hedef_yil_belirle(turkce_sezon)
     hedef_sezon = sezon_cevir(turkce_sezon)
     return predict_fuel_price(hedef_yil, hedef_sezon)
 
 
 def enflasyon_tahmini_al(turkce_sezon: str) -> float:
-    hedef_yil = hedef_yil_belirle()
+    hedef_yil = hedef_yil_belirle(turkce_sezon)
     hedef_sezon = sezon_cevir(turkce_sezon)
     sonuc = predict_inflation(hedef_yil, hedef_sezon)
     return predict_inflation(hedef_yil, hedef_sezon)

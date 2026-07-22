@@ -27,7 +27,11 @@ from fastapi.middleware.cors import CORSMiddleware
 origins = [
     "http://localhost:5173",
     "http://localhost:3000",
+<<<<<<< HEAD
 
+=======
+    "http://localhost:5174"
+>>>>>>> 15e57be719aeab43978804a2f5214398587b24d2
 ]
 
 app_tarim.add_middleware(

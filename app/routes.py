@@ -9,6 +9,8 @@ from app.database import SessionLocal
 from app.services.risk import (FIYAT_HARITASI, REFERANS,kota_doluluk_hesapla, cv_hesapla, sapma_riski_hesapla,genel_risk_hesapla, risk_seviyesi_belirle,mazot_tahmini_al, enflasyon_tahmini_al, guncel_gubre_fiyati_getir,)
 from app.services.risk import URUN_ESLESTIRME, sezon_cevir, hedef_yil_belirle
 from app.services.profit_service import kar_hesapla_tam
+from app.services.price_prediction import predict_product_price
+
 URUN_ESLESTIRME_TERS = {}
 for csv_adi, sistem_adi in URUN_ESLESTIRME.items():
     URUN_ESLESTIRME_TERS[sistem_adi] = csv_adi
@@ -350,7 +352,7 @@ def kar_hesapla(veri: schemas.KarHesabiRequest, db: Session = Depends(get_db)):
     if not urun_adi_csv:
         raise HTTPException(status_code=404, detail="Bu ürün için eşleştirme bulunamadı.")
 
-    hedef_yil = hedef_yil_belirle()
+    hedef_yil = hedef_yil_belirle(veri.sezon)
     hedef_sezon = sezon_cevir(veri.sezon)
 
     try:
@@ -372,3 +374,25 @@ def kar_hesapla(veri: schemas.KarHesabiRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail=str(e))
 
     return sonuc
+
+#fiyat tahmini
+@router.post("/tahmin/fiyat")
+def tahmin_fiyat(veri: schemas.FiyatTahminRequest,db: Session=Depends(get_db)):
+    urun_kaydi = db.query(models.Urun).filter(models.Urun.urun_adi == veri.urun).first()
+    if not urun_kaydi:
+        raise HTTPException(status_code=404,detail="Urun bulanamdi..")
+    urun_adi_csv = URUN_ESLESTIRME_TERS.get(veri.urun) #ürün için eşleştirme var mı
+    if not urun_adi_csv:
+        raise HTTPException(status_code=404,detail="Bu ürün için eşleştirme bulunamadı.")
+    hedef_yil = hedef_yil_belirle(veri.sezon)
+    hedef_sezon = sezon_cevir(veri.sezon)
+
+    sonuc = predict_product_price(product_name=urun_adi_csv,target_year=hedef_yil,target_season=hedef_sezon)
+
+    return {
+        "ilce":veri.ilce,
+        "sezon":veri.sezon,
+        "urun":veri.urun,
+        "yil": hedef_yil,
+        "tahmini_fiyat": sonuc["predicted_price"]
+    }
