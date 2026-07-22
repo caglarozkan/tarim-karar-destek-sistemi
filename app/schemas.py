@@ -87,3 +87,8 @@ class KarHesabiRequest(BaseModel):
     sulama_maliyeti: float | None = None
     iscilik_maliyeti: float | None = None
     tohum_maliyeti: float | None = None
+
+class FiyatTahminRequest(BaseModel):
+    ilce : str
+    sezon: str
+    urun : str

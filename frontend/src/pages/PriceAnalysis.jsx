@@ -34,7 +34,8 @@ function PriceAnalysis() {
       if (res.ok) {
         setSonuc(data);
       } else {
-        setHata(data.detail || "Tahmin alınamadı.");
+        const mesaj = typeof data.detail === "string" ? data.detail : "Tahmin Alınamadı";
+        setHata(mesaj);
       }
     } catch (err) {
       setHata("Sunucuya bağlanılamadı.");
@@ -102,6 +103,12 @@ function PriceAnalysis() {
             <div className="result-card hero-result">
               <div className="label">Tahmini Fiyat</div>
               <div className="value">{sonuc.tahmini_fiyat} ₺</div>
+              <div classname="meta" style={{marginTop:10,color: "#f5f0e6"}}>
+                  {sonuc.urun} - {sonuc.ilce}
+              </div>
+              <div classname="meta" style={{color: "#f5f0e6"}}>
+                  {sonuc.sezon} {sonuc.yil}
+              </div>
             </div>
           ) : (
             <div className="panel">
