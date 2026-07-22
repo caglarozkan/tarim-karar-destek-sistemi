@@ -154,15 +154,14 @@ def sezon_cevir(turkce_sezon: str) -> str:
 def mazot_tahmini_al(turkce_sezon: str) -> float:
     hedef_yil = hedef_yil_belirle()
     hedef_sezon = sezon_cevir(turkce_sezon)
-    sonuc = predict_fuel_price(hedef_yil, hedef_sezon)
-    return sonuc["predicted_diesel_price"]
+    return predict_fuel_price(hedef_yil, hedef_sezon)
 
 
 def enflasyon_tahmini_al(turkce_sezon: str) -> float:
     hedef_yil = hedef_yil_belirle()
     hedef_sezon = sezon_cevir(turkce_sezon)
     sonuc = predict_inflation(hedef_yil, hedef_sezon)
-    return sonuc["predicted_annual_inflation"]
+    return predict_inflation(hedef_yil, hedef_sezon)
 
 
 def guncel_gubre_fiyati_getir() -> float:

@@ -55,13 +55,13 @@ class RiskTahminRequest(BaseModel):
     ilce: str
     urun: str
     donum: float = Field(..., gt=0)
-    sezon: str | None = None
+    sezon: str
     kullanici_id:int
 
 class RiskLogResponse(BaseModel):
     log_id: int
-    sorgulanan_ilce: str
-    sorgulanan_urun: str
+    ilce_adi : str
+    urun_adi:str
     sezon: str
     girilen_donum: float
     kota_doluluk: float | None
