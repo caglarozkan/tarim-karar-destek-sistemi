@@ -189,17 +189,22 @@ def tarla_liste(kullanici_id: int, db: Session = Depends(get_db)):
         urun_kayitlari = db.query(models.TarlaUrun).filter(models.TarlaUrun.tarla_id == t.tarla_id).all()
 
         urunler = []
+        bos_donum=0
         for u in urun_kayitlari:
             urun_bilgisi = db.query(models.Urun).filter(models.Urun.urun_id == u.urun_id).first()
             urunler.append({
                 "urun_adi": urun_bilgisi.urun_adi,
                 "donum": u.donum
             })
+            #boş ürünlerin dönümü için
+            if urun_bilgisi.urun_adi=="Boş":
+                bos_donum+=u.donum
 
         sonuc.append({
             "tarla_id": t.tarla_id,
             "tarla_adi": t.tarla_adi,
             "ilce_adi": ilce.ilce_adi,
+            "bos_donum": bos_donum,
             "urunler": urunler
         })
     return sonuc
