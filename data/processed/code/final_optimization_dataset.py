@@ -31,7 +31,7 @@ tuik_seasonal = (
 )
 final_df = tuik_seasonal.merge(
     seasonal_market,
-    on=["product_name", "year", "season"],
+    on=["product_name", "year"],
     how="left"
 )
 final_df["province"] = (
@@ -53,7 +53,6 @@ final_df = final_df[
         "district",
         "product_name",
         "year",
-        "season",
         "planted_area",
         "production_amount",
         "average_price",
@@ -71,6 +70,7 @@ final_df = final_df[
         final_df["yield_per_decare_kg"].notna()
         & (final_df["yield_per_decare_kg"] > 0)
     ]
-final_df=final_df.replace({"SALATALIK SİLOR":"SALATALIK SILOR"})
+
 final_df=final_df.drop(columns={"average_price","min_price","max_price"})
+final_df=final_df.drop_duplicates()
 final_df.to_csv("data/processed/data_files/final_optimization.csv")
