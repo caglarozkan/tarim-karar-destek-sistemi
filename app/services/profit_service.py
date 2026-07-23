@@ -64,6 +64,9 @@ def verim_orani_hesapla(ilce_id, urun_id, ilce_adi, urun_adi_csv, db):
 
     anahtar = (ilce_adi, urun_adi_csv)
     tahmini_uretim = URETIM_TAHMIN_HARITASI.get(anahtar)
+    print("Anahtar:", anahtar)
+    print("Tahmini üretim:", tahmini_uretim)
+    print("Maksimum kota:", kota_kaydi.maksimum_kota)
 
     if tahmini_uretim is None or tahmini_uretim <= 0:
         raise ValueError("Bu ilce/urun icin tahmini uretim verisi bulunamadi.")
@@ -74,7 +77,7 @@ def verim_orani_hesapla(ilce_id, urun_id, ilce_adi, urun_adi_csv, db):
 
 def tahmini_gelir_hesapla(donum, verim_orani, tahmini_fiyat):
     tahmini_uretim = donum * verim_orani #kullanıcıdan alınan
-    tahmini_gelir = tahmini_uretim * tahmini_fiyat #tahmini fiyat modelden gelen
+    tahmini_gelir = tahmini_uretim * 1000 * tahmini_fiyat #tahmini fiyat modelden gelen kg->ton dönüşümü
 
     return {
         "tahmini_uretim": round(tahmini_uretim, 2),
@@ -186,6 +189,21 @@ def kar_hesapla_tam(db, ilce_id, urun_id, ilce_adi, urun_sistem_adi, urun_adi_cs
 
     # 6. adim: net kar
     net_kar = net_kar_hesapla(gelir_sonucu["tahmini_gelir"], gider_sonucu["toplam_gider"])
+
+    print("\n========== KAR HESABI ==========")
+    print("İlçe:", ilce_adi)
+    print("Ürün:", urun_adi_csv)
+    print("Dönüm:", donum)
+    print("Verim Oranı:", verim_orani)
+    print("Tahmini Fiyat:", tahmini_fiyat)
+    print("Tahmini Üretim:", gelir_sonucu["tahmini_uretim"])
+    print("Tahmini Gelir:", gelir_sonucu["tahmini_gelir"])
+    print("================================\n")
+
+    print("Gübre gideri:", gider_sonucu["gubre_gideri"])
+    print("Mazot gideri:", gider_sonucu["mazot_gideri"])
+    print("Ek giderler:", gider_sonucu["ek_giderler"])
+    print("Toplam gider:", gider_sonucu["toplam_gider"])
 
     # hepsini tek bir sozlukte birlestir
     sonuc = {

@@ -172,20 +172,56 @@ function ProfitAnalysis() {
         <div className="results-column">
           {sonuc ? (
             <>
-              <div className="result-row">
-                <div className="result-card">
-                  <div className="label">Tahmini Gelir</div>
-                  <div className="value">{sonuc.tahmini_gelir} ₺</div>
-                </div>
-                <div className="result-card">
-                  <div className="label">Tahmini Gider</div>
-                  <div className="value">{sonuc.toplam_gider} ₺</div>
-                </div>
-              </div>
-              <div className="result-card highlight">
-                <div className="label">Tahmini Kâr</div>
-                <div className="value">{sonuc.net_kar} ₺</div>
-              </div>
+              <>
+  <div className="result-row">
+    <div className="result-card">
+      <div className="label">Tahmini Üretim</div>
+      <div className="value">{sonuc.tahmini_uretim} ton</div>
+    </div>
+
+    <div className="result-card">
+      <div className="label">Tahmini Fiyat</div>
+      <div className="value">{sonuc.tahmini_fiyat} ₺/kg</div>
+    </div>
+  </div>
+
+  <div className="result-row">
+    <div className="result-card">
+      <div className="label">Tahmini Gelir</div>
+      <div className="value">{sonuc.tahmini_gelir.toLocaleString()} ₺</div>
+    </div>
+
+    <div className="result-card">
+      <div className="label">Toplam Gider</div>
+      <div className="value">{sonuc.toplam_gider.toLocaleString()} ₺</div>
+    </div>
+  </div>
+
+  <div className="panel" style={{marginTop:"15px"}}>
+
+    <h3>Maliyet Detayları</h3>
+
+    <div className="field">
+      <label>Gübre Gideri</label>
+      <strong>{sonuc.gubre_gideri.toLocaleString()} ₺</strong>
+    </div>
+
+    <div className="field">
+      <label>Mazot Gideri</label>
+      <strong>{sonuc.mazot_gideri.toLocaleString()} ₺</strong>
+    </div>
+
+    <div className="field">
+      <label>Ek Giderler</label>
+      <strong>{sonuc.ek_giderler.toLocaleString()} ₺</strong>
+    </div>
+  </div>
+
+  <div className="result-card highlight" style={{marginTop:"20px"}}>
+    <div className="label">Tahmini Net Kâr</div>
+    <div className="value">{sonuc.net_kar.toLocaleString()} ₺</div>
+  </div>
+</>
             </>
           ) : (
             <div className="panel">
