@@ -12,13 +12,22 @@ URETIM_TAHMIN_PATH = KOK_DIZIN / "data" / "processed" / "data_files" / "üretim_
 
 #orman bakanlıgı pdfe göre
 GUBRE_RECETESI = {
-    "Domates (Sofralık)": {"azot_kg": 14, "fosfor_kg": 10},
-    "Biber (Sivri)":      {"azot_kg": 14, "fosfor_kg": 10},
-    "Hıyar (Sofralık)":   {"azot_kg": 14, "fosfor_kg": 10},
-    "Kabak (Sakız)":      {"azot_kg": 14, "fosfor_kg": 10},
-    "Patlıcan":           {"azot_kg": 14, "fosfor_kg": 10},
-    "Soğan (Kuru)":       {"azot_kg": 13, "fosfor_kg": 9},
-    "Karpuz":             {"azot_kg": 15, "fosfor_kg": 9},
+    "DOMATES SALKIM": {"azot_kg": 14, "fosfor_kg": 10},
+    "BIBER SIVRI":      {"azot_kg": 14, "fosfor_kg": 10},
+    "SALATALIK SILOR":   {"azot_kg": 14, "fosfor_kg": 10},
+    "KABAK TAZE":      {"azot_kg": 14, "fosfor_kg": 10},
+    "PATLICAN UZUN":           {"azot_kg": 14, "fosfor_kg": 10},
+    "SOGAN KURU":       {"azot_kg": 13, "fosfor_kg": 9},
+    "KARPUZ":             {"azot_kg": 15, "fosfor_kg": 9},
+    "BAKLA": {"azot_kg": 15, "fosfor_kg": 9},
+    "BEZELYE": {"azot_kg": 15, "fosfor_kg": 9},
+    "BROKOLI": {"azot_kg": 15, "fosfor_kg": 9},
+    "ISPANAK": {"azot_kg": 15, "fosfor_kg": 9},
+    "KARNABAHAR": {"azot_kg": 15, "fosfor_kg": 9},
+    "LAHANA BEYAZ": {"azot_kg": 15, "fosfor_kg": 9},
+    "LAHANA KIRMIZI": {"azot_kg": 15, "fosfor_kg": 9},
+    "MARUL":{"azot_kg": 15, "fosfor_kg": 9},
+    "PIRASA": {"azot_kg": 15, "fosfor_kg": 9},
 }
 
 # Saf maddeyi gercek gubre urunune cevirmek icin carpanlar (PDF'ten)
@@ -29,13 +38,22 @@ DAP_A_CEVIRME_CARPANI = 2.2
 
 # Sadece Domates icin net veri var, digerleri icin ayni oran kullanildi (yaklasik)
 MAZOT_TUKETIMI_LITRE_DONUM = {
-    "Domates (Sofralık)": 16.98,
-    "Biber (Sivri)":      16.98,
-    "Hıyar (Sofralık)":   16.98,
-    "Kabak (Sakız)":      16.98,
-    "Patlıcan":           16.98,
-    "Soğan (Kuru)":       16.98,
-    "Karpuz":             16.98,
+    "DOMATES SALKIM": 16.98,
+    "BIBER SIVRI":      16.98,
+    "SALATALIK SILOR":   16.98,
+    "KABAK TAZE":      16.98,
+    "PATLICAN":           16.98,
+    "SOGAN KURU":       16.98,
+    "KARPUZ":             16.98,
+    "BAKLA":             16.98,
+    "BEZELYE":             16.98,
+    "BROKOLI":             16.98,
+    "ISPANAK":             16.98,
+    "KARNABAHAR":             16.98,
+    "LAHANA BEYAZ":             16.98,
+    "LAHANA KIRMIZI":             16.98,
+    "MARUL":             16.98,
+    "PIRASA":             16.98,
 }
 
 def uretim_tahmin_haritasi_olustur():

@@ -21,16 +21,6 @@ from app.services.fertilizer_service import get_commodity_price
 KOK_DIZIN = Path(__file__).resolve().parent.parent.parent
 CSV_PATH = KOK_DIZIN / "data" / "processed" / "data_files" / "final_price_dataset.csv"
 
-URUN_ESLESTIRME = {
-    "BIBER SIVRI": "Biber (Sivri)",
-    "DOMATES SALKIM": "Domates (Sofralık)",
-    "KABAK TAZE": "Kabak (Sakız)",
-    "PATLICAN UZUN": "Patlıcan",
-    "SALATALIK SILOR": "Hıyar (Sofralık)",
-    "SOGAN KURU": "Soğan (Kuru)",
-    "KARPUZ": "Karpuz",
-}
-
 # Frontend Türkçe sezon gönderiyor, tahmin modelleri İngilizce bekliyor
 SEZON_CEVIRI = {
     "İlkbahar": "Spring",
@@ -68,12 +58,11 @@ def veri_haritalarini_olustur(referans_yil_sayisi:int):
     df = pd.read_csv(CSV_PATH)
 
     fiyat_haritasi = {}
-    for csv_adi, sistem_adi in URUN_ESLESTIRME.items():
-        fiyatlar = df[df["product_name"] == csv_adi]["average_price"].tolist()
+    for urun_adi in df["product_name"].unique():
+        fiyatlar = df[df["product_name"] == urun_adi]["reel_fiyat"].tolist()
         if fiyatlar:
-            fiyat_haritasi[sistem_adi] = fiyatlar
+            fiyat_haritasi[urun_adi] = fiyatlar
 
-    # gübre/mazot/enflasyon ürüne göre değişmiyor, tekrar eden satırları at
     tekil = df.drop_duplicates(subset=["year", "season"])
 
     if referans_yil_sayisi is not None:
