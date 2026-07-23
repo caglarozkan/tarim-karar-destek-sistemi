@@ -75,9 +75,9 @@ df_final["BULTEN_TARIHI"] = pd.to_datetime(
     errors="coerce"
 )
 df_final["BULTEN_TARIHI"] = df_final["BULTEN_TARIHI"].dt.strftime("%m/%d/%Y")
-
+df_final=df_final.drop(columns="S_NO")
 df_final.to_csv(
-    "data/processed/cleaned_2025.csv",
+    "data/processed/data_files/cleaned_2025.csv",
     index=False,
     encoding="utf-8-sig"
 )

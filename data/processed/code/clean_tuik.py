@@ -1,9 +1,19 @@
-import pandas as pd 
-import re
 import pandas as pd
+import re
 
-dosya="data/raw_data/tuik/tarimsal_urunler.xls"
-df_raw = pd.read_excel(dosya, header=None)
+
+dosya = "data/raw_data/tuik/tarimsal_urunler_son.csv"
+
+
+df_raw = pd.read_csv(
+    dosya,
+    header=None,
+    sep="|",
+    engine="python",
+    encoding="utf-8-sig"
+)
+
+df_raw = df_raw.dropna(axis=1, how="all")
 
 desc_col = 1
 year_col = 2
@@ -19,6 +29,8 @@ district_cols_names = [
 
 district_headers = df_raw.iloc[:, year_col:].copy()
 district_headers = district_headers.dropna(how="all")
+
+district_headers = district_headers.iloc[:, :len(district_cols_names) + 1]
 
 district_headers.columns = ["Year"] + district_cols_names
 
@@ -57,21 +69,92 @@ district_cols = [
     col for col in district_headers.columns
     if isinstance(col, str) and col.startswith("İzmir(")
 ]
+
 df_long = district_headers.melt(
     id_vars=["Metric", "ProductCode", "ProductName", "Unit", "Year"],
     value_vars=district_cols,
     var_name="District",
     value_name="Value"
 )
-df_long=df_long.drop(columns=["ProductCode"])
+
+df_long = df_long.drop(columns=["ProductCode"])
+
+df_long["Value"] = pd.to_numeric(
+    df_long["Value"],
+    errors="coerce"
+)
+
 df_long = df_long.sort_values(
     by=["ProductName", "Year", "District"]
 ).reset_index(drop=True)
-df_long=df_long.pivot(
-    index=["ProductName","Year","District"],
+
+df_long = df_long.pivot_table(
+    index=["ProductName", "Year", "District"],
     columns="Metric",
-    values="Value"
+    values="Value",
+    aggfunc="first"
 ).reset_index()
+
 df_long.columns.name = None
-print(df_long.head(2))
-df_long.to_csv("data/processed/data_files/clean_tuik.csv")
+
+df_long = df_long.rename(columns={
+    "ProductName": "product_name",
+    "Year": "year",
+    "District": "district",
+    "Ekilen Alan": "planted_area",
+    "Üretim": "production_amount"
+})
+
+def clean_product_name(value):
+    if pd.isna(value):
+        return pd.NA
+
+    value = str(value)
+
+    # Parantezleri kaldırır ama içindeki metni tutar
+    value = value.replace("(", " ").replace(")", " ")
+
+    # Türkçe karakterleri sadeleştirir
+    value = (
+        value
+        .replace("İ", "I")
+        .replace("ı", "I")
+        .replace("Ş", "S")
+        .replace("ş", "S")
+        .replace("Ğ", "G")
+        .replace("ğ", "G")
+        .replace("Ü", "U")
+        .replace("ü", "U")
+        .replace("Ö", "O")
+        .replace("ö", "O")
+        .replace("Ç", "C")
+        .replace("ç", "C")
+        .replace(",","")
+    )
+
+    # Tüm harfleri büyük yapar
+    value = value.upper()
+
+    # Fazla boşlukları tek boşluğa indirir
+    value = re.sub(r"\s+", " ", value)
+
+    return value.strip()
+PRODUCT_MAP={
+    "BAKLA TAZE":"BAKLA",
+    "BEZELYE TAZE":"BEZELYE",
+    "DOMATES SOFRALIK":"DOMATES SALKIM",
+    "PATLICAN":"PATLICAN UZUN",
+    "MARUL GOBEKLI":"MARUL",
+    "KABAK SAKIZ":"KABAK TAZE",
+    "HIYAR SOFRALIK":"SALATALIK SILOR",
+    
+}
+df_long["product_name"] = df_long["product_name"].apply(clean_product_name)    
+df_long["product_name"]=df_long["product_name"].replace(PRODUCT_MAP)
+df_long=df_long[df_long["product_name"].isin( ["BAKLA","BEZELYE","DOMATES SALKIM","PATLICAN UZUN","MARUL","LAHANA KIRMIZI","LAHANA BEYAZ","PIRASA","SALATALIK SILOR",
+                                           "SOGAN KURU","KARPUZ","KARNABAHAR","KABAK TAZE","ISPANAK","BROKOLI","BIBER SIVRI"])]
+df_long.to_csv(
+    "data/processed/data_files/cleaned_tuik.csv",
+    index=False,
+    encoding="utf-8-sig"
+)

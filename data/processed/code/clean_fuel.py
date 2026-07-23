@@ -27,7 +27,11 @@ def dosya_temizle(df):
         .str.replace("TL/LT", "", regex=False)
         .str.strip()
     )
-    
+    df=df.rename(columns={
+    "Şehir":"province",
+    "İlçe":"district",
+    "Tarih":"date"
+    })
     return df
 
 dosyalar=[
@@ -98,10 +102,10 @@ def get_season(month):
         return "Fall"
 
 for d in df:
-    d["Tarih"] = pd.to_datetime(d["Tarih"], format="%d.%m.%Y")
-    d["Year"] = d["Tarih"].dt.year
-    d["Month"] = d["Tarih"].dt.month
-    d["Season"] = d["Month"].apply(get_season)
+    d["date"] = pd.to_datetime(d["date"], format="%d.%m.%Y")
+    d["year"] = d["date"].dt.year
+    d["month"] = d["date"].dt.month
+    d["season"] = d["month"].apply(get_season)
     
     
 
@@ -110,34 +114,34 @@ all_fuel["V/Pro Diesel"] = pd.to_numeric(all_fuel["V/Pro Diesel"], errors="coerc
 all_fuel["V/Max Diesel"] = pd.to_numeric(all_fuel["V/Max Diesel"], errors="coerce")
 
 fuel_old = all_fuel[
-    (all_fuel["Year"] >= 2014) &
-    (all_fuel["Year"] < 2020)
+    (all_fuel["year"] >= 2014) &
+    (all_fuel["year"] < 2020)
 ]
 fuel_new = all_fuel[
-    all_fuel["Year"] >= 2020
+    all_fuel["year"] >= 2020
 ]
 
 
 season_old = (
     fuel_old
-    .groupby(["Year", "Season"], as_index=False)["V/Pro Diesel"]
+    .groupby(["year", "season"], as_index=False)["V/Pro Diesel"]
     .mean()
     .round(2)
 )
 
 season_new = (
     fuel_new
-    .groupby(["Year", "Season"], as_index=False)["V/Max Diesel"]
+    .groupby(["year", "season"], as_index=False)["V/Max Diesel"]
     .mean()
     .round(2)
 )
 season_old.rename(
-    columns={"V/Pro Diesel": "Diesel_Price"},
+    columns={"V/Pro Diesel": "diesel_Price"},
     inplace=True
 )
 
 season_new.rename(
-    columns={"V/Max Diesel": "Diesel_Price"},
+    columns={"V/Max Diesel": "diesel_Price"},
     inplace=True
 )
 season_df = pd.concat(
