@@ -4,7 +4,7 @@ import requests
 from pathlib import Path
 from datetime import date
 from bs4 import BeautifulSoup
-from get_usd import get_usd_try
+from app.services.get_usd import get_usd_try
 
 CACHE_FILE = Path("commodity_prices.json")
 
