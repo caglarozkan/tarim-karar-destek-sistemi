@@ -12,8 +12,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 
-INFLATION_PATH = Path("data/processed/data_files/seasonal_inflation.csv")
-MODEL_PATH = Path("models/inflation_model.pkl")
+KOK_DIZIN = Path(__file__).resolve().parent.parent.parent
+INFLATION_PATH = KOK_DIZIN / "data" / "processed" / "data_files" / "seasonal_inflation.csv"
+MODEL_PATH = KOK_DIZIN / "models" / "inflation_model.pkl"
 
 TARGET_COLUMN = "annual_inflation"
 

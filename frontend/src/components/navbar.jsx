@@ -49,6 +49,7 @@ function Navbar() {
               <div className="dropdown-menu">
                 <Link to="/bilgilerim">Kişisel Bilgilerim</Link>
                 <Link to="/tarlalarim">Tarlalarım</Link>
+                <Link to="/Risk-gecmisim">Risk Log</Link>
                 <div className="menu-divider" />
                 <button className="logout-item" onClick={cikisYap}>
                   Çıkış Yap

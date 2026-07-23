@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../App.css";
 
 const ILCELER = ["Bayındır","Bergama","Menderes","Tire","Torbalı","Ödemiş"];
@@ -15,9 +15,15 @@ function ProfitAnalysis() {
     iscilik_maliyeti: "",
     tohum_maliyeti: "",
   });
+  const [kullanici,setKullanici]=useState(null);
   const [sonuc, setSonuc] = useState(null);
   const [yukleniyor, setYukleniyor] = useState(false);
   const [hata, setHata] = useState("");
+
+  useEffect(() => {
+      const kayit = localStorage.getItem("kullanici");
+      if ( kayit) setKullanici(JSON.parse(kayit));
+      },[]);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -29,20 +35,25 @@ function ProfitAnalysis() {
       setHata("Lütfen ilçe, ürün, dönüm ve sezon bilgisini doldur.");
       return;
     }
+    if (!kullanici) {
+        setHata("Önce giriş yapmalısın!");
+        return;
+    }
 
     setYukleniyor(true);
     setSonuc(null);
     try {
-      const res = await fetch("http://localhost:8000/tahmin/kar", {
+      const res = await fetch("http://localhost:8000/kar/hesapla", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({...form,kullanici_id:kullanici.id}),
       });
       const data = await res.json();
       if (res.ok) {
-        setSonuc(data);
+         setSonuc(data);
       } else {
-        setHata(data.detail || "Tahmin alınamadı.");
+          const mesaj = typeof data.detail ==="string" ? data.detail : "Tahmin alınamadı";
+          setHata(mesaj);
       }
     } catch (err) {
       setHata("Sunucuya bağlanılamadı.");
@@ -161,20 +172,56 @@ function ProfitAnalysis() {
         <div className="results-column">
           {sonuc ? (
             <>
-              <div className="result-row">
-                <div className="result-card">
-                  <div className="label">Tahmini Gelir</div>
-                  <div className="value">{sonuc.tahmini_gelir} ₺</div>
-                </div>
-                <div className="result-card">
-                  <div className="label">Tahmini Gider</div>
-                  <div className="value">{sonuc.tahmini_gider} ₺</div>
-                </div>
-              </div>
-              <div className="result-card highlight">
-                <div className="label">Tahmini Kâr</div>
-                <div className="value">{sonuc.tahmini_kar} ₺</div>
-              </div>
+              <>
+  <div className="result-row">
+    <div className="result-card">
+      <div className="label">Tahmini Üretim</div>
+      <div className="value">{sonuc.tahmini_uretim} ton</div>
+    </div>
+
+    <div className="result-card">
+      <div className="label">Tahmini Fiyat</div>
+      <div className="value">{sonuc.tahmini_fiyat} ₺/kg</div>
+    </div>
+  </div>
+
+  <div className="result-row">
+    <div className="result-card">
+      <div className="label">Tahmini Gelir</div>
+      <div className="value">{sonuc.tahmini_gelir.toLocaleString()} ₺</div>
+    </div>
+
+    <div className="result-card">
+      <div className="label">Toplam Gider</div>
+      <div className="value">{sonuc.toplam_gider.toLocaleString()} ₺</div>
+    </div>
+  </div>
+
+  <div className="panel" style={{marginTop:"15px"}}>
+
+    <h3>Maliyet Detayları</h3>
+
+    <div className="field">
+      <label>Gübre Gideri</label>
+      <strong>{sonuc.gubre_gideri.toLocaleString()} ₺</strong>
+    </div>
+
+    <div className="field">
+      <label>Mazot Gideri</label>
+      <strong>{sonuc.mazot_gideri.toLocaleString()} ₺</strong>
+    </div>
+
+    <div className="field">
+      <label>Ek Giderler</label>
+      <strong>{sonuc.ek_giderler.toLocaleString()} ₺</strong>
+    </div>
+  </div>
+
+  <div className="result-card highlight" style={{marginTop:"20px"}}>
+    <div className="label">Tahmini Net Kâr</div>
+    <div className="value">{sonuc.net_kar.toLocaleString()} ₺</div>
+  </div>
+</>
             </>
           ) : (
             <div className="panel">

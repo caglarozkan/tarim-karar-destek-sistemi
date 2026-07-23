@@ -9,6 +9,7 @@ import Recommendations from "./pages/Recommendations";
 import Profile from "./pages/Profile";
 import Farms from "./pages/Farms";
 import "./App.css";
+import RiskLog from "./pages/RiskLog";
 
 function Layout({ children }) {
   return (
@@ -80,6 +81,14 @@ function App() {
             </Layout>
           }
         />
+        <Route
+        path="/Risk-gecmisim"
+        element={
+            <Layout>
+                <RiskLog />
+             </Layout>
+            }
+         />
       </Routes>
     </BrowserRouter>
   );

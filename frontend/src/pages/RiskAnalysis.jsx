@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../App.css";
 
 const ILCELER = ["Bayındır","Bergama","Menderes","Tire","Torbalı","Ödemiş"];
@@ -6,10 +6,16 @@ const URUNLER = ["Biber (Sivri)","Domates (Sofralık)","Hıyar (Sofralık)","Kab
 const SEZONLAR = ["İlkbahar", "Yaz", "Sonbahar", "Kış"];
 
 function RiskAnalysis() {
+  const [kullanici, setKullanici] = useState(null);
   const [form, setForm] = useState({ ilce: "", urun: "", donum: "", sezon: "" });
   const [sonuc, setSonuc] = useState(null);
   const [yukleniyor, setYukleniyor] = useState(false);
   const [hata, setHata] = useState("");
+
+  useEffect(() => {
+    const kayit = localStorage.getItem("kullanici");
+    if (kayit) setKullanici(JSON.parse(kayit));
+  }, []);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -21,6 +27,10 @@ function RiskAnalysis() {
       setHata("Lütfen ilçe, ürün, dönüm ve sezon bilgisini doldur.");
       return;
     }
+    if (!kullanici) {
+      setHata("Önce giriş yapmalısın.");
+      return;
+    }
 
     setYukleniyor(true);
     setSonuc(null);
@@ -28,7 +38,7 @@ function RiskAnalysis() {
       const res = await fetch("http://localhost:8000/tahmin/risk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, kullanici_id: kullanici.id }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -59,9 +69,7 @@ function RiskAnalysis() {
             <select name="ilce" value={form.ilce} onChange={handleChange}>
               <option value="">İlçe seç</option>
               {ILCELER.map((i) => (
-                <option key={i} value={i}>
-                  {i}
-                </option>
+                <option key={i} value={i}>{i}</option>
               ))}
             </select>
           </div>
@@ -71,9 +79,7 @@ function RiskAnalysis() {
             <select name="urun" value={form.urun} onChange={handleChange}>
               <option value="">Ürün seç</option>
               {URUNLER.map((u) => (
-                <option key={u} value={u}>
-                  {u}
-                </option>
+                <option key={u} value={u}>{u}</option>
               ))}
             </select>
           </div>
@@ -96,9 +102,7 @@ function RiskAnalysis() {
             <select name="sezon" value={form.sezon} onChange={handleChange}>
               <option value="">Sezon seç</option>
               {SEZONLAR.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
+                <option key={s} value={s}>{s}</option>
               ))}
             </select>
           </div>
@@ -123,8 +127,27 @@ function RiskAnalysis() {
                   />
                 </div>
               </div>
-              <div className="result-note">
-                Kota Doluluk: %{sonuc.kota_doluluk} &nbsp;|&nbsp; Fiyat Oynaklığı (CV): %{sonuc.cv}
+
+              <div className="panel" style={{ marginTop: 16 }}>
+                <h4 style={{ marginBottom: 12 }}>Risk Bileşenleri</h4>
+
+                <div className="meta">Kota Doluluk: <strong>%{sonuc.kota_doluluk}</strong> (ağırlık: %38)</div>
+                <div className="meta">Fiyat Oynaklığı (CV): <strong>%{sonuc.cv}</strong> (ağırlık: %29)</div>
+
+                <hr style={{ margin: "12px 0", opacity: 0.2 }} />
+
+                <div className="meta">Gübre — Güncel Fiyat: <strong>{sonuc.gubre_guncel} TL</strong></div>
+                <div className="meta">Gübre Risk Katkısı: <strong>%{sonuc.gubre_riski}</strong> (ağırlık: %16)</div>
+
+                <hr style={{ margin: "12px 0", opacity: 0.2 }} />
+
+                <div className="meta">Mazot — Tahmini Fiyat: <strong>{sonuc.mazot_tahmini} TL</strong></div>
+                <div className="meta">Mazot Risk Katkısı: <strong>%{sonuc.mazot_riski}</strong> (ağırlık: %9)</div>
+
+                <hr style={{ margin: "12px 0", opacity: 0.2 }} />
+
+                <div className="meta">Enflasyon — Tahmini: <strong>%{sonuc.enflasyon_tahmini}</strong></div>
+                <div className="meta">Enflasyon Risk Katkısı: <strong>%{sonuc.enflasyon_riski}</strong> (ağırlık: %8)</div>
               </div>
             </>
           ) : (

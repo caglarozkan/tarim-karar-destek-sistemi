@@ -66,7 +66,7 @@ class Kota(Base):
     kota_id = Column(Integer, primary_key=True, autoincrement=True)
     urun_id = Column(Integer, ForeignKey("urun.urun_id", ondelete="CASCADE"), nullable=False)
     ilce_id = Column(Integer, ForeignKey("ilce.ilce_id"),nullable=False)
-    maksimum_kota = Column(Float,ForeignKey("ilce.ilce_id"), nullable=False)
+    maksimum_kota = Column(Float, nullable=False)
     kullanilan_kota = Column(Float, default=0)
 
 # öneri paketi modeli
@@ -97,12 +97,24 @@ class RiskAnalizLog(Base):
 
     log_id = Column(Integer, primary_key=True, autoincrement=True)
     kullanici_id = Column(Integer, ForeignKey("kullanici.kullanici_id", ondelete="SET NULL"), nullable=True)
-    sorgulanan_ilce = Column(String(50), nullable=False)
+    ilce_id = Column(Integer, ForeignKey("ilce.ilce_id", ondelete="CASCADE"), nullable=False)
     urun_id = Column(Integer, ForeignKey("urun.urun_id", ondelete="CASCADE"), nullable=False)
+    sezon = Column(String(20), nullable=False)
     girilen_donum = Column(Float, nullable=False)
-    donen_risk_orani = Column(Float, nullable=True)
-    sorgu_tarihi = Column(DateTime, server_default=func.now())
 
+    kota_doluluk = Column(Float, nullable=True)
+    cv_fiyat = Column(Float, nullable=True)
+    mazot_tahmini = Column(Float, nullable=True)
+    mazot_riski = Column(Float, nullable=True)
+    enflasyon_tahmini = Column(Float, nullable=True)
+    enflasyon_riski = Column(Float, nullable=True)
+    gubre_guncel = Column(Float, nullable=True)
+    gubre_riski = Column(Float, nullable=True)
+
+    genel_risk = Column(Float, nullable=True)
+    risk_seviyesi = Column(String(20), nullable=True)
+
+    sorgu_tarihi = Column(DateTime, server_default=func.now())
 # kullanıcı aktivite log modeli
 class KullaniciAktiviteLog(Base):
     __tablename__ = "kullanici_aktivite_log"

@@ -1,13 +1,27 @@
 from pathlib import Path
 import pulp
+import re
 import pandas as pd
-from price_prediction import predict_products
+from app.services.price_prediction import predict_products
 
 DATAPATH = "data/processed/data_files/final_optimization.csv"
 QUOTAPATH="data/processed/data_files/cleaned_quota.csv"
 
-df = pd.read_csv(DATAPATH)
-quota=pd.read_csv(QUOTAPATH)
+def load_optimization_data():
+  df= pd.read_csv(DATAPATH)
+  quota=pd.read_csv(QUOTAPATH)
+  quota["quota"] = pd.to_numeric(quota["quota"], errors="coerce")
+
+  quota = quota.drop_duplicates(
+        subset=["district", "product_name"]
+    )
+
+  df = df.merge(
+        quota[["district", "product_name", "quota"]],
+        on=["district", "product_name"],
+        how="left"
+    )
+  return df
 
 def get_suitable_products(df, district):
     data = df.copy()
@@ -32,15 +46,20 @@ def calculate_product_summary(valid_products_df):
 
     summary =(
         data.groupby(
-            ["province", "district", "product_name"],
+            [ "district", "product_name"],
             as_index=False
         )
         .agg(
             average_yield_per_decare=("yield_per_decare", "mean"),
+            quota=("quota", "first")
         )
     )
     summary["average_yield_per_decare"] = (
         summary["average_yield_per_decare"].round(2)
+    )
+    summary["quota"] = pd.to_numeric(
+        summary["quota"],
+        errors="coerce"
     )
     summary = summary.drop_duplicates().reset_index(drop=True)
 
@@ -95,14 +114,14 @@ def add_price_and_revenue(products,season):
 
 
 def create_planting_plan(
-    df,
     district,
     season,
     total_area,
-    selected_products=None
-):
+    selected_products=None,
+    max_share=0.4
+): 
+    df=load_optimization_data()
     suitable_products = get_suitable_products(df, district)
-
     revenue_data = add_price_and_revenue(suitable_products, season)
 
     if selected_products:
@@ -111,16 +130,19 @@ def create_planting_plan(
         ].reset_index(drop=True)
 
     if revenue_data.empty:
-        raise ValueError("Bu il/ilçe ve ürün seçimi için uygun ürün bulunamadı.")
+        raise ValueError("Bu il/ilce icin uygun urun bulunamadi.")
 
     model=pulp.LpProblem("optimal_ekim_plani",pulp.LpMaximize)
     
+    def safe_name(product_name):
+        return re.sub(r"[^A-Za-z0-9_]", "_", product_name)
+
     area_vars = {}
     for _, row in revenue_data.iterrows():
         product_name = row["product_name"]
 
         area_vars[product_name] = pulp.LpVariable(
-            name=f"x_{product_name}",
+            name=f"x_{safe_name(product_name)}",
             lowBound=0,
             cat="Continuous"
         )
@@ -139,14 +161,14 @@ def create_planting_plan(
         product_name = row["product_name"]
 
         model += (
-            area_vars[product_name] <= total_area * 0.40,
+            area_vars[product_name] <= total_area * max_share,
             f"max_share_{product_name}"
         )
 
         if "quota" in revenue_data.columns and pd.notna(row.get("quota")):
             model += (
                 area_vars[product_name] <= row["quota"],
-                f"quota_{product_name}"
+                f"quota_{safe_name(product_name)}"
             )
 
     status = model.solve(pulp.PULP_CBC_CMD(msg=False))
@@ -189,34 +211,48 @@ def create_planting_plan(
         ascending=False
     ).reset_index(drop=True)
 
-    return result
+    return result.to_dict(orient="records")
+
+def create_plan_for_user_fields(
+    fields,
+    season,
+    selected_products=None
+):
+    all_plans = []
+
+    for field in fields:
+        field_id = field["id"]
+        district = field["district"]
+        total_area = field["area"]
+
+        try:
+            plan = create_planting_plan(
+                district=district,
+                season=season,
+                total_area=total_area,
+                selected_products=selected_products
+            )
+
+            all_plans.append({
+                "field_id": field_id,
+                "district": district,
+                "total_area": total_area,
+                "success": True,
+                "plan": plan
+            })
+
+        except ValueError as error:
+            all_plans.append({
+                "field_id": field_id,
+                "district": district,
+                "total_area": total_area,
+                "success": False,
+                "error": str(error),
+                "plan": []
+            })
+
+    return all_plans
 
 
 
-if __name__ == "__main__":
-    district = input("Ilce giriniz: ")
-    season = input("Sezon giriniz Winter/Spring/Summer/Fall: ")
-    total_area = float(input("Toplam donum giriniz: "))
 
-    product_input = input(
-        "Ekmek istediginiz urunleri virgulle yazin. Sisteme birakmak icin bos birakin: "
-    )
-
-    if product_input.strip():
-        selected_products = [
-            product.strip().upper()
-            for product in product_input.split(",")
-        ]
-    else:
-        selected_products = None
-
-    plan = create_planting_plan(
-        df=df,
-        district=district,
-        season=season,
-        total_area=total_area,
-        selected_products=selected_products
-    )
-
-    print("\nOptimal ekim plani:")
-    print(plan)

@@ -24,6 +24,7 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.metrics import mean_absolute_percentage_error
 
 DATASET_PATH = Path("data/processed/data_files/final_price_dataset.csv")
 MODEL_PATH = Path("models/price_model.pkl")
@@ -133,6 +134,7 @@ def load_dataset(dataset_path: Path = DATASET_PATH) -> pd.DataFrame:
 
     df["product_name"] = df["product_name"].astype(str)
     df["season"] = df["season"].astype(str).apply(validate_season)
+    df["year"] = pd.to_numeric(df["year"], errors="coerce")
 
     for column in NUMERIC_FEATURES + [TARGET_COLUMN]:
         df[column] = pd.to_numeric(df[column], errors="coerce")
@@ -201,28 +203,14 @@ def train_price_model(
     model.fit(x_train, y_train)
 
     predictions = model.predict(x_test)
-    predictions = model.predict(x_test)
-
-    sonuclar = x_test.copy()
-    sonuclar["gercek"] = y_test.values
-    sonuclar["tahmin"] = predictions
-
-    sonuclar["yuzde_hata"] = (
-    abs(sonuclar["gercek"] - sonuclar["tahmin"])
-    / sonuclar["gercek"]
-) * 100
-
-    print(
-    sonuclar.sort_values("yuzde_hata", ascending=False).head(20)
-)
 
     metrics = {
-        "mae": round(float(mean_absolute_error(y_test, predictions)), 4),
-        "rmse": round(float(root_mean_squared_error(y_test, predictions)), 4),
-        "mape": round(float(mean_absolute_percentage_error(y_test, predictions) * 100), 2),
-        "r2": round(float(r2_score(y_test, predictions)), 4) if len(y_test) > 1 else 0.0,
-        "row_count": float(len(df)),
-    }
+    "mae": round(float(mean_absolute_error(y_test, predictions)), 4),
+    "rmse": round(float(root_mean_squared_error(y_test, predictions)), 4),
+    "mape": round(float(mean_absolute_percentage_error(y_test, predictions) * 100), 2),
+    "r2": round(float(r2_score(y_test, predictions)), 4) if len(y_test) > 1 else 0.0,
+    "row_count": float(len(df)),
+}
 
     model_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, model_path)
@@ -462,29 +450,4 @@ def predict_all_products(
     }
 
 
-def test_train_price_model():
-    metrics = train_price_model()
-    print("Model egitim metrikleri:")
-    print(metrics)
 
-
-def test_predict_products():
-    product_name = "DOMATES SALKIM"
-
-    predictions = predict_products(product_name)
-
-    print(f"{product_name} icin sonraki 4 sezon tahmini:")
-
-    for item in predictions:
-        print(
-            item["year"],
-            item["season"],
-            "->",
-            item["predicted_price"]
-        )
-
-
-if __name__ == "__main__":
-    train_price_model()
-    test_train_price_model()
-    test_predict_products()
