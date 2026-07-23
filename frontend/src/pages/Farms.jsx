@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
+import { URUNLER, URUN_GORUNEN_ADLAR } from "../constants/urunler";
 
 function Farms() {
   const navigate = useNavigate();
@@ -173,7 +174,7 @@ function Farms() {
                 <select value={satir.urun_id} onChange={(e) => satirGuncelle(index, "urun_id", e.target.value)}>
                   <option value="">Ürün seç</option>
                   {urunler.map((u) => (
-                    <option key={u.urun_id} value={u.urun_id}>{u.urun_adi}</option>
+                    <option key={u.urun_id} value={u.urun_id}>{URUN_GORUNEN_ADLAR[u.urun_adi] || u.urun_adi}</option>
                   ))}
                 </select>
               </div>

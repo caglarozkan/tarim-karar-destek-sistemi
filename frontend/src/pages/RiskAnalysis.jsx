@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import "../App.css";
+import { URUNLER, URUN_GORUNEN_ADLAR } from "../constants/urunler";
 
 const ILCELER = ["Bayındır","Bergama","Menderes","Tire","Torbalı","Ödemiş"];
-const URUNLER = ["Biber (Sivri)","Domates (Sofralık)","Hıyar (Sofralık)","Kabak (Sakız)","Karpuz","Patlıcan","Soğan (Kuru)","Bos"];
 const SEZONLAR = ["İlkbahar", "Yaz", "Sonbahar", "Kış"];
 
 function RiskAnalysis() {
@@ -79,7 +79,7 @@ function RiskAnalysis() {
             <select name="urun" value={form.urun} onChange={handleChange}>
               <option value="">Ürün seç</option>
               {URUNLER.map((u) => (
-                <option key={u} value={u}>{u}</option>
+                <option key={u} value={u}>{URUN_GORUNEN_ADLAR}</option>
               ))}
             </select>
           </div>

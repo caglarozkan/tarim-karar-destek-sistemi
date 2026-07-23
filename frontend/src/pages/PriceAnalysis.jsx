@@ -1,8 +1,8 @@
 import { useState } from "react";
 import "../App.css";
+import { URUNLER, URUN_GORUNEN_ADLAR } from "../constants/urunler";
 
 const ILCELER = ["Bayındır","Bergama","Menderes","Tire","Torbalı","Ödemiş"];
-const URUNLER = ["Biber (Sivri)","Domates (Sofralık)","Hıyar (Sofralık)","Kabak (Sakız)","Karpuz","Patlıcan","Soğan (Kuru)"];
 const SEZONLAR = ["İlkbahar", "Yaz", "Sonbahar", "Kış"];
 
 function PriceAnalysis() {
@@ -85,7 +85,7 @@ function PriceAnalysis() {
               <option value="">Ürün seç</option>
               {URUNLER.map((u) => (
                 <option key={u} value={u}>
-                  {u}
+                  {URUN_GORUNEN_ADLAR}
                 </option>
               ))}
             </select>
@@ -104,7 +104,7 @@ function PriceAnalysis() {
               <div className="label">Tahmini Fiyat</div>
               <div className="value">{sonuc.tahmini_fiyat} ₺</div>
               <div classname="meta" style={{marginTop:10,color: "#f5f0e6"}}>
-                  {sonuc.urun} - {sonuc.ilce}
+                  {URUN_GORUNEN_ADLAR[sonuc.urun] || sonuc.urun} - {sonuc.ilce}
               </div>
               <div classname="meta" style={{color: "#f5f0e6"}}>
                   {sonuc.sezon} {sonuc.yil}
