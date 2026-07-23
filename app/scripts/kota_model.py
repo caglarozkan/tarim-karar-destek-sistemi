@@ -14,38 +14,38 @@ df = pd.read_csv(GIRIS_PATH)
 print(df.head())
 print(df.isnull().sum())
 
-df["District"] = df["District"].str.replace("İzmir(", "", regex=False)
-df["District"] = df["District"].str.replace(")", "", regex=False)
+df["district"] = df["district"].str.replace("İzmir(", "", regex=False)
+df["district"] = df["district"].str.replace(")", "", regex=False)
 
 # ekilen alan eksik olan değerleri ortalama ile doldurma
 for i in range(len(df)):
-    if pd.isnull(df.loc[i, "Ekilen Alan"]):
-        urun = df.loc[i, "ProductName"]
-        ilce = df.loc[i, "District"]
+    if pd.isnull(df.loc[i, "planted_area"]):
+        urun = df.loc[i, "product_name"]
+        ilce = df.loc[i, "district"]
 
-        if urun != "Soğan (Kuru)":
-            filtre = (df["ProductName"] == urun) & (df["District"] == ilce)
-            ortalama = df.loc[filtre, "Ekilen Alan"].mean()
-            df.loc[i, "Ekilen Alan"] = ortalama
+        if urun != "SOGAN KURU":
+            filtre = (df["product_name"] == urun) & (df["district"] == ilce)
+            ortalama = df.loc[filtre, "planted_area"].mean()
+            df.loc[i, "planted_area"] = ortalama
 
 # üretim miktarı eksik olan yerleri ortalama ile doldurma
 for i in range(len(df)):
     if pd.isnull(df.loc[i, "Üretim Miktarı"]):
-        urun = df.loc[i, "ProductName"]
-        ilce = df.loc[i, "District"]
+        urun = df.loc[i, "product_name"]
+        ilce = df.loc[i, "district"]
 
-        if urun != "Soğan (Kuru)":
-            filtre = (df["ProductName"] == urun) & (df["District"] == ilce)
+        if urun != "SOGAN KURU":
+            filtre = (df["product_name"] == urun) & (df["district"] == ilce)
             ortalama = df.loc[filtre, "Üretim Miktarı"].mean()
             df.loc[i, "Üretim Miktarı"] = ortalama
 
 print(df.isnull().sum())
 
-egitim = df.dropna(subset=["Ekilen Alan"]).copy()
-egitim = pd.get_dummies(egitim, columns=["District", "ProductName"])
+egitim = df.dropna(subset=["planted_area"]).copy()
+egitim = pd.get_dummies(egitim, columns=["district", "product_name"])
 
-X = egitim.drop(columns=["Unnamed: 0", "Ekilen Alan", "Üretim Miktarı"])
-y = egitim["Ekilen Alan"]
+X = egitim.drop(columns=["planted_area", "Üretim Miktarı"])
+y = egitim["planted_area"]
 
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
@@ -61,6 +61,15 @@ print("R2 :", r2_score(y_test, linear_predict))
 print("MAE :", mean_absolute_error(y_test, linear_predict))
 print("MSE :", mean_squared_error(y_test, linear_predict))
 
+# hyperparameter tuning
+params = {
+    "n_estimators": [200,300,500],
+    "max_depth": [1, 3, 5, 10],
+    "criterion": ["squared_error","absolute_error","poisson"]
+}
+from sklearn.model_selection import GridSearchCV
+
+
 from sklearn.ensemble import RandomForestRegressor
 rf = RandomForestRegressor(n_estimators=100, random_state=42)
 rf.fit(X_train, y_train)
@@ -70,24 +79,67 @@ print("R2 :", r2_score(y_test, rf_predict))
 print("MAE :", mean_absolute_error(y_test, rf_predict))
 print("MSE :", mean_squared_error(y_test, rf_predict))
 
+#rf hyperparameter
+grid_rf=GridSearchCV(
+    estimator=RandomForestRegressor(),
+    param_grid=params,
+    n_jobs=-1
+)
+grid_rf.fit(X_train, y_train)
+grid_rf_predict = grid_rf.predict(X_test)
+print("best params:",grid_rf.best_params_)
+print("\n-- Random Forest after --")
+print("R2 :", r2_score(y_test, grid_rf_predict))
+print("MAE :", mean_absolute_error(y_test, grid_rf_predict))
+print("MSE :", mean_squared_error(y_test, grid_rf_predict))
+
+
+#xgbregressor deneme
+from xgboost import XGBRegressor
+xgbr=XGBRegressor()
+xgbr.fit(X_train, y_train)
+xgbr_predict=xgbr.predict(X_test)
+print("\n-- XGB Regression --")
+print("R2 :", r2_score(y_test, rf_predict))
+print("MAE :", mean_absolute_error(y_test, xgbr_predict))
+print("MSE :", mean_squared_error(y_test, xgbr_predict))
+
+params = {
+    "booster":["gbtree","gblinear","dart"],
+    "max_depth":[3,5,10,20]
+}
+#xgbr
+grid = GridSearchCV(
+    estimator=XGBRegressor(),
+    param_grid=params,
+    n_jobs=-1,
+)
+grid.fit(X_train, y_train)
+grid_predict = grid.predict(X_test)
+print("best PARAM:",grid.best_params_)
+print("\n-- XGBoost Regression hyperparameter --")
+print("R2:",r2_score(y_test, grid_predict))
+print("MAE :", mean_absolute_error(y_test, grid_predict))
+print("MSE :",mean_squared_error(y_test, grid_predict))
+
 # her ürün-ilçe için kota bilgisi
-kota_df = pd.DataFrame(columns=["District", "ProductName", "2026 Kota"])
-ilceler = df["District"].unique()
-urunler = df["ProductName"].unique()
+kota_df = pd.DataFrame(columns=["district", "product_name", "2026 Kota"])
+ilceler = df["district"].unique()
+urunler = df["product_name"].unique()
 
 for ilce in ilceler:
     for urun in urunler:
-        veri = df[(df["District"] == ilce) & (df["ProductName"] == urun)]
-        veri = veri.dropna(subset=["Ekilen Alan"])
+        veri = df[(df["district"] == ilce) & (df["product_name"] == urun)]
+        veri = veri.dropna(subset=["planted_area"])
 
         if len(veri) < 2:
             kota_df.loc[len(kota_df)] = [ilce, urun, 0]
             continue
 
-        X = veri[["Year"]]
-        y = veri["Ekilen Alan"]
+        X = veri[["year"]]
+        y = veri["planted_area"]
 
-        model = RandomForestRegressor(n_estimators=50, random_state=42)
+        model = XGBRegressor(n_estimators=5,booster="gbtree", random_state=42)
         model.fit(X, y)
         predict = model.predict([[2026]])
 

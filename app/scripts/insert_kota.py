@@ -12,8 +12,8 @@ kota_df = pd.read_csv(KOTA_CSV_PATH)
 db = SessionLocal()
 
 for i in range(len(kota_df)):
-    ilce_adi = kota_df.loc[i, "District"]
-    urun_adi = kota_df.loc[i, "ProductName"]
+    ilce_adi = kota_df.loc[i, "district"]
+    urun_adi = kota_df.loc[i, "product_name"]
     maksimum_kota = float(kota_df.loc[i, "2026 Kota"])
 
     urun = db.query(Urun).filter(Urun.urun_adi == urun_adi).first()
