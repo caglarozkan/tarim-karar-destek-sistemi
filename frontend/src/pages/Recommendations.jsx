@@ -1,19 +1,23 @@
 import { useEffect, useState } from "react";
 import "../App.css";
 
-const ILCELER = ["Bayındır", "Ödemiş", "Tire", "Kiraz", "Bergama"];
-
+const ILCELER = ["Bayındır","Bergama","Menderes","Tire","Torbalı","Ödemiş"];
+const URUNLER = ["Biber (Sivri)","Domates (Sofralık)","Hıyar (Sofralık)","Kabak (Sakız)","Karpuz","Patlıcan","Sogan (Kuru)","Bos"];
+const SEZONLAR = ["İlkbahar","Yaz","Sonbahar","Kış"];
 function Recommendations() {
   const kayit = localStorage.getItem("kullanici");
   const aktifKullanici = kayit ? JSON.parse(kayit) : null;
 
   const [mod, setMod] = useState(aktifKullanici ? "tarlalarim" : "manuel");
   const [tarlalar, setTarlalar] = useState([]);
-  const [secilenTarlalar, setSecilenTarlalar] = useState([]);
+  const [secilenTarla, setSecilenTarla] = useState([]);
   const [manuelForm, setManuelForm] = useState({ ilce: "", donum: "" });
   const [sonuc, setSonuc] = useState(null);
   const [yukleniyor, setYukleniyor] = useState(false);
   const [hata, setHata] = useState("");
+  const [sezon,setSezon] = useState("");
+  const [secilenUrunler,setSecilenUrunler]=useState([]);
+
 
   useEffect(() => {
     if (aktifKullanici) {
@@ -24,15 +28,19 @@ function Recommendations() {
     }
   }, []);
 
-  const tarlaSecimiDegistir = (tarlaId) => {
-    setSecilenTarlalar((prev) =>
-      prev.includes(tarlaId) ? prev.filter((id) => id !== tarlaId) : [...prev, tarlaId]
+  const tarlaSec = (tarlaId) => {
+  setSecilenTarla(tarlaId);
+  };
+
+  const urunSecimiDegistir = (urun) => {
+    setSecilenUrunler((prev) =>
+      prev.includes(urun) ? prev.filter((u) => u !== urun) : [...prev, urun]
     );
   };
 
-  const toplamDonum = tarlalar
-    .filter((t) => secilenTarlalar.includes(t.id))
-    .reduce((sum, t) => sum + Number(t.donum || 0), 0);
+  const uygunTarlalar = tarlalar.filter((t) => t.bos_donum > 0);
+
+  const toplamDonum = secilenTarla ? uygunTarlalar.find((t) => t.tarla_id === secilenTarla)?.bos_donum || 0: 0;
 
   const handleManuelChange = (e) => {
     setManuelForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -41,19 +49,32 @@ function Recommendations() {
   const oneriAl = async () => {
     setHata("");
 
-    let payload;
+    if (!sezon){
+        setHata("Lütfen Sezon Seçiniz!");
+        return
+    }
+
+    let payload={
+        mod,
+        sezon,
+        secilen_urunler: secilenUrunler.length > 0 ? secilenUrunler: NULL,
+        kullanici_id: aktifKullanici ? aktifKullanici.id : NULL,
+        };
+
     if (mod === "tarlalarim") {
-      if (secilenTarlalar.length === 0) {
-        setHata("Lütfen en az bir tarla seç.");
+      if (!secilenTarla) {
+        setHata("Lütfen bir tarla seç.");
         return;
       }
-      payload = { mod: "tarlalarim", tarla_idleri: secilenTarlalar, toplam_donum: toplamDonum };
+      payload.tarla.idleri=[secilenTarla];
+
     } else {
       if (!manuelForm.ilce || !manuelForm.donum) {
         setHata("Lütfen ilçe ve dönüm bilgisini doldur.");
         return;
       }
-      payload = { mod: "manuel", ilce: manuelForm.ilce, donum: manuelForm.donum };
+      payload.ilce=manuelForm.ilce;
+      payload.donum=Number(manuelForm.donum);
     }
 
     setYukleniyor(true);
@@ -68,7 +89,8 @@ function Recommendations() {
       if (res.ok) {
         setSonuc(data);
       } else {
-        setHata(data.detail || "Öneri alınamadı.");
+          const mesaj = typeof data.detail ==="string" ? data.detail : "Öneri alınamadı";
+          setHata(meaj);
       }
     } catch (err) {
       setHata("Sunucuya bağlanılamadı.");
@@ -110,28 +132,29 @@ function Recommendations() {
               <div className="empty-state">
                 Kayıtlı tarlalarını kullanabilmek için önce giriş yapmalısın.
               </div>
-            ) : tarlalar.length === 0 ? (
+            ) : uygunTarlalar.length === 0 ? (
               <div className="empty-state">
                 Henüz kayıtlı tarlan yok. "Tarlalarım" sayfasından tarla ekleyebilirsin.
               </div>
             ) : (
               <>
                 <div className="tarla-picklist">
-                  {tarlalar.map((t) => (
-                    <label className="tarla-pick-item" key={t.id}>
+                  {uygunTarlalar.map((t) => (
+                    <label className="tarla-pick-item" key={t.tarla_id}>
                       <input
-                        type="checkbox"
-                        checked={secilenTarlalar.includes(t.id)}
-                        onChange={() => tarlaSecimiDegistir(t.id)}
+                        type="radio" //sadece 1 tane tarla seçebilsin
+                        name="tarla-secimi"
+                        checked={secilenTarla===t.tarla_id}
+                        onChange={() => tarlaSec(t.tarla_id)}
                       />
                       <div className="info">
-                        <strong>{t.ad}</strong>
-                        <span>{t.ilce} · {t.donum} dönüm</span>
+                        <strong>{t.tarla_adi}</strong>
+                        <span>{t.ilce_adi} · {t.bos_donum} dönüm boş </span>
                       </div>
                     </label>
                   ))}
                 </div>
-                <div className="toplam-donum-box">Toplam Dönüm: {toplamDonum || 0}</div>
+                <div className="toplam-donum-box">Secilen tarlanın Boş Dönümü: {toplamDonum || 0}</div>
               </>
             )
           ) : (
@@ -159,6 +182,31 @@ function Recommendations() {
               </div>
             </>
           )}
+          <div className="field">
+              <label>Sezonz</label>
+              <select value ={sezon} onChange={(e) => setSezon(e.target.value)}>
+                  <option value="">Sezon Seç</option>
+                  {SEZONLAR.map((s) => (
+                      <option key={s} value = {s}> {s} </option>
+                      ))}
+              </select>
+          </div>
+
+           <div className="field">
+            <label>Ekmek İstediğin Ürünler (opsiyonel — boş bırakırsan sistem tüm ürünler arasından seçer)</label>
+            <div className="urun-picklist">
+              {URUNLER.map((u) => (
+                <label key={u} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <input
+                    type="checkbox"
+                    checked={secilenUrunler.includes(u)}
+                    onChange={() => urunSecimiDegistir(u)}
+                  />
+                  {u}
+                </label>
+              ))}
+            </div>
+          </div>
 
           {hata && <div className="form-message error">{hata}</div>}
 
@@ -180,12 +228,8 @@ function Recommendations() {
               </div>
               <div className="result-row">
                 <div className="result-card highlight">
-                  <div className="label">Tahmini Kâr</div>
+                  <div className="label">Tahmini Toplam Gelirr</div>
                   <div className="value">{sonuc.tahmini_kar} ₺</div>
-                </div>
-                <div className="result-card">
-                  <div className="label">Toplam Risk Skoru</div>
-                  <div className="value">%{sonuc.risk_skoru}</div>
                 </div>
               </div>
             </>

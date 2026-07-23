@@ -19,8 +19,6 @@ function Profile() {
     setKullanici(user);
     setForm({ ad_soyad: user.ad || "", yas: user.yas || "", cinsiyet: user.cinsiyet || "", telefon: user.telefon || "" });
 
-    // Backend'de kullanıcının en güncel bilgisini tutan bir endpoint varsa
-    // (ör. GET /kullanici/:id) burada çekip localStorage'daki veriyi tazeleyebilirsin.
     fetch(`http://localhost:8000/kullanici/${user.id}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {

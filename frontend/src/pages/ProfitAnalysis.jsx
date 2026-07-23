@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../App.css";
 
-const ILCELER = ["Bayındır", "Ödemiş", "Tire", "Kiraz", "Bergama"];
+const ILCELER = ["Bayındır","Bergama","Menderes","Tire","Torbalı","Ödemiş"];
+const URUNLER = ["Biber (Sivri)","Domates (Sofralık)","Hıyar (Sofralık)","Kabak (Sakız)","Karpuz","Patlıcan","Soğan (Kuru)"];
 const SEZONLAR = ["İlkbahar", "Yaz", "Sonbahar", "Kış"];
-const URUNLER = ["Domates", "Patates", "Soğan", "Biber", "Salatalık"];
 
 function ProfitAnalysis() {
   const [form, setForm] = useState({
@@ -15,9 +15,15 @@ function ProfitAnalysis() {
     iscilik_maliyeti: "",
     tohum_maliyeti: "",
   });
+  const [kullanici,setKullanici]=useState(null);
   const [sonuc, setSonuc] = useState(null);
   const [yukleniyor, setYukleniyor] = useState(false);
   const [hata, setHata] = useState("");
+
+  useEffect(() => {
+      const kayit = localStorage.getItem("kullanici");
+      if ( kayit) setKullanici(JSON.parse(kayit));
+      },[]);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -29,20 +35,25 @@ function ProfitAnalysis() {
       setHata("Lütfen ilçe, ürün, dönüm ve sezon bilgisini doldur.");
       return;
     }
+    if (!kullanici) {
+        setHata("Önce giriş yapmalısın!");
+        return;
+    }
 
     setYukleniyor(true);
     setSonuc(null);
     try {
-      const res = await fetch("http://localhost:8000/tahmin/kar", {
+      const res = await fetch("http://localhost:8000/kar/hesapla", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({...form,kullanici_id:kullanici.id}),
       });
       const data = await res.json();
       if (res.ok) {
-        setSonuc(data);
+         setSonuc(data);
       } else {
-        setHata(data.detail || "Tahmin alınamadı.");
+          const mesaj = typeof data.detail ==="string" ? data.detail : "Tahmin alınamadı";
+          setHata(mesaj);
       }
     } catch (err) {
       setHata("Sunucuya bağlanılamadı.");
@@ -168,12 +179,12 @@ function ProfitAnalysis() {
                 </div>
                 <div className="result-card">
                   <div className="label">Tahmini Gider</div>
-                  <div className="value">{sonuc.tahmini_gider} ₺</div>
+                  <div className="value">{sonuc.toplam_gider} ₺</div>
                 </div>
               </div>
               <div className="result-card highlight">
                 <div className="label">Tahmini Kâr</div>
-                <div className="value">{sonuc.tahmini_kar} ₺</div>
+                <div className="value">{sonuc.net_kar} ₺</div>
               </div>
             </>
           ) : (

@@ -102,8 +102,10 @@ df_long = df_long.rename(columns={
     "Year": "year",
     "District": "district",
     "Ekilen Alan": "planted_area",
-    "Üretim": "production_amount"
+    "Üretim": "production_amount",
+    "Üretim Miktarı": "production_amount"
 })
+
 
 def clean_product_name(value):
     if pd.isna(value):
@@ -111,10 +113,8 @@ def clean_product_name(value):
 
     value = str(value)
 
-    # Parantezleri kaldırır ama içindeki metni tutar
     value = value.replace("(", " ").replace(")", " ")
 
-    # Türkçe karakterleri sadeleştirir
     value = (
         value
         .replace("İ", "I")
@@ -129,32 +129,75 @@ def clean_product_name(value):
         .replace("ö", "O")
         .replace("Ç", "C")
         .replace("ç", "C")
-        .replace(",","")
+        .replace(",", "")
     )
 
-    # Tüm harfleri büyük yapar
     value = value.upper()
-
-    # Fazla boşlukları tek boşluğa indirir
     value = re.sub(r"\s+", " ", value)
 
     return value.strip()
-PRODUCT_MAP={
-    "BAKLA TAZE":"BAKLA",
-    "BEZELYE TAZE":"BEZELYE",
-    "DOMATES SOFRALIK":"DOMATES SALKIM",
-    "PATLICAN":"PATLICAN UZUN",
-    "MARUL GOBEKLI":"MARUL",
-    "KABAK SAKIZ":"KABAK TAZE",
-    "HIYAR SOFRALIK":"SALATALIK SILOR",
-    
+
+
+PRODUCT_MAP = {
+    "BAKLA TAZE": "BAKLA",
+    "BEZELYE TAZE": "BEZELYE",
+    "DOMATES SOFRALIK": "DOMATES SALKIM",
+    "PATLICAN": "PATLICAN UZUN",
+    "MARUL GOBEKLI": "MARUL",
+    "KABAK SAKIZ": "KABAK TAZE",
+    "HIYAR SOFRALIK": "SALATALIK SILOR",
+    "SOGAN KURU": "SOGAN KURU",
+    "BIBER SIVRI": "BIBER SIVRI",
 }
-df_long["product_name"] = df_long["product_name"].apply(clean_product_name)    
-df_long["product_name"]=df_long["product_name"].replace(PRODUCT_MAP)
-df_long=df_long[df_long["product_name"].isin( ["BAKLA","BEZELYE","DOMATES SALKIM","PATLICAN UZUN","MARUL","LAHANA KIRMIZI","LAHANA BEYAZ","PIRASA","SALATALIK SILOR",
-                                           "SOGAN KURU","KARPUZ","KARNABAHAR","KABAK TAZE","ISPANAK","BROKOLI","BIBER SIVRI"])]
+
+ALLOWED_PRODUCTS = [
+    "BAKLA",
+    "BEZELYE",
+    "DOMATES SALKIM",
+    "PATLICAN UZUN",
+    "MARUL",
+    "LAHANA KIRMIZI",
+    "LAHANA BEYAZ",
+    "PIRASA",
+    "SALATALIK SILOR",
+    "SOGAN KURU",
+    "KARPUZ",
+    "KARNABAHAR",
+    "KABAK TAZE",
+    "ISPANAK",
+    "BROKOLI",
+    "BIBER SIVRI"
+]
+
+df_long["product_name"] = df_long["product_name"].apply(clean_product_name)
+df_long["product_name"] = df_long["product_name"].replace(PRODUCT_MAP)
+
+df_long = df_long[
+    df_long["product_name"].isin(ALLOWED_PRODUCTS)
+]
+
+df_long["year"] = pd.to_numeric(df_long["year"], errors="coerce")
+df_long["planted_area"] = pd.to_numeric(df_long["planted_area"], errors="coerce")
+
+if "production_amount" in df_long.columns:
+    df_long["production_amount"] = pd.to_numeric(
+        df_long["production_amount"],
+        errors="coerce"
+    )
+
+df_long = df_long.dropna(
+    subset=["product_name", "year", "district"]
+)
+
+df_long["year"] = df_long["year"].astype(int)
+
+df_long = df_long.reset_index(drop=True)
+
 df_long.to_csv(
     "data/processed/data_files/cleaned_tuik.csv",
     index=False,
     encoding="utf-8-sig"
 )
+
+print("cleaned_tuik.csv oluşturuldu.")
+print(df_long.head())
