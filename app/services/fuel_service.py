@@ -8,8 +8,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 
-FUEL_PATH = Path("data/processed/data_files/seasonal_fuel_prices.csv")
-MODEL_PATH = Path("models/fuel_model.pkl")
+KOK_DIZIN = Path(__file__).resolve().parent.parent.parent
+FUEL_PATH = KOK_DIZIN / "data" / "processed" / "data_files" / "seasonal_fuel_prices.csv"
+MODEL_PATH = KOK_DIZIN / "models" / "fuel_model.pkl"
 
 TARGET_COLUMN = "diesel_price"
 
