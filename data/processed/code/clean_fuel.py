@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 
@@ -12,24 +11,36 @@ def dosya_temizle(df):
     df = df.dropna(how="all")
     df = df.dropna(axis=1, how="all")
     df = df.reset_index(drop=True)
-    df = df[[
-        "Şehir",
-        "İlçe",
-        "Tarih",
-        "V/Pro Diesel",
-        "V/Max Diesel"
-    ]]
+
+    df = df[
+        [
+            "Şehir",
+            "İlçe",
+            "Tarih",
+            "V/Pro Diesel",
+            "V/Max Diesel"
+        ]
+    ]
 
     df["V/Pro Diesel"] = (
         df["V/Pro Diesel"].astype(str)
         .str.replace("TL/LT", "", regex=False)
+        .str.replace(",", ".", regex=False)
         .str.strip()
     )
+
     df["V/Max Diesel"] = (
         df["V/Max Diesel"].astype(str)
         .str.replace("TL/LT", "", regex=False)
+        .str.replace(",", ".", regex=False)
         .str.strip()
     )
+
+    df = df.rename(columns={
+        "Şehir": "province",
+        "İlçe": "district",
+        "Tarih": "date"
+    })
 
     return df
 
@@ -103,52 +114,87 @@ def get_season(month):
         return "Fall"
 
 
+SEASON_ORDER = {
+    "Winter": 1,
+    "Spring": 2,
+    "Summer": 3,
+    "Fall": 4
+}
+
+
 for d in df:
-    d["Tarih"] = pd.to_datetime(d["Tarih"], format="%d.%m.%Y")
-    d["Year"] = d["Tarih"].dt.year
-    d["Month"] = d["Tarih"].dt.month
-    d.loc[d["Month"] == 12, "Year"] = d["Year"] + 1
-    d["Season"] = d["Month"].apply(get_season)
+    d["date"] = pd.to_datetime(
+        d["date"],
+        format="%d.%m.%Y",
+        errors="coerce"
+    )
+
+    d["year"] = d["date"].dt.year
+    d["month"] = d["date"].dt.month
+    d["season"] = d["month"].apply(get_season)
 
 
 all_fuel = pd.concat(df, ignore_index=True)
-all_fuel["V/Pro Diesel"] = pd.to_numeric(all_fuel["V/Pro Diesel"], errors="coerce")
-all_fuel["V/Max Diesel"] = pd.to_numeric(all_fuel["V/Max Diesel"], errors="coerce")
+
+all_fuel["V/Pro Diesel"] = pd.to_numeric(
+    all_fuel["V/Pro Diesel"],
+    errors="coerce"
+)
+
+all_fuel["V/Max Diesel"] = pd.to_numeric(
+    all_fuel["V/Max Diesel"],
+    errors="coerce"
+)
 
 fuel_old = all_fuel[
-    (all_fuel["Year"] >= 2014) &
-    (all_fuel["Year"] < 2020)
+    (all_fuel["year"] >= 2014) &
+    (all_fuel["year"] < 2020)
 ]
+
 fuel_new = all_fuel[
-    all_fuel["Year"] >= 2020
+    all_fuel["year"] >= 2020
 ]
 
 season_old = (
     fuel_old
-    .groupby(["Year", "Season"], as_index=False)["V/Pro Diesel"]
+    .groupby(["year", "season"], as_index=False)["V/Pro Diesel"]
     .mean()
     .round(2)
 )
 
 season_new = (
     fuel_new
-    .groupby(["Year", "Season"], as_index=False)["V/Max Diesel"]
+    .groupby(["year", "season"], as_index=False)["V/Max Diesel"]
     .mean()
     .round(2)
 )
 
-season_old.rename(columns={"V/Pro Diesel": "diesel_price"}, inplace=True)
-season_new.rename(columns={"V/Max Diesel": "diesel_price"}, inplace=True)
+season_old = season_old.rename(
+    columns={"V/Pro Diesel": "diesel_Price"}
+)
 
-season_df = pd.concat([season_old, season_new], ignore_index=True)
-season_df = season_df.rename(columns={"Year": "year", "Season": "season"})
+season_new = season_new.rename(
+    columns={"V/Max Diesel": "diesel_Price"}
+)
 
-SEASON_ORDER = {"Winter": 1, "Spring": 2, "Summer": 3, "Fall": 4}
+season_df = pd.concat(
+    [season_old, season_new],
+    ignore_index=True
+)
+
 season_df["season_order"] = season_df["season"].map(SEASON_ORDER)
-season_df = season_df.sort_values(["year", "season_order"]).reset_index(drop=True)
+
+season_df = season_df.sort_values(
+    ["year", "season_order"]
+).reset_index(drop=True)
+
 season_df = season_df.drop(columns=["season_order"])
 
 print(season_df.info())
 print(season_df.to_string())
 
-season_df.to_csv("data/processed/data_files/seasonal_fuel_prices.csv", index=False)
+season_df.to_csv(
+    "data/processed/data_files/seasonal_fuel_prices.csv",
+    index=False,
+    encoding="utf-8-sig"
+)
