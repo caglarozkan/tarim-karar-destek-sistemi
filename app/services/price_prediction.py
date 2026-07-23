@@ -6,18 +6,25 @@ from typing import Any
 
 import joblib
 import pandas as pd
+
 from app.services.fertilizer_service import get_commodity_price
 from app.services.fuel_service import predict_fuel_price
 from app.services.inflation_service import predict_inflation
+
+from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import mean_absolute_error, r2_score,mean_absolute_percentage_error,root_mean_squared_error
+from sklearn.metrics import (
+    mean_absolute_error,
+    mean_absolute_percentage_error,
+    r2_score,
+    root_mean_squared_error,
+)
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import mean_absolute_percentage_error
-
 
 DATASET_PATH = Path("data/processed/data_files/final_price_dataset.csv")
 MODEL_PATH = Path("models/price_model.pkl")
@@ -43,8 +50,7 @@ SEASON_ORDER = {
     "Winter": 1,
     "Spring": 2,
     "Summer": 3,
-    "Fall": 4,
-    "Autumn": 4,
+    "Fall": 4
 }
 
 SEASON_SEQUENCE = ["Winter", "Spring", "Summer", "Fall"]
@@ -53,12 +59,11 @@ SEASON_SEQUENCE = ["Winter", "Spring", "Summer", "Fall"]
 def validate_season(season: str) -> str:
     season = str(season).strip()
 
-    if season == "Autumn":
-        season = "Fall"
-
     if season not in SEASON_ORDER:
         valid_seasons = ", ".join(SEASON_SEQUENCE)
-        raise ValueError(f"Gecersiz sezon: {season}. Gecerli sezonlar: {valid_seasons}")
+        raise ValueError(
+            f"Gecersiz sezon: {season}. Gecerli sezonlar: {valid_seasons}"
+        )
 
     return season
 
@@ -92,6 +97,7 @@ def get_next_season(year: int, season: str) -> tuple[int, str]:
         return year + 1, "Winter"
 
     current_index = SEASON_SEQUENCE.index(season)
+
     return year, SEASON_SEQUENCE[current_index + 1]
 
 
@@ -282,6 +288,7 @@ def build_prediction_input(
     annual_inflation: float | None = None,
 ) -> dict[str, Any]:
     target_season = validate_season(target_season)
+
     lag_1_price, lag_4_price = get_lag_prices(product_history)
 
     if fuel_price is None:
@@ -443,7 +450,4 @@ def predict_all_products(
     }
 
 
-if __name__ == "__main__":
-    metrics = train_price_model()
-    print(metrics)
-    predict_products("DOMATES SALKIM")
+
