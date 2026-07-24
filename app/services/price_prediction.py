@@ -269,11 +269,11 @@ def latest_or_given(
 
 
 def get_fuel_for_period(target_year: int, target_season: str) -> float:
-    return float(predict_fuel_price(target_season))
+    return float(predict_fuel_price(target_year,target_season))
 
 
 def get_inflation_for_period(target_year: int, target_season: str) -> float:
-    return float(predict_inflation(target_season))
+    return float(predict_inflation(target_year,target_season))
 
 
 def build_prediction_input(
@@ -451,3 +451,24 @@ def predict_all_products(
 
 
 
+if __name__ == "__main__":
+    metrics = train_price_model()
+    print("Model metrikleri:")
+    print(metrics)
+
+    prediction = predict_product_price(
+        product_name="BAKLA",
+        target_year=2027,
+        target_season="Winter",
+    )
+
+    print("Tek ürün tahmini:")
+    print(prediction)
+
+    next_predictions = predict_products(
+        product_name="BAKLA"
+    )
+
+    print("Gelecek 4 sezon tahmini:")
+    for item in next_predictions:
+        print(item)
