@@ -4,6 +4,11 @@ Risk analizi hesaplama modülü.
 AHP (Analytic Hierarchy Process) ile belirlenmiş ağırlıklara göre
 5 faktörden oluşan bileşik bir risk skoru üretir:
 Kota (0.38), Fiyat (0.29), Gübre (0.16), Mazot (0.09), Enflasyon (0.08)
+
+NOT: CV ve z-score hesaplamasından ÖNCE fiyatlar enflasyona göre
+"reel" hale getiriliyor - yoksa Türkiye'deki sürekli enflasyon
+yüzünden fiyatlar hep yukarı gittiği için bu artış "oynaklık/risk"
+gibi algılanır ve skorlar hep 100'e yakın çıkar.
 """
 
 import statistics
@@ -54,13 +59,49 @@ AY_MEVSIM_HARITASI = {
     9: "Fall", 10: "Fall", 11: "Fall",
 }
 
-def veri_haritalarini_olustur(referans_yil_sayisi:int):
+
+def enflasyon_endeksi_ekle(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Endeksi SADECE tekil (year, season) satırları üzerinde kurar
+    (aksi halde her çeyrekte birden fazla ürün satırı olduğu için
+    aynı çeyrek birden fazla kez bileşiklenir ve sayılar patlar).
+    Sonra bu endeksi tüm df'ye (her ürün satırına) geri eşler.
+    annual_inflation YILLIK bir oran olduğu için, çeyreklik
+    bileşiklendirme yaparken 4'e bölüyoruz (yaklaşık bir dönüşüm).
+    """
+    df = df.copy()
+    df["season_order"] = df["season"].map(MEVSIM_SIRASI)
+
+    tekil = df.drop_duplicates(subset=["year", "season"]).copy()
+    tekil = tekil.sort_values(["year", "season_order"]).reset_index(drop=True)
+
+    endeks = [1.0]
+    for i in range(1, len(tekil)):
+        yillik_oran = tekil.loc[i - 1, "annual_inflation"] / 100
+        ceyreklik_oran = yillik_oran / 4
+        endeks.append(endeks[-1] * (1 + ceyreklik_oran))
+
+    tekil["endeks"] = endeks
+    son_endeks = tekil["endeks"].iloc[-1]
+    tekil["endeks"] = tekil["endeks"] / son_endeks  # son dönem = 1.0 olsun
+
+    df = df.merge(tekil[["year", "season", "endeks"]], on=["year", "season"], how="left")
+    return df
+
+
+def veri_haritalarini_olustur(referans_yil_sayisi: int | None):
     df = pd.read_csv(CSV_PATH)
+    df = enflasyon_endeksi_ekle(df)
+
+    # Reel (enflasyondan arındırılmış) değerler
+    df["reel_fiyat"] = df["average_price"] / df["endeks"]
+    df["reel_gubre"] = df["fertilizer_price"] / df["endeks"]
+    df["reel_mazot"] = df["fuel_price"] / df["endeks"]
 
     fiyat_haritasi = {}
     for urun_adi in df["product_name"].unique():
-        fiyatlar = df[df["product_name"] == urun_adi]["reel_fiyat"].tolist()
-        if fiyatlar:
+        fiyatlar = df[df["product_name"] == urun_adi]["reel_fiyat"].dropna().tolist()
+        if len(fiyatlar) >= 2:
             fiyat_haritasi[urun_adi] = fiyatlar
 
     tekil = df.drop_duplicates(subset=["year", "season"])
@@ -71,24 +112,26 @@ def veri_haritalarini_olustur(referans_yil_sayisi:int):
 
     referans = {
         "gubre": {
-            "ortalama": statistics.mean(tekil["fertilizer_price"]),
-            "std": statistics.stdev(tekil["fertilizer_price"]),
+            "ortalama": tekil["reel_gubre"].mean(),
+            "std": tekil["reel_gubre"].std(),
         },
         "mazot": {
-            "ortalama": statistics.mean(tekil["fuel_price"]),
-            "std": statistics.stdev(tekil["fuel_price"]),
+            "ortalama": tekil["reel_mazot"].mean(),
+            "std": tekil["reel_mazot"].std(),
         },
         "enflasyon": {
-            "ortalama": statistics.mean(tekil["annual_inflation"]),
-            "std": statistics.stdev(tekil["annual_inflation"]),
+            "ortalama": tekil["annual_inflation"].mean(),
+            "std": tekil["annual_inflation"].std(),
         },
     }
 
     return fiyat_haritasi, referans
 
 
-# Uygulama başlarken bir kez yüklenir, bellekte tutulur
-FIYAT_HARITASI, REFERANS = veri_haritalarini_olustur(referans_yil_sayisi=3) #son 5 yılın verisine göre
+# Uygulama başlarken bir kez yüklenir, bellekte tutulur.
+# Referans penceresi tüm geçmiş veri (None = filtre yok) - dar pencerede
+# standart sapma güvenilmez çıktığı için tüm veriye genişletildi.
+FIYAT_HARITASI, REFERANS = veri_haritalarini_olustur(referans_yil_sayisi=None)
 
 # Gübre web'den çekildiği için basit önbellekleme (her istekte siteye gitmesin)
 _GUBRE_CACHE = {"deger": None, "zaman": None}
@@ -99,10 +142,11 @@ def kota_doluluk_hesapla(kullanilan_kota: float, girilen_donum: float, maksimum_
     yeni_kota = kullanilan_kota + girilen_donum
     if maksimum_kota <= 0:
         return 0.0
-    return (yeni_kota / maksimum_kota) * 100
+    doluluk = (yeni_kota / maksimum_kota) * 100
+    return min(doluluk, 100.0)
+
 
 def cv_hesapla(degerler: list[float]) -> float:
-
     ortalama = statistics.mean(degerler)
     std = statistics.stdev(degerler)
 
@@ -111,13 +155,12 @@ def cv_hesapla(degerler: list[float]) -> float:
     cv = (std / ortalama) * 100
     return min(cv, 100.0)
 
+
 def sapma_riski_hesapla(deger: float, ortalama: float, std: float) -> float:
-    if std == 0:
+    if std == 0 or pd.isna(std):
         return 0.0
     z = abs((deger - ortalama) / std)
-    if z <= 0:
-        return 0.0
-    return min((z / 3) * 100, 100.0)
+    return min((z / 5) * 100, 100.0)
 
 
 def genel_risk_hesapla(kota_doluluk: float, cv_fiyat: float,
@@ -175,7 +218,6 @@ def mazot_tahmini_al(turkce_sezon: str) -> float:
 def enflasyon_tahmini_al(turkce_sezon: str) -> float:
     hedef_yil = hedef_yil_belirle(turkce_sezon)
     hedef_sezon = sezon_cevir(turkce_sezon)
-    sonuc = predict_inflation(hedef_yil, hedef_sezon)
     return predict_inflation(hedef_yil, hedef_sezon)
 
 

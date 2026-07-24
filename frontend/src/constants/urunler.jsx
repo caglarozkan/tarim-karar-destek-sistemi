@@ -16,7 +16,6 @@ export const URUN_GORUNEN_ADLAR = {
   "LAHANA KIRMIZI": "Lahana (Kırmızı)",
   "MARUL": "Marul",
   "PIRASA": "Pırasa",
-
 };
 
 export const URUNLER = Object.keys(URUN_GORUNEN_ADLAR);
