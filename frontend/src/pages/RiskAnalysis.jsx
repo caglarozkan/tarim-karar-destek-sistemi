@@ -44,7 +44,8 @@ function RiskAnalysis() {
       if (res.ok) {
         setSonuc(data);
       } else {
-        setHata(data.detail || "Tahmin alınamadı.");
+        const mesaj = typeof data.detail === "string" ? data.detail : "Tahmin alınamadı.";
+        setHata(mesaj);
       }
     } catch (err) {
       setHata("Sunucuya bağlanılamadı.");
@@ -79,7 +80,7 @@ function RiskAnalysis() {
             <select name="urun" value={form.urun} onChange={handleChange}>
               <option value="">Ürün seç</option>
               {URUNLER.map((u) => (
-                <option key={u} value={u}>{URUN_GORUNEN_ADLAR}</option>
+                <option key={u} value={u}>{URUN_GORUNEN_ADLAR[u]}</option>
               ))}
             </select>
           </div>
