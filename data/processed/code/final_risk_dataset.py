@@ -136,11 +136,12 @@ if "fertilizer_price" in final.columns:
 
 final = final.drop_duplicates().reset_index(drop=True)
 
+final = final.drop(columns=["Amonyum_Sulfat","CAN","Ure","DAP","Gubre_20_20_0"]).reset_index(drop=True)
 final.to_csv(
     "data/processed/data_files/final_risk_dataset.csv",
     index=False,
     encoding="utf-8-sig"
 )
-
+final=final.dropna()
 print("final_risk_dataset.csv olusturuldu.")
 print(final.head())
