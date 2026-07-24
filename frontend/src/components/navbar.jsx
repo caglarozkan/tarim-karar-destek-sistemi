@@ -26,6 +26,9 @@ function Navbar() {
         <Link to="/" className={isActive("/")}>
           Ana Sayfa
         </Link>
+        <Link to="/istatistikler" className={isActive("/istatistikler")}>
+         İstatistikler
+       </Link>
         <Link to="/fiyat-tahmini" className={isActive("/fiyat-tahmini")}>
           Fiyat Tahmini
         </Link>
