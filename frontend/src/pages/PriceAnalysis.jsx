@@ -85,7 +85,7 @@ function PriceAnalysis() {
               <option value="">Ürün seç</option>
               {URUNLER.map((u) => (
                 <option key={u} value={u}>
-                  {URUN_GORUNEN_ADLAR}
+                  {URUN_GORUNEN_ADLAR[u]}
                 </option>
               ))}
             </select>
