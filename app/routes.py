@@ -392,3 +392,42 @@ def tahmin_fiyat(veri: schemas.FiyatTahminRequest,db: Session=Depends(get_db)):
         "yil": hedef_yil,
         "tahmini_fiyat": sonuc["predicted_price"]
     }
+
+#urunler
+@router.get("/urunlerim/{kullanici_id}")
+def kullanici_urunleri(kullanici_id:int,db:Session=Depends(get_db)):
+    #kullanıcıya ait tarlarar getirir,
+    tarlalar= (db.query(models.Tarla).filter(models.Tarla.kullanici_id == kullanici_id).all())
+    if not tarlalar:
+        return []
+
+    urun_map={}
+    for tarla in tarlalar:
+        tarla_urunleri=db.query(models.TarlaUrun).filter(models.TarlaUrun.tarla_id == tarla.tarla_id).all()
+
+        for tarla_urun in tarla_urunleri:
+            urun=db.query(models.Urun).filter(models.Urun.urun_id == tarla_urun.urun_id).first()
+            if not urun:
+                continue
+
+        #daha önce eklenmemisse oluştur
+            if urun.urun_adi not in urun_map:
+                urun_map[urun.urun_adi]={
+                "urun_adi":urun.urun_adi,
+                "toplam_donum": 0,
+                "tarlalar" : []
+            }
+
+            #toplam alan hesaplama
+            urun_map[urun.urun_adi]["toplam_donum"] += tarla_urun.donum
+
+            #hangi tarlalarda var bilgisini ekleme
+            urun_map[urun.urun_adi]["tarlalar"].append({
+                "tarla_adi":  tarla.tarla_adi,
+                "donum":tarla_urun.donum
+            })
+
+    sonuc=list(urun_map.values())
+    sonuc.sort(key=lambda x: x["toplam_donum"],reverse=True)
+
+    return sonuc

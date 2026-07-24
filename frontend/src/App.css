@@ -786,3 +786,87 @@ button {
   gap: 10px;
   justify-content: flex-end;
 }
+
+.products-layout{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:30px;
+    align-items:start;
+}
+
+.products-list{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.product-card{
+    background:white;
+    border-radius:18px;
+    padding:22px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+.product-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.product-header h3{
+    margin:0;
+    color:#1b5e20;
+}
+
+.product-total{
+    background:#2e7d32;
+    color:white;
+    padding:8px 18px;
+    border-radius:999px;
+    font-weight:600;
+}
+
+.field-progress{
+    margin-bottom:18px;
+}
+
+.field-top{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:7px;
+    font-size:15px;
+}
+
+.progress-background{
+    width:100%;
+    height:14px;
+    background:#dfe9df;
+    border-radius:999px;
+    overflow:hidden;
+}
+
+.progress-fill{
+    height:100%;
+    border-radius:999px;
+    background:linear-gradient(
+        90deg,
+        #2e7d32,
+        #66bb6a
+    );
+    transition:.5s;
+}
+
+.products-sidebar{
+    position:sticky;
+    top:90px;
+}
+
+.products-sidebar .panel{
+    padding:20px;
+}
+
+.products-sidebar h3{
+    text-align:center;
+    margin-bottom:20px;
+}

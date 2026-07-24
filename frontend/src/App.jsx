@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import Farms from "./pages/Farms";
 import "./App.css";
 import RiskLog from "./pages/RiskLog";
+import Products from "./pages/my_products";
 
 function Layout({ children }) {
   return (
@@ -89,6 +90,14 @@ function App() {
              </Layout>
             }
          />
+         <Route
+            path="/urunlerim"
+            element={
+            <Layout>
+                <Products />
+            </Layout>
+            }
+        />
       </Routes>
     </BrowserRouter>
   );

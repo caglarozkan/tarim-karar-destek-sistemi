@@ -50,6 +50,7 @@ function Navbar() {
                 <Link to="/bilgilerim">Kişisel Bilgilerim</Link>
                 <Link to="/tarlalarim">Tarlalarım</Link>
                 <Link to="/Risk-gecmisim">Risk Log</Link>
+                <Link to ="/urunlerim"> Ürünlerim</Link>
                 <div className="menu-divider" />
                 <button className="logout-item" onClick={cikisYap}>
                   Çıkış Yap
