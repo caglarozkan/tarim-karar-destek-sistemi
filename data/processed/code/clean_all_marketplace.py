@@ -44,6 +44,15 @@ PRODUCTS = [
     "SOGAN KURU",
     "PATLICAN UZUN",
     "BIBER SIVRI",
+    "KARNABAHAR",
+    "LAHANA BEYAZ",
+    "MARUL",
+    "PIRASA",
+    "LAHANA KIRMIZI",
+    "BAKLA",
+    "BEZELYE",
+    "ISPANAK",
+    "BROKOLI",
 ]
 
 
@@ -100,7 +109,20 @@ def standardize_product_name(value):
 
         "BIBER SIVRI": "BIBER SIVRI",
         "BİBER SİVRİ": "BIBER SIVRI",
-    }
+    
+  
+       "PATLICAN UZUN": "PATLICAN UZUN",
+       "KARNABAHAR": "KARNABAHAR",
+       "LAHANA BEYAZ": "LAHANA BEYAZ",
+       "MARUL": "MARUL",
+       "PIRASA": "PIRASA",
+       "LAHANA KIRMIZI": "LAHANA KIRMIZI",
+       "BAKLA": "BAKLA",
+       "BEZELYE": "BEZELYE",
+       "ISPANAK": "ISPANAK",
+       "BROKOLI": "BROKOLI",
+}
+    
 
     return product_map.get(value, value)
 
