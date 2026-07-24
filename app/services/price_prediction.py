@@ -449,26 +449,3 @@ def predict_all_products(
         for product in products
     }
 
-
-
-if __name__ == "__main__":
-    metrics = train_price_model()
-    print("Model metrikleri:")
-    print(metrics)
-
-    prediction = predict_product_price(
-        product_name="BAKLA",
-        target_year=2027,
-        target_season="Winter",
-    )
-
-    print("Tek ürün tahmini:")
-    print(prediction)
-
-    next_predictions = predict_products(
-        product_name="BAKLA"
-    )
-
-    print("Gelecek 4 sezon tahmini:")
-    for item in next_predictions:
-        print(item)
