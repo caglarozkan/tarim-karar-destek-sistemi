@@ -11,6 +11,7 @@ import Farms from "./pages/Farms";
 import "./App.css";
 import RiskLog from "./pages/RiskLog";
 import Products from "./pages/my_products";
+import Statistics from "./pages/Statistics";
 
 function Layout({ children }) {
   return (
@@ -34,6 +35,7 @@ function App() {
             </Layout>
           }
         />
+        
         <Route
           path="/fiyat-tahmini"
           element={
@@ -42,6 +44,14 @@ function App() {
             </Layout>
           }
         />
+        <Route
+       path="/istatistikler"
+         element={
+           <Layout>
+           <Statistics />
+       </Layout>
+           }
+         />
         <Route
           path="/kar-hesabi"
           element={
