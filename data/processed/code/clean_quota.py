@@ -11,7 +11,7 @@ PRODUCT_NAME_MAP = {
     "Hıyar (Sofralık)": "SALATALIK SILOR",
     "Kabak (Sakız)": "KABAK TAZE",
     "Soğan (Kuru)": "SOGAN KURU",
-    "Patlıcan": "PATLICAN",
+    "Patlıcan": "PATLICAN UZUN",
     "Karpuz": "KARPUZ",
 }
 
