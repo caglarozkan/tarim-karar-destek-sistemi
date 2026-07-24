@@ -93,11 +93,8 @@ def build_pipeline(alpha: float = 1.0) -> Pipeline:
     preprocessor = ColumnTransformer(
         transformers=[
             ("season", OneHotEncoder(handle_unknown="ignore"), ["season"]),
-            (
-                "num",
-                StandardScaler(),
-                [
-                    "year",
+            ("num", StandardScaler(),
+                [  "year",
                     "lag_1",
                     "lag_2",
                     "lag_3",
@@ -309,31 +306,8 @@ def predict_inflation(
     return float(last_row["annual_inflation"])
 
 
-def predict_upcoming_inflation_series(
-    target_season: str,
-    path: Path = INFLATION_PATH,
-    model_path: Path = MODEL_PATH,
-) -> pd.DataFrame:
-    return predict_inflation_series(
-        target_year_or_season=target_season,
-        path=path,
-        model_path=model_path,
-    )
-
-
-def predict_upcoming_inflation(
-    target_season: str,
-    path: Path = INFLATION_PATH,
-    model_path: Path = MODEL_PATH,
-) -> float:
-    return predict_inflation(
-        target_year_or_season=target_season,
-        path=path,
-        model_path=model_path,
-    )
-
-
 if __name__ == "__main__":
     model, model_metrics = train_inflation_model()
+
 
 
