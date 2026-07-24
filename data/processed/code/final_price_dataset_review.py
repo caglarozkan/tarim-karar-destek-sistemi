@@ -254,7 +254,7 @@ def prepare_inflation():
         errors="coerce"
     )
 
-    return inflation[["year", "annual_inflation"]].drop_duplicates()
+    return inflation[["year","season", "annual_inflation"]].drop_duplicates()
 
 
 market = prepare_market()
@@ -277,7 +277,7 @@ final = final.merge(
 
 final = final.merge(
     inflation,
-    on="year",
+    on=["year","season"],
     how="left"
 )
 
