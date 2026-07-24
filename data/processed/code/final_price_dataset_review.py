@@ -221,7 +221,7 @@ def prepare_fuel():
 )
 
     fuel = fuel.rename(columns={
-        "diesel_Price": "fuel_price",
+        "diesel_price": "fuel_price",
         "FUEL_PRICE": "fuel_price",
         "Year": "year",
         "YIL": "year",
