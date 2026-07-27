@@ -92,3 +92,16 @@ class FiyatTahminRequest(BaseModel):
     ilce : str
     sezon: str
     urun : str
+
+class OptimizationTarlaRequest(BaseModel):
+    kullanici_id : int
+    sezon: str
+    tarla_id:int
+    bos_donum: float
+    secilen_urunler: Optional[list[str]] = None
+
+class OptimizationManuelRequest(BaseModel):
+    ilce: str
+    donum:float
+    sezon : str
+    secilen_urunler:Optional[list[str]] = None

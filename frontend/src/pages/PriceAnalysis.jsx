@@ -1,6 +1,9 @@
 import { useState } from "react";
 import "../App.css";
 import { URUNLER, URUN_GORUNEN_ADLAR } from "../constants/urunler";
+import Select from "react-select";
+import { PRODUCT_IMAGES } from "../constants/productImages";
+import ProductSelect from "../components/ProductSelect";
 
 const ILCELER = ["Bayındır","Bergama","Menderes","Tire","Torbalı","Ödemiş"];
 const SEZONLAR = ["İlkbahar", "Yaz", "Sonbahar", "Kış"];
@@ -42,6 +45,11 @@ function PriceAnalysis() {
     } finally {
       setYukleniyor(false);
     }
+    const urunOptions = URUNLER.map((urun) => ({
+    value: urun,
+    label: URUN_GORUNEN_ADLAR[urun],
+    image: PRODUCT_IMAGES[urun],
+    }));
   };
 
   return (
@@ -81,18 +89,17 @@ function PriceAnalysis() {
 
           <div className="field">
             <label>Ürün Seçimi</label>
-            <select name="urun" value={form.urun} onChange={handleChange}>
-              <option value="">Ürün seç</option>
-              {URUNLER.map((u) => (
-                <option key={u} value={u}>
-                  {URUN_GORUNEN_ADLAR[u]}
-                </option>
-              ))}
-            </select>
+            <ProductSelect
+                value={form.urun}
+                onChange={(urun)=>
+                    setForm((prev)=>({
+                    ...prev,
+                    urun,
+                    }))
+                }
+            />
           </div>
-
           {hata && <div className="form-message error">{hata}</div>}
-
           <button className="run-btn" onClick={analiziBaslat} disabled={yukleniyor}>
             {yukleniyor ? "Hesaplanıyor..." : "Analizi Başlat"}
           </button>
@@ -101,6 +108,7 @@ function PriceAnalysis() {
         <div className="results-column">
           {sonuc ? (
             <div className="result-card hero-result">
+                <img src={PRODUCT_IMAGES[sonuc.urun]}className="product-result-image"alt={sonuc.urun}/>
               <div className="label">Tahmini Fiyat</div>
               <div className="value">{sonuc.tahmini_fiyat} ₺</div>
               <div classname="meta" style={{marginTop:10,color: "#f5f0e6"}}>
