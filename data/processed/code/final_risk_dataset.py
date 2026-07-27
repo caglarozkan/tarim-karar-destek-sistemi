@@ -110,12 +110,12 @@ final["average_price"] = final["average_price"].fillna(
 final["average_price"] = final["average_price"].fillna(
     final["average_price"].mean()
 )
-final.to_csv(
-    OUTPUT_PATH,
-    index=False,
-    encoding="utf-8-sig"
-)
 
-print("final_risk_dataset.csv olusturuldu.")
-print(final.head())
-print(final["average_price"].isna().sum())
+final["province"] = final["district"].str.split("(").str[0].str.strip()
+
+final["district1"] = (
+    final["district"]
+    .str.split("(").str[1]
+    .str.split(")").str[0]
+    .str.strip()
+)
