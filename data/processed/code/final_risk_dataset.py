@@ -1,69 +1,57 @@
 import pandas as pd
-import re
 
-dosyalar = [
-    "data/processed/data_files/cleaned_tuik.csv",
-    "data/processed/data_files/cleaned_fertilizer.csv",
-    "data/processed/data_files/seasonal_fuel_prices.csv"
-]
+TUIK_PATH = "data/processed/data_files/cleaned_tuik.csv"
+FERTILIZER_PATH = "data/processed/data_files/cleaned_fertilizer.csv"
+FUEL_PATH = "data/processed/data_files/seasonal_fuel_prices.csv"
+MARKET_PATH = "data/processed/data_files/final_price_dataset.csv"
+OUTPUT_PATH = "data/processed/data_files/final_risk_dataset.csv"
 
-tuik = pd.read_csv(dosyalar[0])
-gubre = pd.read_csv(dosyalar[1])
-petrol = pd.read_csv(dosyalar[2])
+
+tuik = pd.read_csv(TUIK_PATH)
+gubre = pd.read_csv(FERTILIZER_PATH)
+petrol = pd.read_csv(FUEL_PATH)
+market = pd.read_csv(MARKET_PATH)
 
 tuik.columns = tuik.columns.str.strip()
 gubre.columns = gubre.columns.str.strip()
 petrol.columns = petrol.columns.str.strip()
+market.columns = market.columns.str.strip()
 
-tuik = tuik.rename(columns={
-    "ProductName": "product_name",
-    "Year": "year",
-    "District": "district",
-    "Ekilen Alan": "planted_area",
-    "Üretim Miktarı": "production_amount",
-    "URUN_ADI": "product_name",
-    "YIL": "year",
+
+for df in [tuik, gubre, petrol, market]:
+    df["year"] = pd.to_numeric(df["year"], errors="coerce")
+    df.dropna(subset=["year"], inplace=True)
+    df["year"] = df["year"].astype(int)
+
+tuik["planted_area"] = pd.to_numeric(tuik["planted_area"], errors="coerce")
+tuik["production_amount"] = pd.to_numeric(tuik["production_amount"], errors="coerce")
+petrol["diesel_price"] = pd.to_numeric(petrol["diesel_price"], errors="coerce")
+
+if "fertilizer_price" in gubre.columns:
+    gubre["fertilizer_price"] = pd.to_numeric(gubre["fertilizer_price"], errors="coerce")
+
+if "average_price" in market.columns:
+    market["average_price"] = pd.to_numeric(market["average_price"], errors="coerce")
+
+
+seasons = pd.DataFrame({
+    "season": ["Winter", "Spring", "Summer", "Fall"]
 })
 
-gubre = gubre.rename(columns={
-    "Ortalama_Gubre_Maliyeti_Ton_TL": "fertilizer_price",
-    "YIL": "year",
-    "Year": "year",
-})
-
-petrol = petrol.rename(columns={
-    "diesel_Price": "diesel_price",
-    "FUEL_PRICE": "diesel_price",
-    "YIL": "year",
-    "Year": "year",
-})
-
-tuik["year"] = pd.to_numeric(tuik["year"], errors="coerce")
-gubre["year"] = pd.to_numeric(gubre["year"], errors="coerce")
-petrol["year"] = pd.to_numeric(petrol["year"], errors="coerce")
-
-tuik = tuik[tuik["year"].notna()].copy()
-gubre = gubre[gubre["year"].notna()].copy()
-petrol = petrol[petrol["year"].notna()].copy()
-
-tuik["year"] = tuik["year"].astype(int)
-gubre["year"] = gubre["year"].astype(int)
-petrol["year"] = petrol["year"].astype(int)
-
-petrol["diesel_price"] = pd.to_numeric(
-    petrol["diesel_price"],
-    errors="coerce"
+tuik_seasonal = (
+    tuik.assign(key=1)
+    .merge(seasons.assign(key=1), on="key")
+    .drop(columns="key")
 )
 
-petrol_yearly = (
-    petrol.groupby("year", as_index=False)["diesel_price"]
-    .mean()
-    .rename(columns={"diesel_price": "fuel_price"})
+market_price = (
+    market.groupby(["product_name", "year", "season"], as_index=False)
+    .agg(average_price=("average_price", "mean"))
 )
 
-final = tuik.merge(
-    petrol_yearly,
-    on="year",
+final = tuik_seasonal.merge(
+    petrol[["year", "season", "diesel_price"]],
+    on=["year", "season"],
     how="left"
 )
 
@@ -73,75 +61,61 @@ final = final.merge(
     how="left"
 )
 
-
-def clean_product_name(value):
-    if pd.isna(value):
-        return pd.NA
-
-    value = str(value)
-
-    value = value.replace("(", " ").replace(")", " ")
-
-    value = (
-        value
-        .replace("İ", "I")
-        .replace("ı", "I")
-        .replace("Ş", "S")
-        .replace("ş", "S")
-        .replace("Ğ", "G")
-        .replace("ğ", "G")
-        .replace("Ü", "U")
-        .replace("ü", "U")
-        .replace("Ö", "O")
-        .replace("ö", "O")
-        .replace("Ç", "C")
-        .replace("ç", "C")
-        .replace(",", "")
-    )
-
-    value = value.upper()
-    value = re.sub(r"\s+", " ", value)
-
-    return value.strip()
-
-
-PRODUCT_MAP = {
-    "BAKLA TAZE": "BAKLA",
-    "BEZELYE TAZE": "BEZELYE",
-    "DOMATES SOFRALIK": "DOMATES SALKIM",
-    "PATLICAN": "PATLICAN UZUN",
-    "MARUL GOBEKLI": "MARUL",
-    "KABAK SAKIZ": "KABAK TAZE",
-    "HIYAR SOFRALIK": "SALATALIK SILOR",
-}
-
-final["product_name"] = final["product_name"].apply(clean_product_name)
-final["product_name"] = final["product_name"].replace(PRODUCT_MAP)
-
-final["planted_area"] = pd.to_numeric(
-    final["planted_area"],
-    errors="coerce"
+final = final.merge(
+    market_price,
+    on=["product_name", "year", "season"],
+    how="left"
 )
 
-final["production_amount"] = pd.to_numeric(
-    final["production_amount"],
-    errors="coerce"
+final = final[
+    (final["year"] != 2013) &
+    (final["planted_area"] > 0) &
+    (final["production_amount"] > 0)
+].copy()
+
+final["yield_per_decare_kg"] = (
+    final["production_amount"] * 1000 / final["planted_area"]
 )
 
-if "fertilizer_price" in final.columns:
-    final["fertilizer_price"] = pd.to_numeric(
-        final["fertilizer_price"],
-        errors="coerce"
-    )
+drop_columns = [
+    "Amonyum_Sulfat",
+    "CAN",
+    "Ure",
+    "DAP",
+    "Gubre_20_20_0",
+    "unit",
+    "date",
+    "product_type",
+    "min_price",
+    "max_price",
+    "month"
+]
+
+final = final.drop(
+    columns=[col for col in drop_columns if col in final.columns]
+)
 
 final = final.drop_duplicates().reset_index(drop=True)
 
-final = final.drop(columns=["Amonyum_Sulfat","CAN","Ure","DAP","Gubre_20_20_0"]).reset_index(drop=True)
+final["average_price"] = final["average_price"].fillna(
+    final.groupby(["product_name", "year"])["average_price"]
+    .transform("mean")
+)
+
+final["average_price"] = final["average_price"].fillna(
+    final.groupby(["product_name"])["average_price"]
+    .transform("mean")
+)
+
+final["average_price"] = final["average_price"].fillna(
+    final["average_price"].mean()
+)
 final.to_csv(
-    "data/processed/data_files/final_risk_dataset.csv",
+    OUTPUT_PATH,
     index=False,
     encoding="utf-8-sig"
 )
-final=final.dropna()
+
 print("final_risk_dataset.csv olusturuldu.")
 print(final.head())
+print(final["average_price"].isna().sum())
