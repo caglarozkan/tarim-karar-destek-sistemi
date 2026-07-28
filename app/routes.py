@@ -10,7 +10,7 @@ from app.services.risk import (FIYAT_HARITASI, REFERANS, kota_doluluk_hesapla, c
                                genel_risk_hesapla, risk_seviyesi_belirle, mazot_tahmini_al, enflasyon_tahmini_al,
                                guncel_gubre_fiyati_getir, SEZON_CEVIRI, )
 from app.services.risk import sezon_cevir,hedef_yil_belirle
-from app.services.profit_service import kar_hesapla_tam
+from app.services.profit_service import kar_hesaplama_son
 from app.services.price_prediction import predict_product_price
 from app.services.optimization_plan import create_plan_for_user_fields
 
@@ -357,24 +357,22 @@ def kar_hesapla(veri: schemas.KarHesabiRequest, db: Session = Depends(get_db)):
     hedef_sezon = sezon_cevir(veri.sezon)
 
     try:
-        sonuc = kar_hesapla_tam(
+        return kar_hesaplama_son(
             db=db,
-            ilce_id=ilce_kaydi.ilce_id,
-            urun_id=urun_kaydi.urun_id,
-            ilce_adi=veri.ilce,
-            urun_sistem_adi=veri.urun,
-            urun_adi_csv=veri.urun,
+            ilce=veri.ilce,
+            urun=veri.urun,
+            sezon=veri.sezon,
             donum=veri.donum,
-            hedef_yil=hedef_yil,
-            hedef_sezon=hedef_sezon,
             sulama_maliyeti=veri.sulama_maliyeti,
             iscilik_maliyeti=veri.iscilik_maliyeti,
             tohum_maliyeti=veri.tohum_maliyeti,
         )
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
 
-    return sonuc
+    except ValueError as e:
+        raise HTTPException(
+            status_code=404,
+            detail=str(e)
+        )
 
 #fiyat tahmini
 @router.post("/tahmin/fiyat")
@@ -436,7 +434,7 @@ def kullanici_urunleri(kullanici_id:int,db:Session=Depends(get_db)):
     return sonuc
 
 @router.post("/oneri/tarla_getir")
-def optimize_ekim_planı(veri:schemas.OptimizationTarlaRequest,db:session=Depends(get_db)):
+def optimize_ekim_planı(veri:schemas.OptimizationTarlaRequest,db: Session=Depends(get_db)):
     kullanici = (db.query(models.Kullanici).filter(models.Kullanici.kullanici_id == veri.kullanici_id).first())
     if not kullanici:
         raise HTTPException(
@@ -472,7 +470,7 @@ def optimize_ekim_planı(veri:schemas.OptimizationTarlaRequest,db:session=Depend
     return plan
 
 @router.post("/oneri/manual")
-def manuel_optimized(veri:schemas.OptimizationManuelRequest,db:session=Depends(get_db)):
+def manuel_optimized(veri:schemas.OptimizationManuelRequest,db: Session=Depends(get_db)):
     fields=[{
         "id":0, #tarlalar içinde seçim yapmayacagı için
         "district":veri.ilce_adi,
@@ -482,7 +480,7 @@ def manuel_optimized(veri:schemas.OptimizationManuelRequest,db:session=Depends(g
         "İlkbahar":"Spring",
         "Sonbahar":"Fall",
         "Yaz":"Summer",
-        "Kı":"Winter"
+        "Kış":"Winter"
     }
     season = SEZON_CEVIR[veri.sezon]
 

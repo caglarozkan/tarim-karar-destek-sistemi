@@ -5,6 +5,7 @@ from app import models
 from app.services.price_prediction import predict_product_price
 from app.services.fuel_service import predict_fuel_price
 from app.services.fertilizer_service import get_commodity_price
+from app.services.risk import hedef_yil_belirle, sezon_cevir
 
 # Bu dosyanin bulundugu yerden proje kokune cikip data klasorune iniyoruz
 KOK_DIZIN = Path(__file__).resolve().parent.parent.parent
@@ -42,7 +43,7 @@ MAZOT_TUKETIMI_LITRE_DONUM = {
     "BIBER SIVRI":      16.98,
     "SALATALIK SILOR":   16.98,
     "KABAK TAZE":      16.98,
-    "PATLICAN":           16.98,
+    "PATLICAN UZUN":           16.98,
     "SOGAN KURU":       16.98,
     "KARPUZ":             16.98,
     "BAKLA":             16.98,
@@ -235,3 +236,33 @@ def kar_hesapla_tam(db, ilce_id, urun_id, ilce_adi, urun_sistem_adi, urun_adi_cs
         "net_kar": net_kar,
     }
     return sonuc
+
+def kar_hesaplama_son(db,ilce,urun,sezon,donum,sulama_maliyeti=0,iscilik_maliyeti=0,tohum_maliyeti=0):
+    ilce_kaydi = db.query(models.Ilce).filter(
+        models.Ilce.ilce_adi == ilce
+    ).first()
+
+    urun_kaydi = db.query(models.Urun).filter(
+        models.Urun.urun_adi == urun
+    ).first()
+
+    if not ilce_kaydi or not urun_kaydi:
+        raise ValueError("İlçe veya ürün bulunamadı.")
+
+    hedef_yil = hedef_yil_belirle(sezon)
+    hedef_sezon = sezon_cevir(sezon)
+
+    return kar_hesapla_tam(
+        db=db,
+        ilce_id=ilce_kaydi.ilce_id,
+        urun_id=urun_kaydi.urun_id,
+        ilce_adi=ilce,
+        urun_sistem_adi=urun,
+        urun_adi_csv=urun,
+        donum=donum,
+        hedef_yil=hedef_yil,
+        hedef_sezon=hedef_sezon,
+        sulama_maliyeti=sulama_maliyeti,
+        iscilik_maliyeti=iscilik_maliyeti,
+        tohum_maliyeti=tohum_maliyeti,
+    )
