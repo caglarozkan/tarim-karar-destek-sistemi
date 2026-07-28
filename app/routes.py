@@ -9,7 +9,7 @@ from app.database import SessionLocal
 from app.services.risk import (FIYAT_HARITASI, REFERANS, kota_doluluk_hesapla, cv_hesapla, sapma_riski_hesapla,
                                genel_risk_hesapla, risk_seviyesi_belirle, mazot_tahmini_al, enflasyon_tahmini_al,
                                guncel_gubre_fiyati_getir, SEZON_CEVIRI, )
-from app.services.risk import sezon_cevir,hedef_yil_belirle
+from app.services.risk import sezon_cevir,hedef_yil_belirle,risk_hesapla
 from app.services.profit_service import kar_hesaplama_son
 from app.services.price_prediction import predict_product_price
 from app.services.optimization_plan import create_plan_for_user_fields
@@ -235,81 +235,21 @@ def tarla_sil(tarla_id: int, db: Session = Depends(get_db)):
 
     return {"mesaj": "Tarla silindi."}
 
-#risk tahmini
+#risk analiz
 @router.post("/tahmin/risk")
-def tahmin_risk(veri: schemas.RiskTahminRequest, db: Session = Depends(get_db)):
+def tahmin_risk(veri: schemas.RiskTahminRequest,db: Session = Depends(get_db)):
+    try:
+        return risk_hesapla(
+            db=db,
+            ilce=veri.ilce,
+            urun=veri.urun,
+            sezon=veri.sezon,
+            donum=veri.donum,
+            kullanici_id=veri.kullanici_id,
+        )
 
-    ilce_kaydi = db.query(models.Ilce).filter(models.Ilce.ilce_adi == veri.ilce).first()
-    urun_kaydi = db.query(models.Urun).filter(models.Urun.urun_adi == veri.urun).first()
-
-    if not ilce_kaydi or not urun_kaydi:
-        raise HTTPException(status_code=404, detail="İlçe veya ürün bulunamadı.")
-
-    kota_kaydi = db.query(models.Kota).filter(
-        models.Kota.ilce_id == ilce_kaydi.ilce_id,
-        models.Kota.urun_id == urun_kaydi.urun_id
-    ).first()
-
-    if not kota_kaydi:
-        raise HTTPException(status_code=404, detail="Bu ilçe ve ürün için kota kaydı bulunamadı.")
-
-    kota_doluluk = kota_doluluk_hesapla(
-        kullanilan_kota=kota_kaydi.kullanilan_kota or 0,
-        girilen_donum=veri.donum,
-        maksimum_kota=kota_kaydi.maksimum_kota
-    )
-
-    fiyatlar = FIYAT_HARITASI.get(veri.urun)
-    if not fiyatlar or len(fiyatlar) < 2:
-        raise HTTPException(status_code=404, detail="Bu ürün için fiyat geçmişi bulunamadı.")
-
-    #deger hesaplamaları modellerden
-    cv_fiyat = cv_hesapla(fiyatlar)
-    mazot_deger = mazot_tahmini_al(veri.sezon)
-    enflasyon_deger = enflasyon_tahmini_al(veri.sezon)
-    gubre_deger = guncel_gubre_fiyati_getir()
-
-    #risk hesaplamaları
-    gubre_riski = sapma_riski_hesapla(gubre_deger, REFERANS["gubre"]["ortalama"], REFERANS["gubre"]["std"])
-    mazot_riski = sapma_riski_hesapla(mazot_deger, REFERANS["mazot"]["ortalama"], REFERANS["mazot"]["std"])
-    enflasyon_riski = sapma_riski_hesapla(enflasyon_deger, REFERANS["enflasyon"]["ortalama"], REFERANS["enflasyon"]["std"])
-
-    genel_risk = genel_risk_hesapla(kota_doluluk, cv_fiyat, gubre_riski, mazot_riski, enflasyon_riski)
-    seviye, emoji = risk_seviyesi_belirle(genel_risk)
-
-    log_kaydi = models.RiskAnalizLog(
-        kullanici_id=veri.kullanici_id,
-        ilce_id=ilce_kaydi.ilce_id,
-        urun_id=urun_kaydi.urun_id,
-        sezon=veri.sezon,
-        girilen_donum=veri.donum,
-        kota_doluluk=round(kota_doluluk, 2),
-        cv_fiyat=round(cv_fiyat, 2),
-        mazot_tahmini=round(mazot_deger, 2),
-        mazot_riski=round(mazot_riski, 2),
-        enflasyon_tahmini=round(enflasyon_deger, 2),
-        enflasyon_riski=round(enflasyon_riski, 2),
-        gubre_guncel=round(gubre_deger, 2),
-        gubre_riski=round(gubre_riski, 2),
-        genel_risk=round(genel_risk, 2),
-        risk_seviyesi=seviye,
-    )
-    db.add(log_kaydi)
-    db.commit()
-
-    return {
-        "kota_doluluk": round(kota_doluluk, 2),
-        "cv": round(cv_fiyat, 2),
-        "mazot_tahmini": round(mazot_deger, 2),
-        "mazot_riski": round(mazot_riski, 2),
-        "enflasyon_tahmini": round(enflasyon_deger, 2),
-        "enflasyon_riski": round(enflasyon_riski, 2),
-        "gubre_guncel": round(gubre_deger, 2),
-        "gubre_riski": round(gubre_riski, 2),
-        "genel_risk": round(genel_risk, 2),
-        "risk_seviyesi": seviye,
-        "risk_emoji": emoji
-    }
+    except ValueError as e:
+        raise HTTPException(status_code=404,detail=str(e),)
 
 #risk analiz logu profildeki
 @router.get("/risk/gecmis", response_model=list[schemas.RiskLogResponse])

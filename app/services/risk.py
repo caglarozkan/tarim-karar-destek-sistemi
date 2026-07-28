@@ -1,16 +1,3 @@
-"""
-risk.py
-Risk analizi hesaplama modülü.
-AHP (Analytic Hierarchy Process) ile belirlenmiş ağırlıklara göre
-5 faktörden oluşan bileşik bir risk skoru üretir:
-Kota (0.38), Fiyat (0.29), Gübre (0.16), Mazot (0.09), Enflasyon (0.08)
-
-NOT: CV ve z-score hesaplamasından ÖNCE fiyatlar enflasyona göre
-"reel" hale getiriliyor - yoksa Türkiye'deki sürekli enflasyon
-yüzünden fiyatlar hep yukarı gittiği için bu artış "oynaklık/risk"
-gibi algılanır ve skorlar hep 100'e yakın çıkar.
-"""
-
 import statistics
 import time
 from datetime import datetime
@@ -22,6 +9,7 @@ from app.services.fertilizer_service import get_commodity_price
 from app.services.fuel_service import predict_fuel_price
 from app.services.inflation_service import predict_inflation
 from app.services.fertilizer_service import get_commodity_price
+from app import models
 
 #dizin işlemleri
 KOK_DIZIN = Path(__file__).resolve().parent.parent.parent
@@ -139,10 +127,6 @@ def veri_haritalarini_olustur(referans_yil_sayisi: int | None):
 
     return fiyat_haritasi, referans
 
-
-# Uygulama başlarken bir kez yüklenir, bellekte tutulur.
-# Referans penceresi tüm geçmiş veri (None = filtre yok) - dar pencerede
-# standart sapma güvenilmez çıktığı için tüm veriye genişletildi.
 FIYAT_HARITASI, REFERANS = veri_haritalarini_olustur(referans_yil_sayisi=None)
 
 # Gübre web'den çekildiği için basit önbellekleme (her istekte siteye gitmesin)
@@ -251,3 +235,94 @@ def guncel_gubre_fiyati_getir() -> float:
         if _GUBRE_CACHE["deger"] is not None:
             return _GUBRE_CACHE["deger"]
         return REFERANS["gubre"]["ortalama"]
+
+def risk_hesapla(db,ilce,urun,sezon,donum,kullanici_id=None):
+    ilce_kaydi = db.query(models.Ilce).filter(models.Ilce.ilce_adi == ilce).first()
+
+    urun_kaydi = db.query(models.Urun).filter(models.Urun.urun_adi == urun).first()
+
+    if not ilce_kaydi or not urun_kaydi:
+        raise ValueError("İlçe veya ürün bulunamadı.")
+
+    kota_kaydi = db.query(models.Kota).filter(models.Kota.ilce_id == ilce_kaydi.ilce_id,models.Kota.urun_id == urun_kaydi.urun_id,).first()
+
+    if not kota_kaydi:
+        raise ValueError("Bu ilçe ve ürün için kota kaydı bulunamadı.")
+
+    kota_doluluk = kota_doluluk_hesapla(
+        kullanilan_kota=kota_kaydi.kullanilan_kota or 0,
+        girilen_donum=donum,
+        maksimum_kota=kota_kaydi.maksimum_kota,
+    )
+    fiyatlar = FIYAT_HARITASI.get(urun)
+    if not fiyatlar or len(fiyatlar) < 2:
+        raise ValueError("Bu ürün için fiyat geçmişi bulunamadı.")
+
+    cv_fiyat = cv_hesapla(fiyatlar)
+    mazot_deger = mazot_tahmini_al(sezon)
+    enflasyon_deger = enflasyon_tahmini_al(sezon)
+    gubre_deger = guncel_gubre_fiyati_getir()
+
+    gubre_riski = sapma_riski_hesapla(
+        gubre_deger,
+        REFERANS["gubre"]["ortalama"],
+        REFERANS["gubre"]["std"],
+    )
+
+    mazot_riski = sapma_riski_hesapla(
+        mazot_deger,
+        REFERANS["mazot"]["ortalama"],
+        REFERANS["mazot"]["std"],
+    )
+
+    enflasyon_riski = sapma_riski_hesapla(
+        enflasyon_deger,
+        REFERANS["enflasyon"]["ortalama"],
+        REFERANS["enflasyon"]["std"],
+    )
+
+    genel_risk = genel_risk_hesapla(
+        kota_doluluk,
+        cv_fiyat,
+        gubre_riski,
+        mazot_riski,
+        enflasyon_riski,
+    )
+
+    seviye, emoji = risk_seviyesi_belirle(genel_risk)
+
+    if kullanici_id is not None:
+        log = models.RiskAnalizLog(
+            kullanici_id=kullanici_id,
+            ilce_id=ilce_kaydi.ilce_id,
+            urun_id=urun_kaydi.urun_id,
+            sezon=sezon,
+            girilen_donum=donum,
+            kota_doluluk=round(kota_doluluk, 2),
+            cv_fiyat=round(cv_fiyat, 2),
+            mazot_tahmini=round(mazot_deger, 2),
+            mazot_riski=round(mazot_riski, 2),
+            enflasyon_tahmini=round(enflasyon_deger, 2),
+            enflasyon_riski=round(enflasyon_riski, 2),
+            gubre_guncel=round(gubre_deger, 2),
+            gubre_riski=round(gubre_riski, 2),
+            genel_risk=round(genel_risk, 2),
+            risk_seviyesi=seviye,
+        )
+
+        db.add(log)
+        db.commit()
+
+    return {
+        "kota_doluluk": round(kota_doluluk, 2),
+        "cv": round(cv_fiyat, 2),
+        "mazot_tahmini": round(mazot_deger, 2),
+        "mazot_riski": round(mazot_riski, 2),
+        "enflasyon_tahmini": round(enflasyon_deger, 2),
+        "enflasyon_riski": round(enflasyon_riski, 2),
+        "gubre_guncel": round(gubre_deger, 2),
+        "gubre_riski": round(gubre_riski, 2),
+        "genel_risk": round(genel_risk, 2),
+        "risk_seviyesi": seviye,
+        "risk_emoji": emoji,
+    }
