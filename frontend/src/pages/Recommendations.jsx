@@ -47,7 +47,11 @@ function Recommendations() {
   const handleManuelChange = (e) => {
     setManuelForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
-
+  const toplamGelir =
+    sonuc?.plan?.reduce(
+        (toplam, urun) => toplam + urun.gross_revenue,
+        0
+    ) || 0;
   const oneriAl = async () => {
     setHata("");
 
@@ -55,7 +59,7 @@ function Recommendations() {
       setHata("Lütfen Sezon Seçiniz!");
       return;
     }
-
+    let endpoint="";
     let payload = {
       mod,
       sezon,
@@ -68,20 +72,36 @@ function Recommendations() {
         setHata("Lütfen bir tarla seç.");
         return;
       }
-      payload.tarla_idleri = [secilenTarla];
+      endpoint = "http://localhost:8000/oneri/tarla_getir";
+
+      payload = {
+        kullanici_id: aktifKullanici.id,
+        tarla_id: secilenTarla,
+        sezon,
+        bos_donum: toplamDonum,
+        secilen_urunler:
+            secilenUrunler.length > 0 ? secilenUrunler : null,
+      };
     } else {
-      if (!manuelForm.ilce || !manuelForm.donum) {
-        setHata("Lütfen ilçe ve dönüm bilgisini doldur.");
-        return;
-      }
-      payload.ilce = manuelForm.ilce;
-      payload.donum = Number(manuelForm.donum);
+        if(!manuelForm.ilce || !manuelForm.donum){
+            setHata("Lütfen ilçe ve dönüm gir.");
+            return
+        }
+        endpoint = "http://localhost:8000/oneri/manual";
+
+        payload = {
+        ilce: manuelForm.ilce,
+        donum: Number(manuelForm.donum),
+        sezon,
+        secilen_urunler:
+          secilenUrunler.length > 0 ? secilenUrunler : null,
+        };
     }
 
     setYukleniyor(true);
     setSonuc(null);
     try {
-      const res = await fetch("http://localhost:8000/oneri/getir", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -221,17 +241,19 @@ function Recommendations() {
           {sonuc ? (
             <>
               <div className="oneri-grid">
-                {sonuc.oneriler?.map((o, idx) => (
+                {sonuc?.plan?.map((o, idx) => (
                   <div className="oneri-cell" key={idx}>
-                    <div className="donum">{o.donum} dönüm</div>
-                    <div className="urun">{URUN_GORUNEN_ADLAR[o.urun] || o.urun}</div>
+                    <div className="donum">{o.recommended_area} dönüm</div>
+                    <div className="urun">{URUN_GORUNEN_ADLAR[o.product_name] || o.product_name}</div>
+                    <div classname="meta"> Verim: {o.estimated_production_kg.toLocaleString("tr-TR")} tl/kg </div>
+                  <div className="meta"> Gelir: {o.gross_revenue.toLocaleString("tr-TR")}TL </div>
                   </div>
                 ))}
               </div>
               <div className="result-row">
                 <div className="result-card highlight">
                   <div className="label">Tahmini Toplam Gelir</div>
-                  <div className="value">{sonuc.tahmini_kar} ₺</div>
+                  <div className="value">{toplamGelir.toLocaleString("tr-TR")} ₺</div>
                 </div>
               </div>
             </>

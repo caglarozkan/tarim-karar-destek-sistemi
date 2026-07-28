@@ -870,3 +870,9 @@ button {
     text-align:center;
     margin-bottom:20px;
 }
+.product-result-image{
+    width:90px;
+    height:90px;
+    object-fit:contain;
+    margin-bottom:15px;
+}

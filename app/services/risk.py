@@ -63,12 +63,11 @@ AY_MEVSIM_HARITASI = {
 
 def enflasyon_endeksi_ekle(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Endeksi SADECE tekil (year, season) satırları üzerinde kurar
-    (aksi halde her çeyrekte birden fazla ürün satırı olduğu için
-    aynı çeyrek birden fazla kez bileşiklenir ve sayılar patlar).
-    Sonra bu endeksi tüm df'ye (her ürün satırına) geri eşler.
-    annual_inflation YILLIK bir oran olduğu için, çeyreklik
-    bileşiklendirme yaparken 4'e bölüyoruz (yaklaşık bir dönüşüm).
+    Endeksi SADECE tekil (year, season) satirlari uzerinde kurar,
+    sonra bunu tum df'ye dict-tabanli esleme ile geri yansitir.
+    annual_inflation'da eksik (NaN) deger varsa, o donem icin
+    'degisim yok' (0) varsayilir - yoksa carpimsal zincir bir kere
+    NaN'a dusunce tum sonraki degerler de NaN olur.
     """
     df = df.copy()
     df["season_order"] = df["season"].map(MEVSIM_SIRASI)
@@ -76,19 +75,31 @@ def enflasyon_endeksi_ekle(df: pd.DataFrame) -> pd.DataFrame:
     tekil = df.drop_duplicates(subset=["year", "season"]).copy()
     tekil = tekil.sort_values(["year", "season_order"]).reset_index(drop=True)
 
-    endeks = [1.0]
-    for i in range(1, len(tekil)):
-        yillik_oran = tekil.loc[i - 1, "annual_inflation"] / 100
-        ceyreklik_oran = yillik_oran / 4
-        endeks.append(endeks[-1] * (1 + ceyreklik_oran))
+    # eksik enflasyon degerini 0 kabul et (o donem icin fiyat degismedi varsayimi)
+    tekil["annual_inflation"] = tekil["annual_inflation"].fillna(0)
 
-    tekil["endeks"] = endeks
+    ceyreklik_carpan = 1 + (tekil["annual_inflation"] / 100 / 4)
+    # ilk donemin carpani onemsiz (referans nokta), kumulatif urun bir onceki
+    # donemin degerine gore ilerlemeli, o yuzden 1 kaydiriyoruz
+    kumulatif = ceyreklik_carpan.shift(1).fillna(1).cumprod()
+
+    tekil["endeks"] = kumulatif
     son_endeks = tekil["endeks"].iloc[-1]
-    tekil["endeks"] = tekil["endeks"] / son_endeks  # son dönem = 1.0 olsun
+    if son_endeks == 0 or pd.isna(son_endeks):
+        son_endeks = 1.0
+    tekil["endeks"] = tekil["endeks"] / son_endeks
 
-    df = df.merge(tekil[["year", "season", "endeks"]], on=["year", "season"], how="left")
+    endeks_sozlugu = {}
+    for _, satir in tekil.iterrows():
+        anahtar = (str(satir["year"]), str(satir["season"]))
+        endeks_sozlugu[anahtar] = satir["endeks"]
+
+    df["endeks"] = df.apply(
+        lambda satir: endeks_sozlugu.get((str(satir["year"]), str(satir["season"])), 1.0),
+        axis=1
+    )
+
     return df
-
 
 def veri_haritalarini_olustur(referans_yil_sayisi: int | None):
     df = pd.read_csv(CSV_PATH)

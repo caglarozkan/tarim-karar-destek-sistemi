@@ -1,15 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, session
 from passlib.context import CryptContext
 
 from app import models
 from app import schemas
 from app.database import SessionLocal
 
-from app.services.risk import (FIYAT_HARITASI, REFERANS,kota_doluluk_hesapla, cv_hesapla, sapma_riski_hesapla,genel_risk_hesapla, risk_seviyesi_belirle,mazot_tahmini_al, enflasyon_tahmini_al, guncel_gubre_fiyati_getir,)
+from app.services.risk import (FIYAT_HARITASI, REFERANS, kota_doluluk_hesapla, cv_hesapla, sapma_riski_hesapla,
+                               genel_risk_hesapla, risk_seviyesi_belirle, mazot_tahmini_al, enflasyon_tahmini_al,
+                               guncel_gubre_fiyati_getir, SEZON_CEVIRI, )
 from app.services.risk import sezon_cevir,hedef_yil_belirle
 from app.services.profit_service import kar_hesapla_tam
 from app.services.price_prediction import predict_product_price
+from app.services.optimization_plan import create_plan_for_user_fields
 
 # İşlem yollarını ayıran Router objemiz
 router = APIRouter()
@@ -431,3 +434,61 @@ def kullanici_urunleri(kullanici_id:int,db:Session=Depends(get_db)):
     sonuc.sort(key=lambda x: x["toplam_donum"],reverse=True)
 
     return sonuc
+
+@router.post("/oneri/tarla_getir")
+def optimize_ekim_planı(veri:schemas.OptimizationTarlaRequest,db:session=Depends(get_db)):
+    kullanici = (db.query(models.Kullanici).filter(models.Kullanici.kullanici_id == veri.kullanici_id).first())
+    if not kullanici:
+        raise HTTPException(
+            status_code=404,
+            detail="Kullanıcı bulunamadı."
+        )
+
+    tarla = (db.query(models.Tarla).filter(models.Tarla.tarla_id==veri.tarla_id,models.Tarla.kullanici_id==veri.kullanici_id).first())
+    if not tarla:
+        raise HTTPException(status_code=404,detail="Tarla bulunamadı")
+
+    ilce = (db.query(models.Ilce).filter(models.Ilce.ilce_id == tarla.ilce_id).first())
+
+    fields=[{
+        "id":tarla.tarla_id,
+        "district":ilce.ilce_adi,
+        "area": veri.bos_donum
+    }]
+    SEZON_CEVIR={
+        "İlkbahar":"Spring",
+        "Sonbahar":"Fall",
+        "Kış":"Winter",
+        "Yaz":"Summer"
+    }
+    season = SEZON_CEVIR[veri.sezon]
+
+    plan =create_plan_for_user_fields(
+        fields=fields,
+        season=season,
+        selected_products=veri.secilen_urunler
+    )
+
+    return plan
+
+@router.post("/oneri/manual")
+def manuel_optimized(veri:schemas.OptimizationManuelRequest,db:session=Depends(get_db)):
+    fields=[{
+        "id":0, #tarlalar içinde seçim yapmayacagı için
+        "district":veri.ilce_adi,
+        "area":veri.donum
+    }]
+    SEZON_CEVIR={
+        "İlkbahar":"Spring",
+        "Sonbahar":"Fall",
+        "Yaz":"Summer",
+        "Kı":"Winter"
+    }
+    season = SEZON_CEVIR[veri.sezon]
+
+    plan = create_plan_for_user_fields(
+        fields=fields,
+        season=season,
+        selected_products=veri.secilen_urunler
+    )
+    return plan
