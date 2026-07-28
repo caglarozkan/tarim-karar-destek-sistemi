@@ -1,7 +1,7 @@
 from pathlib import Path
 import re
 from typing import Any
-
+from datetime import date
 import pandas as pd
 import pulp
 from app.services.fertilizer_service import get_commodity_price
@@ -14,6 +14,24 @@ DATAPATH = ROOT_DIR / "data" / "processed" / "data_files" / "final_optimization.
 QUOTAPATH = ROOT_DIR / "data" / "processed" / "data_files" / "cleaned_quota.csv"
 FERTILIZER_COMMODITY = "urea"
 
+PRODUCT_SEASONS = {
+    "DOMATES SALKIM": "Summer",
+    "SALATALIK SILOR": "Summer",
+    "BEZELYE": "Spring",
+    "BAKLA": "Spring",
+    "KARNABAHAR": "Winter",
+    "LAHANA KIRMIZI": "Winter",
+    "LAHANA BEYAZ": "Winter",
+    "BROKOLI": "Winter",
+    "MARUL GOBEKLI": "Winter",
+    "ISPANAK": "Winter",
+    "PIRASA": "Winter",
+    "BIBER SIVRI": "Summer",
+    "KARPUZ": "Summer",
+    "SOGAN KURU": "Spring",
+    "KABAK TAZE": "Summer",
+    "PATLICAN UZUN": "Summer",
+}
 
 def safe_name(value):
     return re.sub(r"[^A-Za-z0-9_]", "_", str(value))
@@ -35,6 +53,7 @@ def load_optimization_data():
 
 def get_suitable_products(df, district, season=None):
     data = df.copy()
+
     data["planted_area"] = pd.to_numeric(data["planted_area"], errors="coerce")
     data["production_amount"] = pd.to_numeric(data["production_amount"], errors="coerce")
 
@@ -44,10 +63,11 @@ def get_suitable_products(df, district, season=None):
         & (data["production_amount"] > 0)
     )
 
-    if season and "season" in data.columns:
-        mask = mask & (data["season"] == season)
+    if season:
+        data["suitable_season"] = data["product_name"].map(PRODUCT_SEASONS)
+        mask = mask & (data["suitable_season"] == season)
 
-    return data[mask].reset_index(drop=True)
+    return data[mask].drop(columns=["suitable_season"], errors="ignore").reset_index(drop=True)
 
 
 def calculate_product_summary(valid_products_df):
@@ -112,7 +132,42 @@ def add_other_predictions(products, target_year, season):
 
     return data
 
+def get_target_year(season):
+    season_order = {
+        "Winter": 1,
+        "Spring": 2,
+        "Summer": 3,
+        "Fall": 4,
+    }
 
+    month_to_season = {
+        12: "Winter",
+        1: "Winter",
+        2: "Winter",
+        3: "Spring",
+        4: "Spring",
+        5: "Spring",
+        6: "Summer",
+        7: "Summer",
+        8: "Summer",
+        9: "Fall",
+        10: "Fall",
+        11: "Fall",
+    }
+
+    today = date.today()
+    current_year = today.year
+    current_month = today.month
+    current_season = month_to_season[current_month]
+
+    if season not in season_order:
+        raise ValueError(f"Geçersiz sezon: {season}")
+
+    if season_order[season] > season_order[current_season]:
+        return current_year
+
+    return current_year + 1
+    
 def filter_selected_products(data, selected_products):
     if not selected_products:
         return data
@@ -217,11 +272,10 @@ def create_planting(
 def create_plan_for_user_fields(
     fields,
     season,
-    target_year=2026,
     selected_products=None,
 ):
     all_plans = []
-
+    target_year=get_target_year(season)
     for field in fields:
         field_id = field["id"]
         district = field["district"]
