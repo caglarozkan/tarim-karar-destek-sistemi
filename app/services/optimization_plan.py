@@ -179,10 +179,10 @@ def create_planting(
     district,
     season,
     total_area,
-    target_year=2026,
     selected_products=None,
     max_share=0.4,
 ):
+    target_year=get_target_year(season)
     df = load_optimization_data()
     suitable_products = get_suitable_products(df, district, season=season)
     revenue_data = add_other_predictions(
@@ -315,5 +315,38 @@ def create_plan_for_user_fields(
             )
 
     return all_plans
+if __name__ == "__main__":
+    try:
+        plan = create_planting(
+            district="Tire",
+            season="Winter",
+            total_area=100,
+            selected_products=[
+                "KARNABAHAR",
+                "LAHANA KIRMIZI",
+                "LAHANA BEYAZ",
+                "BROKOLI",
+                "ISPANAK",
+                "PIRASA",
+                "MARUL GOBEKLI",
+            ],
+            max_share=0.4,
+        )
 
+        print("\nOPTIMIZASYON SONUCU")
+        print("=" * 50)
+
+        for item in plan:
+            print(f"Urun: {item['product_name']}")
+            print(f"Sezon: {item['season']}")
+            print(f"Onerilen alan: {item['recommended_area']} donum")
+            print(f"Tahmini uretim: {item['estimated_production_kg']} kg")
+            print(f"Tahmini fiyat: {item['predicted_price']} TL/kg")
+            print(f"Tahmini gelir: {item['gross_revenue']} TL")
+            print(f"Kota: {item['quota']}")
+            print("-" * 50)
+
+    except Exception as error:
+        print("Hata olustu:")
+        print(error)
 
