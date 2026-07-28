@@ -7,30 +7,33 @@ import pulp
 from app.services.fertilizer_service import get_commodity_price
 from app.services.fuel_service import predict_fuel_price
 from app.services.price_prediction import predict_product_price
+from app.services.profit_service import kar_hesapla_tam
 
 
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+
 DATAPATH = ROOT_DIR / "data" / "processed" / "data_files" / "final_optimization.csv"
 QUOTAPATH = ROOT_DIR / "data" / "processed" / "data_files" / "cleaned_quota.csv"
+YIELD_PATH=ROOT_DIR / "data" / "processed" / "data_files" / "predict_yield_per_decare.csv"
 FERTILIZER_COMMODITY = "urea"
 
 PRODUCT_SEASONS = {
-    "DOMATES SALKIM": "Summer",
-    "SALATALIK SILOR": "Summer",
-    "BEZELYE": "Spring",
-    "BAKLA": "Spring",
-    "KARNABAHAR": "Winter",
-    "LAHANA KIRMIZI": "Winter",
-    "LAHANA BEYAZ": "Winter",
-    "BROKOLI": "Winter",
-    "MARUL GOBEKLI": "Winter",
-    "ISPANAK": "Winter",
-    "PIRASA": "Winter",
-    "BIBER SIVRI": "Summer",
-    "KARPUZ": "Summer",
-    "SOGAN KURU": "Spring",
-    "KABAK TAZE": "Summer",
-    "PATLICAN UZUN": "Summer",
+    "DOMATES SALKIM": ["Spring"],
+    "SALATALIK SILOR": ["Spring", "Summer"],
+    "BEZELYE": ["Fall", "Winter"],
+    "BAKLA": ["Fall", "Winter"],
+    "KARNABAHAR": ["Summer", "Fall"],
+    "LAHANA KIRMIZI": ["Summer", "Fall"],
+    "LAHANA BEYAZ": ["Summer", "Fall"],
+    "BROKOLI": ["Summer", "Fall"],
+    "MARUL GOBEKLI": ["Fall", "Winter", "Spring"],
+    "ISPANAK": ["Fall", "Winter"],
+    "PIRASA": ["Spring", "Summer"],
+    "BIBER SIVRI": ["Spring"],
+    "KARPUZ": ["Spring"],
+    "SOGAN KURU": ["Fall", "Spring"],
+    "KABAK TAZE": ["Spring", "Summer"],
+    "PATLICAN UZUN": ["Spring"],
 }
 
 def safe_name(value):
@@ -65,14 +68,25 @@ def get_suitable_products(df, district, season=None):
 
     if season:
         data["suitable_season"] = data["product_name"].map(PRODUCT_SEASONS)
-        mask = mask & (data["suitable_season"] == season)
+        season_mask = data["suitable_season"].apply(
+            lambda seasons: (
+                season in seasons
+                if isinstance(seasons, list)
+                else False
+            )
+        )
+        mask = mask & season_mask
 
-    return data[mask].drop(columns=["suitable_season"], errors="ignore").reset_index(drop=True)
-
+    return (
+        data[mask]
+        .drop(columns=["suitable_season"], errors="ignore")
+        .reset_index(drop=True)
+    )
 
 def calculate_product_summary(valid_products_df):
     data = valid_products_df.copy()
-    data["yield_per_decare_kg"] = data["production_amount"] * 1000 / data["planted_area"]
+    production=pd.read_csv(YIELD_PATH)
+    data["yield_per_decare_kg"] = production["predicted_yield_per_decare_kg"]
 
     summary = (
         data.groupby(["district", "product_name"], as_index=False)
@@ -105,10 +119,22 @@ def get_predicted_price(product_name, target_year, target_season):
 
 def add_other_predictions(products, target_year, season):
     data = calculate_product_summary(products)
-    fuel_price = get_fuel_price(target_year, season)
-    fertilizer_price = get_fertilizer_price()
+
+    if data.empty:
+        return data
+
+    try:
+        fuel_price = get_fuel_price(target_year, season)
+    except Exception:
+        fuel_price = None
+
+    try:
+        fertilizer_price = get_fertilizer_price()
+    except Exception:
+        fertilizer_price = None
 
     predicted_prices = []
+
     for product_name in data["product_name"]:
         try:
             predicted_price = get_predicted_price(
@@ -116,15 +142,27 @@ def add_other_predictions(products, target_year, season):
                 target_year=target_year,
                 target_season=season,
             )
-        except (ValueError, TypeError, KeyError):
+        except Exception:
             predicted_price = None
 
         predicted_prices.append(predicted_price)
 
     data["predicted_price"] = predicted_prices
+
+    data = data[data["predicted_price"].notna()].reset_index(drop=True)
+
+    if data.empty:
+        return data
+
+    data["predicted_price"] = pd.to_numeric(
+        data["predicted_price"],
+        errors="coerce",
+    )
+
+    data = data[data["predicted_price"].notna()].reset_index(drop=True)
+
     data["predicted_fuel_price"] = fuel_price
     data["current_fertilizer_price"] = fertilizer_price
-    data = data[data["predicted_price"].notna()].reset_index(drop=True)
 
     data["revenue_per_decare"] = (
         data["average_yield_per_decare"] * data["predicted_price"]
@@ -268,7 +306,8 @@ def create_planting(
 
     return result.to_dict(orient="records")
 
-
+def get_profi():
+    profit=kar_hesapla_tam()
 def create_plan_for_user_fields(
     fields,
     season,
@@ -313,40 +352,4 @@ def create_plan_for_user_fields(
                     "plan": [],
                 }
             )
-
-    return all_plans
-if __name__ == "__main__":
-    try:
-        plan = create_planting(
-            district="Tire",
-            season="Winter",
-            total_area=100,
-            selected_products=[
-                "KARNABAHAR",
-                "LAHANA KIRMIZI",
-                "LAHANA BEYAZ",
-                "BROKOLI",
-                "ISPANAK",
-                "PIRASA",
-                "MARUL GOBEKLI",
-            ],
-            max_share=0.4,
-        )
-
-        print("\nOPTIMIZASYON SONUCU")
-        print("=" * 50)
-
-        for item in plan:
-            print(f"Urun: {item['product_name']}")
-            print(f"Sezon: {item['season']}")
-            print(f"Onerilen alan: {item['recommended_area']} donum")
-            print(f"Tahmini uretim: {item['estimated_production_kg']} kg")
-            print(f"Tahmini fiyat: {item['predicted_price']} TL/kg")
-            print(f"Tahmini gelir: {item['gross_revenue']} TL")
-            print(f"Kota: {item['quota']}")
-            print("-" * 50)
-
-    except Exception as error:
-        print("Hata olustu:")
-        print(error)
 
