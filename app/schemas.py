@@ -101,7 +101,7 @@ class OptimizationTarlaRequest(BaseModel):
     secilen_urunler: Optional[list[str]] = None
 
 class OptimizationManuelRequest(BaseModel):
-    ilce: str
+    ilce_adi: str
     donum:float
     sezon : str
     secilen_urunler:Optional[list[str]] = None

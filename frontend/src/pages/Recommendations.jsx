@@ -47,11 +47,11 @@ function Recommendations() {
   const handleManuelChange = (e) => {
     setManuelForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
-  const toplamGelir =
-    sonuc?.plan?.reduce(
-        (toplam, urun) => toplam + urun.gross_revenue,
-        0
-    ) || 0;
+  const ilkPlan = sonuc?.[0];
+  const urunListesi = ilkPlan?.plan || [];
+
+  const toplamGelir = urunListesi.reduce((toplam, urun) => toplam + urun.estimated_revenue,0);
+
   const oneriAl = async () => {
     setHata("");
 
@@ -90,7 +90,7 @@ function Recommendations() {
         endpoint = "http://localhost:8000/oneri/manual";
 
         payload = {
-        ilce: manuelForm.ilce,
+        ilce_adi: manuelForm.ilce,
         donum: Number(manuelForm.donum),
         sezon,
         secilen_urunler:
@@ -240,13 +240,17 @@ function Recommendations() {
         <div className="results-column">
           {sonuc ? (
             <>
+                {ilkPlan && !ilkPlan.success && (
+                    <div className="form-message error">{ilkPlan.error}</div>
+                )}
               <div className="oneri-grid">
-                {sonuc?.plan?.map((o, idx) => (
+                {urunListesi.map((o, idx) => (
                   <div className="oneri-cell" key={idx}>
                     <div className="donum">{o.recommended_area} dönüm</div>
                     <div className="urun">{URUN_GORUNEN_ADLAR[o.product_name] || o.product_name}</div>
-                    <div classname="meta"> Verim: {o.estimated_production_kg.toLocaleString("tr-TR")} tl/kg </div>
-                  <div className="meta"> Gelir: {o.gross_revenue.toLocaleString("tr-TR")}TL </div>
+                    <div className="Meta">Tahmini Üretim: {(o.estimated_production ?? 0).toLocaleString("tr-TR")} ton</div>
+                    <div className="Meta">Tahmini Gelir: {(o.estimated_revenue ?? 0).toLocaleString("tr-TR")} ₺</div>
+                    <div className="Meta">Tahmini Kâr: {(o.estimated_profit ?? 0).toLocaleString("tr-TR")} ₺</div>
                   </div>
                 ))}
               </div>

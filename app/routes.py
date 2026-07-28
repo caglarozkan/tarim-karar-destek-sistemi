@@ -402,6 +402,7 @@ def optimize_ekim_planı(veri:schemas.OptimizationTarlaRequest,db: Session=Depen
     season = SEZON_CEVIR[veri.sezon]
 
     plan =create_plan_for_user_fields(
+        db=db,
         fields=fields,
         season=season,
         selected_products=veri.secilen_urunler
@@ -425,6 +426,7 @@ def manuel_optimized(veri:schemas.OptimizationManuelRequest,db: Session=Depends(
     season = SEZON_CEVIR[veri.sezon]
 
     plan = create_plan_for_user_fields(
+        db=db,
         fields=fields,
         season=season,
         selected_products=veri.secilen_urunler
