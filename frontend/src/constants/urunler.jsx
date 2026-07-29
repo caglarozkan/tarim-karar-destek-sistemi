@@ -5,7 +5,6 @@ export const URUN_GORUNEN_ADLAR = {
   "SALATALIK SILOR": "Salatalık (Silor)",
   "KABAK TAZE": "Kabak (Taze)",
   "PATLICAN UZUN": "Patlıcan (Uzun)",
-  "SOGAN KURU": "Soğan (Kuru)",
   "KARPUZ": "Karpuz",
   "BAKLA": "Bakla",
   "BEZELYE": "Bezelye",
