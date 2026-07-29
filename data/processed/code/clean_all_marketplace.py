@@ -41,7 +41,6 @@ PRODUCTS = [
     "SALATALIK SILOR",
     "KABAK TAZE",
     "KARPUZ",
-    "SOGAN KURU",
     "PATLICAN UZUN",
     "BIBER SIVRI",
     "KARNABAHAR",
@@ -100,9 +99,6 @@ def standardize_product_name(value):
         "KABAK TAZE": "KABAK TAZE",
 
         "KARPUZ": "KARPUZ",
-
-        "SOGAN KURU": "SOGAN KURU",
-        "SOĞAN KURU": "SOGAN KURU",
 
         "PATLICAN": "PATLICAN UZUN",
         "PATLICAN UZUN": "PATLICAN UZUN",

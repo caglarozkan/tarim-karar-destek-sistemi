@@ -6,6 +6,8 @@ FERTILIZER_PATH = "data/processed/data_files/cleaned_fertilizer.csv"
 FUEL_PATH = "data/processed/data_files/seasonal_fuel_prices.csv"
 INFLATION_PATH = "data/processed/data_files/seasonal_inflation.csv"
 TUIK_PATH = "data/processed/data_files/cleaned_tuik.csv"
+PRODUCTION_PATH="data/processed/data_files/üretim_miktari_sonuclari.csv"
+PLANTED_PATH="data/processed/data_files/cleaned_quota.csv"
 
 OUTPUT_PATH = "data/processed/data_files/final_price_dataset.csv"
 
@@ -26,8 +28,6 @@ PRODUCT_NAME_MAP = {
     "KABAK SAKIZ": "KABAK TAZE",
     "KABAK TAZE": "KABAK TAZE",
     "KARPUZ": "KARPUZ",
-    "SOGAN KURU": "SOGAN KURU",
-    "SOĞAN KURU": "SOGAN KURU",
     "BIBER SIVRI": "BIBER SIVRI",
     "BİBER SİVRİ": "BIBER SIVRI",
     "PATLICAN": "PATLICAN UZUN",
@@ -93,14 +93,6 @@ def prepare_market():
     on_bad_lines="skip"
 )
 
-    market = market.rename(columns={
-        "TARIH": "date",
-        "URUN_ADI": "product_name",
-        "ORTALAMA_FIYAT": "average_price",
-        "YIL": "year",
-        "SEZON": "season",
-        "AY": "month",
-    })
 
     market["date"] = pd.to_datetime(market["date"], errors="coerce")
 
@@ -123,7 +115,9 @@ def prepare_market():
         market["average_price"],
         errors="coerce"
     )
-
+    market["min_price"] = pd.to_numeric(market["min_price"], errors="coerce")
+    market["max_price"] = pd.to_numeric(market["max_price"], errors="coerce")
+    
     market = market[
         market["product_name"].isin(ALLOWED_PRODUCTS)
     ]
@@ -140,7 +134,9 @@ def prepare_market():
             as_index=False
         )
         .agg(
-            average_price=("average_price", "mean")
+            average_price=("average_price", "mean"),
+            min_price=("min_price","mean"),
+            max_price=("max_price","mean")
         )
     )
 
@@ -155,14 +151,6 @@ def prepare_tuik():
     engine="python",
     on_bad_lines="skip"
 )
-
-    tuik = tuik.rename(columns={
-        "ProductName": "product_name",
-        "Year": "year",
-        "District": "district",
-        "Ekilen Alan": "planted_area",
-        "Üretim Miktarı": "production_amount",
-    })
 
     tuik["product_name"] = tuik["product_name"].apply(normalize_product_name)
     tuik["year"] = pd.to_numeric(tuik["year"], errors="coerce")
@@ -197,12 +185,6 @@ def prepare_fertilizer():
     engine="python",
     on_bad_lines="skip"
 )
-
-    fertilizer = fertilizer.rename(columns={
-        "YIL": "year",
-        "Year": "year",
-        "Ortalama_Gubre_Maliyeti_Ton_TL": "fertilizer_price",
-    })
 
     fertilizer["year"] = pd.to_numeric(fertilizer["year"], errors="coerce")
     fertilizer["fertilizer_price"] = pd.to_numeric(
@@ -241,13 +223,6 @@ def prepare_inflation():
     on_bad_lines="skip"
 )
 
-    inflation = inflation.rename(columns={
-        "YIL": "year",
-        "Year": "year",
-        "annual_inflation": "annual_inflation",
-        "Annual_Inflation": "annual_inflation",
-    })
-
     inflation["year"] = pd.to_numeric(inflation["year"], errors="coerce")
     inflation["annual_inflation"] = pd.to_numeric(
         inflation["annual_inflation"],
@@ -255,6 +230,134 @@ def prepare_inflation():
     )
 
     return inflation[["year","season", "annual_inflation"]].drop_duplicates()
+
+
+def add_lag_features(final):
+    final = final.copy()
+    final["season_order"] = final["season"].map(SEASON_ORDER)
+
+    # 1) Her urun icin olasi TUM yil x sezon kombinasyonlarini iceren
+    #    tam bir izgara olustur (eksik sezonlar da satir olarak var olsun)
+    all_products = final["product_name"].unique()
+    all_years = final["year"].unique()
+    all_seasons = list(SEASON_ORDER.keys())
+
+    full_index = pd.MultiIndex.from_product(
+        [all_products, all_years, all_seasons],
+        names=["product_name", "year", "season"],
+    )
+    grid = pd.DataFrame(index=full_index).reset_index()
+    grid["season_order"] = grid["season"].map(SEASON_ORDER)
+
+    # 2) Gercek veriyi bu tam izgaraya birlestir; eksik yil-sezon
+    #    kombinasyonlari icin average_price NaN olur
+    merged = grid.merge(
+        final[["product_name", "year", "season", "average_price"]],
+        on=["product_name", "year", "season"],
+        how="left",
+    )
+
+    merged = merged.sort_values(
+        ["product_name", "year", "season_order"]
+    ).reset_index(drop=True)
+
+    # 3) Artik shift, gercek kronolojik bir onceki/4 onceki sezonu veriyor.
+    #    Eksik bir sezon araya girdiyse, sonraki sezonun lag'i otomatik NaN olur.
+    merged["lag_1_price"] = merged.groupby("product_name")["average_price"].shift(1)
+    merged["lag_4_price"] = merged.groupby("product_name")["average_price"].shift(4)
+
+    # 4) Sadece gercekte veride olan satirlari geri al (sentetik satirlari at)
+    final = final.merge(
+        merged[["product_name", "year", "season", "lag_1_price", "lag_4_price"]],
+        on=["product_name", "year", "season"],
+        how="left",
+    )
+
+    final = final.drop(columns=["season_order"])
+
+    return final
+
+
+def fill_2026_production(final):
+    predicted = pd.read_csv(PRODUCTION_PATH)
+
+    predicted = predicted.rename(columns={
+        "2026 Üretim Miktari": "predicted_production_amount",
+    })
+
+    predicted["year"] = 2026
+    predicted["product_name"] = predicted["product_name"].apply(normalize_product_name)
+
+    predicted["predicted_production_amount"] = pd.to_numeric(
+        predicted["predicted_production_amount"],
+        errors="coerce",
+    )
+
+    predicted = (
+        predicted
+        .groupby(["year", "product_name"], as_index=False)["predicted_production_amount"]
+        .sum()
+    )
+
+    final = final.merge(
+        predicted,
+        on=["year", "product_name"],
+        how="left",
+    )
+
+    mask = (
+        (final["year"] == 2026)
+        & (final["production_amount"].isna())
+        & (final["predicted_production_amount"].notna())
+    )
+
+    final.loc[mask, "production_amount"] = (
+        final.loc[mask, "predicted_production_amount"].round(2)
+    )
+
+    return final.drop(columns=["predicted_production_amount"])
+
+
+def fill_2026_planted_area(final):
+    predicted = pd.read_csv(PLANTED_PATH)
+
+    predicted = predicted.rename(columns={
+        "quota": "predicted_planted_area",
+        "2026 Ekim Miktarı": "predicted_planted_area",
+        "2026 Ekim Miktari": "predicted_planted_area",
+    })
+
+    predicted["year"] = 2026
+    predicted["product_name"] = predicted["product_name"].apply(normalize_product_name)
+
+    predicted["predicted_planted_area"] = pd.to_numeric(
+        predicted["predicted_planted_area"],
+        errors="coerce",
+    )
+
+    predicted = (
+        predicted
+        .groupby(["year", "product_name"], as_index=False)["predicted_planted_area"]
+        .sum()
+    )
+
+    final = final.merge(
+        predicted,
+        on=["year", "product_name"],
+        how="left",
+    )
+
+    mask = (
+        (final["year"] == 2026)
+        & (final["planted_area"].isna())
+        & (final["predicted_planted_area"].notna())
+    )
+
+    final.loc[mask, "planted_area"] = (
+        final.loc[mask, "predicted_planted_area"].round(2)
+    )
+
+    return final.drop(columns=["predicted_planted_area"])
 
 
 market = prepare_market()
@@ -266,52 +369,28 @@ inflation = prepare_inflation()
 final = market.merge(
     fertilizer,
     on="year",
-    how="left"
+    how="left",
 )
 
 final = final.merge(
     fuel,
     on=["year", "season"],
-    how="left"
+    how="left",
 )
 
 final = final.merge(
     inflation,
-    on=["year","season"],
-    how="left"
+    on=["year", "season"],
+    how="left",
 )
 
 final = final.merge(
     tuik,
     on=["product_name", "year"],
-    how="left"
+    how="left",
 )
 
-final["season_order"] = final["season"].map(SEASON_ORDER)
-
-final = final.sort_values(
-    ["product_name", "year", "season_order"]
-).reset_index(drop=True)
-
-final["lag_1_price"] = (
-    final.groupby("product_name")["average_price"]
-    .shift(1)
-)
-
-final["lag_4_price"] = (
-    final.groupby("product_name")["average_price"]
-    .shift(4)
-)
-
-final["lag_1_price"] = final["lag_1_price"].fillna(
-    final["average_price"]
-)
-
-final["lag_4_price"] = final["lag_4_price"].fillna(
-    final["lag_1_price"]
-)
-
-final = final.drop(columns=["season_order"])
+final = add_lag_features(final)
 
 final = final[
     [
@@ -324,16 +403,27 @@ final = final[
         "annual_inflation",
         "planted_area",
         "production_amount",
+        "min_price",
+        "max_price",
         "lag_1_price",
         "lag_4_price",
     ]
 ]
 
+final = fill_2026_production(final)
+final = fill_2026_planted_area(final)
+ 
+final["season_order"] = final["season"].map(SEASON_ORDER)
+final = final.sort_values(
+    ["product_name", "year", "season_order"]
+).reset_index(drop=True)
+final = final.drop(columns=["season_order"])
+
 final.to_csv(
     OUTPUT_PATH,
     index=False,
-    encoding="utf-8-sig"
+    encoding="utf-8-sig",
 )
 
-print("final_price_dataset.csv oluşturuldu.")
-print(final.head(20))
+print(final.sample(10))
+print(final.isnull().sum())
