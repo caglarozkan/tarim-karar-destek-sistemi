@@ -105,3 +105,13 @@ class OptimizationManuelRequest(BaseModel):
     donum:float
     sezon : str
     secilen_urunler:Optional[list[str]] = None
+
+class OneriOnaylaUrun(BaseModel):
+    urun_adi:str
+    donum:float
+
+class OnerıOnaylaRequest(BaseModel):
+    kullanici_id: int
+    tarla_id:int
+    hesaplanan_toplam_kar:float
+    urunler: list[OneriOnaylaUrun]

@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import "../App.css";
 import { URUNLER, URUN_GORUNEN_ADLAR } from "../constants/urunler";
 
-const ILCELER = ["Bayındır","Bergama","Menderes","Tire","Torbalı","Ödemiş"];
-const SEZONLAR = ["İlkbahar","Yaz","Sonbahar","Kış"];
+const ILCELER = ["Bayındır", "Bergama", "Menderes", "Tire", "Torbalı", "Ödemiş"];
+const SEZONLAR = ["İlkbahar", "Yaz", "Sonbahar", "Kış"];
 
 function Recommendations() {
   const kayit = localStorage.getItem("kullanici");
@@ -18,15 +18,17 @@ function Recommendations() {
   const [hata, setHata] = useState("");
   const [sezon, setSezon] = useState("");
   const [secilenUrunler, setSecilenUrunler] = useState([]);
+  const [onaylaniyor, setOnaylaniyor] = useState(false);
+  const [basariMesaji, setBasariMesaji] = useState("");
 
   useEffect(() => {
-    if (aktifKullanici) {
+    if (aktifKullanici?.id) {
       fetch(`http://localhost:8000/tarla/liste?kullanici_id=${aktifKullanici.id}`)
         .then((res) => res.json())
         .then((data) => setTarlalar(Array.isArray(data) ? data : []))
         .catch(() => setTarlalar([]));
     }
-  }, []);
+  }, [aktifKullanici?.id]);
 
   const tarlaSec = (tarlaId) => {
     setSecilenTarla(tarlaId);
@@ -47,10 +49,57 @@ function Recommendations() {
   const handleManuelChange = (e) => {
     setManuelForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+
   const ilkPlan = sonuc?.[0];
   const urunListesi = ilkPlan?.plan || [];
+  const toplamGelir = urunListesi.reduce(
+    (toplam, urun) => toplam + urun.estimated_revenue,
+    0
+  );
 
-  const toplamGelir = urunListesi.reduce((toplam, urun) => toplam + urun.estimated_revenue,0);
+  const ekimiOnayla = async () => {
+    if (!ilkPlan || !ilkPlan.success || urunListesi.length === 0) return;
+
+    setOnaylaniyor(true);
+    setHata("");
+    setBasariMesaji("");
+
+    try {
+      const res = await fetch("http://localhost:8000/oneri/onayla", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kullanici_id: aktifKullanici.id,
+          tarla_id: secilenTarla,
+          hesaplanan_toplam_kar: Math.round(toplamGelir),
+          urunler: urunListesi.map((o) => ({
+            urun_adi: o.product_name,
+            donum: o.recommended_area,
+          })),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setBasariMesaji("✅ Ekim planı başarıyla onaylandı. Tarlanız güncellendi.");
+        // Tarla listesini tazele (boş dönüm güncellensin)
+        fetch(`http://localhost:8000/tarla/liste?kullanici_id=${aktifKullanici.id}`)
+          .then((r) => r.json())
+          .then((d) => setTarlalar(Array.isArray(d) ? d : []));
+        setTimeout(() => {
+            setSonuc(null);
+            setBasariMesaji("");
+            }, 5000);
+      } else {
+        const mesaj =
+          typeof data.detail === "string" ? data.detail : "Onaylanamadı.";
+        setHata(mesaj);
+      }
+    } catch (err) {
+      setHata("Sunucuya bağlanılamadı.");
+    } finally {
+      setOnaylaniyor(false);
+    }
+  };
 
   const oneriAl = async () => {
     setHata("");
@@ -59,7 +108,8 @@ function Recommendations() {
       setHata("Lütfen Sezon Seçiniz!");
       return;
     }
-    let endpoint="";
+
+    let endpoint = "";
     let payload = {
       mod,
       sezon,
@@ -79,23 +129,21 @@ function Recommendations() {
         tarla_id: secilenTarla,
         sezon,
         bos_donum: toplamDonum,
-        secilen_urunler:
-            secilenUrunler.length > 0 ? secilenUrunler : null,
+        secilen_urunler: secilenUrunler.length > 0 ? secilenUrunler : null,
       };
     } else {
-        if(!manuelForm.ilce || !manuelForm.donum){
-            setHata("Lütfen ilçe ve dönüm gir.");
-            return
-        }
-        endpoint = "http://localhost:8000/oneri/manual";
+      if (!manuelForm.ilce || !manuelForm.donum) {
+        setHata("Lütfen ilçe ve dönüm gir.");
+        return;
+      }
+      endpoint = "http://localhost:8000/oneri/manual";
 
-        payload = {
+      payload = {
         ilce_adi: manuelForm.ilce,
         donum: Number(manuelForm.donum),
         sezon,
-        secilen_urunler:
-          secilenUrunler.length > 0 ? secilenUrunler : null,
-        };
+        secilen_urunler: secilenUrunler.length > 0 ? secilenUrunler : null,
+      };
     }
 
     setYukleniyor(true);
@@ -110,7 +158,8 @@ function Recommendations() {
       if (res.ok) {
         setSonuc(data);
       } else {
-        const mesaj = typeof data.detail === "string" ? data.detail : "Öneri alınamadı";
+        const mesaj =
+          typeof data.detail === "string" ? data.detail : "Öneri alınamadı";
         setHata(mesaj);
       }
     } catch (err) {
@@ -154,9 +203,7 @@ function Recommendations() {
                 Kayıtlı tarlalarını kullanabilmek için önce giriş yapmalısın.
               </div>
             ) : uygunTarlalar.length === 0 ? (
-              <div className="empty-state">
-                Boş dönümü olan bir tarlan yok. "Tarlalarım" sayfasından tarla düzenleyebilirsin.
-              </div>
+              <div className="empty-state">Boş dönümü olan bir tarlan yok. "Tarlalarım" sayfasından tarladüzenleyebilirsin. </div>
             ) : (
               <>
                 <div className="tarla-picklist">
@@ -182,7 +229,10 @@ function Recommendations() {
             <>
               <div className="field">
                 <label>İlçe</label>
-                <select name="ilce" value={manuelForm.ilce} onChange={handleManuelChange}>
+                <select name="ilce"
+                  value={manuelForm.ilce}
+                  onChange={handleManuelChange}
+                >
                   <option value="">İlçe seç</option>
                   {ILCELER.map((i) => (
                     <option key={i} value={i}>{i}</option>
@@ -199,7 +249,8 @@ function Recommendations() {
                   placeholder="Örn. 10"
                   value={manuelForm.donum}
                   onChange={handleManuelChange}
-                />
+                >
+                </input>
               </div>
             </>
           )}
@@ -215,7 +266,7 @@ function Recommendations() {
           </div>
 
           <div className="field">
-            <label>Ekmek İstediğin Ürünler (opsiyonel — boş bırakırsan sistem tüm ürünler arasından seçer)</label>
+            <label>Ekmek İstediğin Ürünler (opsiyonel — boş bırakırsan sistem tümürünler arasından seçer) </label>
             <div className="urun-picklist">
               {URUNLER.map((u) => (
                 <label key={u} style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -238,19 +289,23 @@ function Recommendations() {
         </div>
 
         <div className="results-column">
+            {basariMesaji && (
+                <div className="form-message succes">
+                    {basariMesaji}
+                </div>
+                )}
           {sonuc ? (
             <>
-                {ilkPlan && !ilkPlan.success && (
-                    <div className="form-message error">{ilkPlan.error}</div>
-                )}
-              <div className="oneri-grid">
-                {urunListesi.map((o, idx) => (
+              {ilkPlan && !ilkPlan.success && (
+                <div className="form-message error">{ilkPlan.error}</div>
+              )}
+              <div className="oneri-grid">{urunListesi.map((o, idx) => (
                   <div className="oneri-cell" key={idx}>
                     <div className="donum">{o.recommended_area} dönüm</div>
                     <div className="urun">{URUN_GORUNEN_ADLAR[o.product_name] || o.product_name}</div>
-                    <div className="Meta">Tahmini Üretim: {(o.estimated_production ?? 0).toLocaleString("tr-TR")} ton</div>
-                    <div className="Meta">Tahmini Gelir: {(o.estimated_revenue ?? 0).toLocaleString("tr-TR")} ₺</div>
-                    <div className="Meta">Tahmini Kâr: {(o.estimated_profit ?? 0).toLocaleString("tr-TR")} ₺</div>
+                    <div className="Meta">Tahmini Üretim:{" "}{(o.estimated_production ?? 0).toLocaleString("tr-TR")}{" "}ton</div>
+                    <div className="Meta">Tarhini Gelir:{" "}{(o.estimated_revenue ?? 0).toLocaleString("tr-TR")} ₺</div>
+                    <div className="Meta">Tahmini Kâr:{" "}{(o.estimated_profit ?? 0).toLocaleString("tr-TR")} ₺</div>
                   </div>
                 ))}
               </div>
@@ -260,13 +315,28 @@ function Recommendations() {
                   <div className="value">{toplamGelir.toLocaleString("tr-TR")} ₺</div>
                 </div>
               </div>
+
+              {basariMesaji && (
+                <div className="form-message success">{basariMesaji}</div>
+              )}
+
+              {mod === "tarlalarim" && ilkPlan?.success && (
+                <button
+                  className="run-btn"
+                  onClick={ekimiOnayla}
+                  disabled={onaylaniyor}
+                  style={{ marginTop: 12 }}
+                >
+                  {onaylaniyor ? "Kaydediliyor..." : "Bu Ekimi Onaylıyorum"}
+                </button>
+              )}
             </>
           ) : (
             <div className="panel">
               <div className="empty-state">
-                Bir kaynak seç ve "Öneri Al" butonuna bas — tarlan için önerilen ekim
-                dağılımı burada görünecek.
-              </div>
+                  {basariMesaji
+                    ? "✔ Ekim planı kaydedildi. Yeni bir öneri oluşturmak için tarla veya sezon seçebilirsiniz."
+                    : 'Bir kaynak seç ve "Öneri Al" butonuna bas — tarlan için önerilen ekim dağılımı burada görünecek.'}</div>
             </div>
           )}
         </div>
