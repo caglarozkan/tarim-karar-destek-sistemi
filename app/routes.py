@@ -432,3 +432,72 @@ def manuel_optimized(veri:schemas.OptimizationManuelRequest,db: Session=Depends(
         selected_products=veri.secilen_urunler
     )
     return plan
+
+@router.post("/oneri/onayla")
+def oneri_onayla(veri: schemas.OnerıOnaylaRequest, db: Session=Depends(get_db)):
+    kullanici=db.query(models.Kullanici).filter(models.Kullanici.kullanici_id==veri.kullanici_id).first()
+    if not kullanici:
+        raise HTTPException(status_code=404,detail="Kullanici bulunamadi")
+
+    tarla=db.query(models.Tarla).filter(models.Tarla.tarla_id==veri.tarla_id,
+                                        models.Tarla.kullanici_id==veri.kullanici_id).first()
+    if not tarla:
+        raise HTTPException(status_code=404,detail="tarla bulunamadu.")
+    if not veri.urunler:
+        raise HTTPException(status_code=404,detail="urunler bulunamadı")
+
+    bos_urun=db.query(models.Urun).filter(models.Urun.urun_adi == "Boş").first()
+    if not bos_urun:
+        raise HTTPException(status_code=404,detail="Boş ürün sistemde tanımlı degil")
+
+    bos_kayit =db.query(models.TarlaUrun).filter(models.TarlaUrun.tarla_id == veri.tarla_id,
+                                                models.TarlaUrun.urun_id == bos_urun.urun_id).first()
+
+    toplam_ekilecek=sum(u.donum for u in veri.urunler)
+
+    if bos_kayit:
+        bos_kayit.donum= round(bos_kayit.donum-toplam_ekilecek,2)
+
+    for satir in veri.urunler:
+        urun_kaydi=db.query(models.Urun).filter(models.Urun.urun_adi == satir.urun_adi).first()
+        if not urun_kaydi:
+            continue
+
+        mevcut=db.query(models.TarlaUrun).filter(models.TarlaUrun.tarla_id==veri.tarla_id,
+                                                 models.TarlaUrun.urun_id==urun_kaydi.urun_id).first()
+        if mevcut:
+            mevcut.donum=round(mevcut.donum+satir.donum,2)
+        else:
+            db.add(models.TarlaUrun(tarla_id=veri.tarla_id,urun_id=urun_kaydi.urun_id,donum=satir.donum))
+
+        kota_kaydi=db.query(models.Kota).filter(models.Kota.ilce_id==tarla.ilce_id,
+                                                models.Kota.urun_id==urun_kaydi.urun_id).first()
+        if  kota_kaydi:
+           kota_kaydi.kullanilan_kota=(kota_kaydi.kullanilan_kota or 0) + satir.donum
+
+    yeni_paket=models.OneriPaketi(
+        kullanici_id=veri.kullanici_id,
+        tarla_id=veri.tarla_id,
+        hesaplanan_toplam_kar=veri.hesaplanan_toplam_kar,
+        kabul_edildi_mi=True
+    )
+    db.add(yeni_paket)
+    db.commit()
+    db.refresh(yeni_paket)
+
+    for satir in veri.urunler:
+        urun_kaydi =db.query(models.Urun).filter(models.Urun.urun_adi==satir.urun_adi).first()
+        if not urun_kaydi:
+            continue
+        db.add(models.EkimKaydi(
+            paket_id=yeni_paket.paket_id,
+            urun_id=urun_kaydi.urun_id,
+            ekilen_donum=satir.donum,
+            durum=models.DurumEnum.aktif
+        ))
+    db.commit()
+
+    return {
+        "mesaj": "Ekim planı onaylandı ve tarlana işlendi",
+        "paket_id": yeni_paket.paket_id,
+    }

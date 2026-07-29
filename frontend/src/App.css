@@ -882,4 +882,12 @@ button {
 }
 .products-chart .recharts-legend-item-text {
   color: #000 !important;
+.form-message.success {
+    background: #eafaf1;
+    border: 1px solid #27ae60;
+    color: #1e7e34;
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 600;
+    margin-bottom: 16px;
 }
