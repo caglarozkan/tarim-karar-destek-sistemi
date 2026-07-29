@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-df=pd.read_csv("data/raw_data/marketplace_data/izbb-sebzemeyve-hal-fiyatlari-2026.csv")
+df=pd.read_csv("data/raw_data/marketplace_data/izbb_hal_fiyatlari_2026_gecici.csv")
 df=df.rename(columns={
     "ORTALAMA_FIYAT":"average_price",
     "MAL_ADI":"product_name",

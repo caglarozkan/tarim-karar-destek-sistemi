@@ -17,24 +17,24 @@ print(df.isnull().sum())
 df["district"] = df["district"].str.replace("İzmir(", "", regex=False)
 df["district"] = df["district"].str.replace(")", "", regex=False)
 
-# üretim miktarı eksik olan yerleri ortalama ile doldurma
+#"production_amount eksik olan yerleri ortalama ile doldurma
 for i in range(len(df)):
-    if pd.isnull(df.loc[i, "Üretim Miktarı"]):
+    if pd.isnull(df.loc[i, "production_amount"]):
         urun = df.loc[i, "product_name"]
         ilce = df.loc[i, "district"]
 
         if urun != "SOGAN KURU":
             filtre = (df["product_name"] == urun) & (df["district"] == ilce)
-            ortalama = df.loc[filtre, "Üretim Miktarı"].mean()
-            df.loc[i, "Üretim Miktarı"] = ortalama
+            ortalama = df.loc[filtre, "production_amount"].mean()
+            df.loc[i, "production_amount"] = ortalama
 
 print(df.isnull().sum())
 
-egitim = df.dropna(subset=["Üretim Miktarı"]).copy()
+egitim = df.dropna(subset=["production_amount"]).copy()
 egitim = pd.get_dummies(egitim, columns=["district", "product_name"])
 
-X = egitim.drop(columns=["planted_area","Üretim Miktarı"])
-y = egitim["Üretim Miktarı"]
+X = egitim.drop(columns=["planted_area","production_amount"])
+y = egitim["production_amount"]
 
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
@@ -129,14 +129,14 @@ urunler = df["product_name"].unique()
 for ilce in ilceler:
     for urun in urunler:
         veri = df[(df["district"] == ilce) & (df["product_name"] == urun)]
-        veri = veri.dropna(subset=["Üretim Miktarı"])
+        veri = veri.dropna(subset=["production_amount"])
 
         if len(veri) < 2:
             kota_df.loc[len(kota_df)] = [ilce, urun, 0]
             continue
 
         X = veri[["year"]]
-        y = veri["Üretim Miktarı"]
+        y = veri["production_amount"]
 
         model = XGBRegressor(n_estimators=500,colsample_bytree=1,learning_rate=0.05, random_state=42)
         model.fit(X, y)
@@ -144,8 +144,8 @@ for ilce in ilceler:
 
         kota_df.loc[len(kota_df)] = [ilce, urun, round(predict[0], 2)]
 
+
+kota_df["year"]=2026
 print("2026 Üretim TAHMİNLERİ")
 print(kota_df)
-
 kota_df.to_csv(CIKIS_PATH, index=False)
-print(f"Üretim Miktarı tahminleri oluşturuldu: {CIKIS_PATH}")
