@@ -9,13 +9,16 @@ import {
 } from "recharts";
 
 const COLORS = [
-  "#2E7D32",
-  "#43A047",
-  "#66BB6A",
-  "#81C784",
-  "#A5D6A7",
-  "#C8E6C9",
-  "#388E3C",
+  "#2E7D32", // yeşil
+  "#F2C94C", // sarı
+  "#2D9CDB", // mavi
+  "#F2994A", // turuncu
+  "#9B51E0", // mor
+  "#EB5757", // kırmızı
+  "#56CCF2", // açık mavi
+  "#6FCF97", // mint
+  "#BB6BD9", // lila
+  "#F08080", // mercan
 ];
 
 function MyProducts() {
@@ -149,47 +152,49 @@ function MyProducts() {
             );
           })}
         </div>
-        <div className="products-chart">
-          <h3>
-            Alan Dağılımı
-          </h3>
-          <ResponsiveContainer
-            width="100%"
-            height={300}
-          >
-            <PieChart>
-              <Pie
-                data={urunler}
-                dataKey="toplam_donum"
-                nameKey="urun_adi"
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                label
-              >
-                {
-                  urunler.map((entry, index) => (
+<div className="products-chart">
+  <h3>Alan Dağılımı</h3>
 
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={
-                        COLORS[index % COLORS.length]
-                      }
-                    />
-                  ))
-                }
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="total-area">
-            Toplam Alan:
-            <b>
-              {toplamAlan} dönüm
-            </b>
-          </div>
-        </div>
+  <ResponsiveContainer width="100%" height={360}>
+    <PieChart>
+      <Pie
+        data={urunler}
+        dataKey="toplam_donum"
+        nameKey="urun_adi"
+        cx="50%"
+        cy="42%"
+        outerRadius={90}
+        label={false}
+      >
+        {urunler.map((entry, index) => (
+          <Cell
+            key={`cell-${index}`}
+            fill={COLORS[index % COLORS.length]}
+          />
+        ))}
+      </Pie>
+
+      <Tooltip
+        formatter={(value, name) => [`${value} dönüm`, name]}
+      />
+
+      <Legend
+        layout="horizontal"
+        verticalAlign="bottom"
+        align="center"
+        wrapperStyle={{
+          fontSize: "13px",
+          lineHeight: "20px",
+          paddingTop: "12px",
+        }}
+      />
+    </PieChart>
+  </ResponsiveContainer>
+
+  <div className="total-area">
+    Toplam Alan: <b>{toplamAlan} dönüm</b>
+  </div>
+</div>
       </div>
     </div>
   );

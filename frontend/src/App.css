@@ -880,3 +880,6 @@ button {
     object-fit:contain;
     margin-bottom:15px;
 }
+.products-chart .recharts-legend-item-text {
+  color: #000 !important;
+}
