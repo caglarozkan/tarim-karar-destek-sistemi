@@ -170,7 +170,6 @@ def net_kar_hesapla(tahmini_gelir, toplam_gider):
 def tahmini_fiyat_al(urun_adi_csv, hedef_yil, hedef_sezon):
     sonuc = predict_product_price(
         product_name=urun_adi_csv,
-        target_year=hedef_yil,
         target_season=hedef_sezon,
     )
     return sonuc["predicted_price"]
