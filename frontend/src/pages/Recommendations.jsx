@@ -265,21 +265,48 @@ function Recommendations() {
             </select>
           </div>
 
-          <div className="field">
-            <label>Ekmek İstediğin Ürünler (opsiyonel — boş bırakırsan sistem tümürünler arasından seçer) </label>
-            <div className="urun-picklist">
-              {URUNLER.map((u) => (
-                <label key={u} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <input
-                    type="checkbox"
-                    checked={secilenUrunler.includes(u)}
-                    onChange={() => urunSecimiDegistir(u)}
-                  />
-                  {URUN_GORUNEN_ADLAR[u]}
-                </label>
-              ))}
-            </div>
-          </div>
+<div className="field">
+  <label>Ürün Seç</label>
+
+  <select
+    value=""
+    onChange={(e) => {
+      const urun = e.target.value;
+
+      if (!urun) return;
+
+      setSecilenUrunler((prev) =>
+        prev.includes(urun) ? prev : [...prev, urun]
+      );
+    }}
+  >
+    <option value="">Ürün Seç</option>
+    {URUNLER.map((u) => (
+      <option key={u} value={u}>
+        {URUN_GORUNEN_ADLAR[u]}
+      </option>
+    ))}
+  </select>
+
+  {secilenUrunler.length > 0 && (
+    <div className="selected-products-box">
+      <div className="selected-products-title">Seçilen Ürünler</div>
+
+      <div className="selected-products-list">
+        {secilenUrunler.map((u) => (
+          <button
+            type="button"
+            key={u}
+            className="selected-product-pill"
+            onClick={() => urunSecimiDegistir(u)}
+          >
+            {URUN_GORUNEN_ADLAR[u]} ×
+          </button>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
 
           {hata && <div className="form-message error">{hata}</div>}
 

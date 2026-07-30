@@ -1010,3 +1010,34 @@ button {
   height: auto;
   min-height: 0;
 }
+.selected-products-box {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--wheat);
+  border: 1px solid var(--wheat-deep);
+}
+
+.selected-products-title {
+  margin-bottom: 8px;
+  color: var(--soil);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.selected-products-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.selected-product-pill {
+  border: none;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  color: var(--forest);
+  padding: 7px 11px;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
