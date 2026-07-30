@@ -147,7 +147,7 @@ def ilce_liste(db: Session = Depends(get_db)):
 #formdaki select için ürün list
 @router.get("/urun/liste")
 def urun_liste(db: Session = Depends(get_db)):
-    return db.query(models.Urun).all()
+    return db.query(models.Urun).filter(models.Urun.urun_adi!="SOGAN KURU").all()
 
 #tarla ekleme
 @router.post("/tarla/ekle")

@@ -11,7 +11,6 @@ from app.services.fertilizer_service import get_commodity_price
 from app.services.fuel_service import predict_fuel_price
 from app.services.inflation_service import predict_inflation
 
-from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.impute import SimpleImputer
@@ -24,7 +23,7 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.metrics import mean_absolute_percentage_error
+
 
 DATASET_PATH = Path("data/processed/data_files/final_price_dataset.csv")
 MODEL_PATH = Path("models/price_model.pkl")
@@ -50,7 +49,7 @@ SEASON_ORDER = {
     "Winter": 1,
     "Spring": 2,
     "Summer": 3,
-    "Fall": 4
+    "Fall": 4,
 }
 
 SEASON_SEQUENCE = ["Winter", "Spring", "Summer", "Fall"]
@@ -90,6 +89,19 @@ def get_current_season(today: date | None = None) -> tuple[int, str]:
     return year, "Fall"
 
 
+def get_target_year(target_season: str, today: date | None = None) -> int:
+    if today is None:
+        today = date.today()
+
+    target_season = validate_season(target_season)
+    current_year, current_season = get_current_season(today)
+
+    if SEASON_ORDER[target_season] > SEASON_ORDER[current_season]:
+        return current_year
+
+    return current_year + 1
+
+
 def get_next_season(year: int, season: str) -> tuple[int, str]:
     season = validate_season(season)
 
@@ -108,7 +120,7 @@ def get_next_n_periods_from_current(n: int = 4) -> list[tuple[int, str]]:
     for _ in range(n):
         current_year, current_season = get_next_season(
             current_year,
-            current_season
+            current_season,
         )
         periods.append((current_year, current_season))
 
@@ -134,15 +146,11 @@ def load_dataset(dataset_path: Path = DATASET_PATH) -> pd.DataFrame:
 
     df["product_name"] = df["product_name"].astype(str)
     df["season"] = df["season"].astype(str).apply(validate_season)
-    df["year"] = pd.to_numeric(df["year"], errors="coerce")
 
     for column in NUMERIC_FEATURES + [TARGET_COLUMN]:
         df[column] = pd.to_numeric(df[column], errors="coerce")
 
-    df = df.dropna(
-        subset=[TARGET_COLUMN, *FEATURE_COLUMNS]
-    )
-
+    df = df.dropna(subset=[TARGET_COLUMN, *FEATURE_COLUMNS])
     df["year"] = df["year"].astype(int)
 
     return df
@@ -205,12 +213,17 @@ def train_price_model(
     predictions = model.predict(x_test)
 
     metrics = {
-    "mae": round(float(mean_absolute_error(y_test, predictions)), 4),
-    "rmse": round(float(root_mean_squared_error(y_test, predictions)), 4),
-    "mape": round(float(mean_absolute_percentage_error(y_test, predictions) * 100), 2),
-    "r2": round(float(r2_score(y_test, predictions)), 4) if len(y_test) > 1 else 0.0,
-    "row_count": float(len(df)),
-}
+        "mae": round(float(mean_absolute_error(y_test, predictions)), 4),
+        "rmse": round(float(root_mean_squared_error(y_test, predictions)), 4),
+        "mape": round(
+            float(mean_absolute_percentage_error(y_test, predictions) * 100),
+            2,
+        ),
+        "r2": round(float(r2_score(y_test, predictions)), 4)
+        if len(y_test) > 1
+        else 0.0,
+        "row_count": float(len(df)),
+    }
 
     model_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, model_path)
@@ -225,7 +238,7 @@ def load_or_train_model(
     if not Path(model_path).exists():
         train_price_model(
             dataset_path=dataset_path,
-            model_path=model_path
+            model_path=model_path,
         )
 
     return joblib.load(model_path)
@@ -269,11 +282,11 @@ def latest_or_given(
 
 
 def get_fuel_for_period(target_year: int, target_season: str) -> float:
-    return float(predict_fuel_price(target_year,target_season))
+    return float(predict_fuel_price(target_year, target_season))
 
 
 def get_inflation_for_period(target_year: int, target_season: str) -> float:
-    return float(predict_inflation(target_year,target_season))
+    return float(predict_inflation(target_year, target_season))
 
 
 def build_prediction_input(
@@ -288,7 +301,6 @@ def build_prediction_input(
     annual_inflation: float | None = None,
 ) -> dict[str, Any]:
     target_season = validate_season(target_season)
-
     lag_1_price, lag_4_price = get_lag_prices(product_history)
 
     if fuel_price is None:
@@ -321,21 +333,15 @@ def build_prediction_input(
 
 def predict_product_price(
     product_name: str,
-    target_year: int,
     target_season: str,
-    planted_area: float | None = None,
-    production_amount: float | None = None,
-    fertilizer_price: float | None = None,
-    fuel_price: float | None = None,
-    annual_inflation: float | None = None,
     dataset_path: Path = DATASET_PATH,
     model_path: Path = MODEL_PATH,
 ) -> dict[str, Any]:
     df = load_dataset(dataset_path)
     product_history = get_product_history(df, product_name)
 
-    if fertilizer_price is None:
-        fertilizer_price = float(get_commodity_price("urea"))
+    target_year = get_target_year(target_season)
+    fertilizer_price = float(get_commodity_price("urea"))
 
     input_row = build_prediction_input(
         product_name=product_name,
@@ -343,22 +349,22 @@ def predict_product_price(
         target_year=target_year,
         target_season=target_season,
         fertilizer_price=fertilizer_price,
-        planted_area=planted_area,
-        production_amount=production_amount,
-        fuel_price=fuel_price,
-        annual_inflation=annual_inflation,
+        planted_area=None,
+        production_amount=None,
+        fuel_price=None,
+        annual_inflation=None,
     )
 
     model = load_or_train_model(
         dataset_path=dataset_path,
-        model_path=model_path
+        model_path=model_path,
     )
 
     prediction_df = pd.DataFrame([input_row])[FEATURE_COLUMNS]
 
     predicted_price = round(
         max(0.0, float(model.predict(prediction_df)[0])),
-        2
+        2,
     )
 
     return {
@@ -385,7 +391,7 @@ def predict_products(
 
     model = load_or_train_model(
         dataset_path=dataset_path,
-        model_path=model_path
+        model_path=model_path,
     )
 
     predictions = []
@@ -405,7 +411,7 @@ def predict_products(
 
         predicted_price = round(
             max(0.0, float(model.predict(prediction_df)[0])),
-            2
+            2,
         )
 
         result = {
@@ -448,4 +454,3 @@ def predict_all_products(
         )
         for product in products
     }
-

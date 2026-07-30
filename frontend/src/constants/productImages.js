@@ -3,7 +3,6 @@ import tomato from "../assets/product_images/tomato.png";
 import cucumber from "../assets/product_images/cucumber.png";
 import pumpkin from "../assets/product_images/pumpkin.png";
 import eggplant from "../assets/product_images/eggplant.png";
-import onion from "../assets/product_images/onion.png";
 import watermelon from "../assets/product_images/watermelon.png";
 import favaBeans from "../assets/product_images/fava_beans.png";
 import peas from "../assets/product_images/peas.png";
@@ -21,7 +20,6 @@ export const PRODUCT_IMAGES = {
   "SALATALIK SILOR": cucumber,
   "KABAK TAZE": pumpkin,
   "PATLICAN UZUN": eggplant,
-  "SOGAN KURU": onion,
   "KARPUZ": watermelon,
   "BAKLA": favaBeans,
   "BEZELYE": peas,
