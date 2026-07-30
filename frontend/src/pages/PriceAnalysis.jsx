@@ -1,15 +1,13 @@
 import { useState } from "react";
 import "../App.css";
-import { URUNLER, URUN_GORUNEN_ADLAR } from "../constants/urunler";
-import Select from "react-select";
+import { URUN_GORUNEN_ADLAR } from "../constants/urunler";
 import { PRODUCT_IMAGES } from "../constants/productImages";
 import ProductSelect from "../components/ProductSelect";
 
-const ILCELER = ["Bayındır","Bergama","Menderes","Tire","Torbalı","Ödemiş"];
 const SEZONLAR = ["İlkbahar", "Yaz", "Sonbahar", "Kış"];
 
 function PriceAnalysis() {
-  const [form, setForm] = useState({ ilce: "", sezon: "", urun: "" });
+  const [form, setForm] = useState({ sezon: "", urun: "" });
   const [sonuc, setSonuc] = useState(null);
   const [yukleniyor, setYukleniyor] = useState(false);
   const [hata, setHata] = useState("");
@@ -20,36 +18,36 @@ function PriceAnalysis() {
 
   const analiziBaslat = async () => {
     setHata("");
-    if (!form.ilce || !form.sezon || !form.urun) {
-      setHata("Lütfen ilçe, sezon ve ürün seçimini tamamla.");
+
+    if (!form.sezon || !form.urun) {
+      setHata("Lütfen sezon ve ürün seçimini tamamla.");
       return;
     }
 
     setYukleniyor(true);
     setSonuc(null);
+
     try {
       const res = await fetch("http://localhost:8000/tahmin/fiyat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
+
       const data = await res.json();
+
       if (res.ok) {
         setSonuc(data);
       } else {
-        const mesaj = typeof data.detail === "string" ? data.detail : "Tahmin Alınamadı";
+        const mesaj =
+          typeof data.detail === "string" ? data.detail : "Tahmin alınamadı.";
         setHata(mesaj);
       }
-    } catch (err) {
+    } catch {
       setHata("Sunucuya bağlanılamadı.");
     } finally {
       setYukleniyor(false);
     }
-    const urunOptions = URUNLER.map((urun) => ({
-    value: urun,
-    label: URUN_GORUNEN_ADLAR[urun],
-    image: PRODUCT_IMAGES[urun],
-    }));
   };
 
   return (
@@ -62,18 +60,6 @@ function PriceAnalysis() {
       <div className="analysis-grid">
         <div className="panel">
           <h3>Seçim Kriterleri</h3>
-
-          <div className="field">
-            <label>İlçe Seçimi</label>
-            <select name="ilce" value={form.ilce} onChange={handleChange}>
-              <option value="">İlçe seç</option>
-              {ILCELER.map((i) => (
-                <option key={i} value={i}>
-                  {i}
-                </option>
-              ))}
-            </select>
-          </div>
 
           <div className="field">
             <label>Sezon Seçimi</label>
@@ -90,17 +76,23 @@ function PriceAnalysis() {
           <div className="field">
             <label>Ürün Seçimi</label>
             <ProductSelect
-                value={form.urun}
-                onChange={(urun)=>
-                    setForm((prev)=>({
-                    ...prev,
-                    urun,
-                    }))
-                }
+              value={form.urun}
+              onChange={(urun) =>
+                setForm((prev) => ({
+                  ...prev,
+                  urun,
+                }))
+              }
             />
           </div>
+
           {hata && <div className="form-message error">{hata}</div>}
-          <button className="run-btn" onClick={analiziBaslat} disabled={yukleniyor}>
+
+          <button
+            className="run-btn"
+            onClick={analiziBaslat}
+            disabled={yukleniyor}
+          >
             {yukleniyor ? "Hesaplanıyor..." : "Analizi Başlat"}
           </button>
         </div>
@@ -108,21 +100,30 @@ function PriceAnalysis() {
         <div className="results-column">
           {sonuc ? (
             <div className="result-card hero-result">
-                <img src={PRODUCT_IMAGES[sonuc.urun]}className="product-result-image"alt={sonuc.urun}/>
+              {PRODUCT_IMAGES[sonuc.urun] && (
+                <img
+                  src={PRODUCT_IMAGES[sonuc.urun]}
+                  className="product-result-image"
+                  alt={sonuc.urun}
+                />
+              )}
+
               <div className="label">Tahmini Fiyat</div>
               <div className="value">{sonuc.tahmini_fiyat} ₺</div>
-              <div classname="meta" style={{marginTop:10,color: "#f5f0e6"}}>
-                  {URUN_GORUNEN_ADLAR[sonuc.urun] || sonuc.urun} - {sonuc.ilce}
+
+              <div className="meta" style={{ marginTop: 10, color: "#f5f0e6" }}>
+                {URUN_GORUNEN_ADLAR[sonuc.urun] || sonuc.urun}
               </div>
-              <div classname="meta" style={{color: "#f5f0e6"}}>
-                  {sonuc.sezon} {sonuc.yil}
+
+              <div className="meta" style={{ color: "#f5f0e6" }}>
+                {sonuc.sezon} {sonuc.yil}
               </div>
             </div>
           ) : (
             <div className="panel">
               <div className="empty-state">
-                Seçimlerini yap ve "Analizi Başlat" butonuna bas — tahmini kilogram fiyatı
-                burada görünecek.
+                Seçimlerini yap ve "Analizi Başlat" butonuna bas — tahmini
+                kilogram fiyatı burada görünecek.
               </div>
             </div>
           )}

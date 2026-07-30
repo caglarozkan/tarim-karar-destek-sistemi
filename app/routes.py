@@ -322,19 +322,16 @@ def tahmin_fiyat(veri: schemas.FiyatTahminRequest,db: Session=Depends(get_db)):
     if not urun_kaydi:
         raise HTTPException(status_code=404,detail="Urun bulanamdi..")
 
-    hedef_yil = hedef_yil_belirle(veri.sezon)
     hedef_sezon = sezon_cevir(veri.sezon)
 
-    sonuc = predict_product_price(product_name=veri.urun,target_year=hedef_yil,target_season=hedef_sezon)
+    sonuc = predict_product_price(product_name=veri.urun,target_season=hedef_sezon)
 
     return {
-        "ilce":veri.ilce,
         "sezon":veri.sezon,
         "urun":veri.urun,
-        "yil": hedef_yil,
         "tahmini_fiyat": sonuc["predicted_price"]
     }
-
+    
 #urunler
 @router.get("/urunlerim/{kullanici_id}")
 def kullanici_urunleri(kullanici_id:int,db:Session=Depends(get_db)):

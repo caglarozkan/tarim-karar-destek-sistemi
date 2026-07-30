@@ -18,11 +18,9 @@ ALLOWED_PRODUCTS = [
     "BEZELYE",
     "LAHANA BEYAZ",
     "LAHANA KIRMIZI",
-    "MARUL",
     "BAKLA",
     "PIRASA",
     "KARNABAHAR",
-    
 ]
 
 
@@ -54,6 +52,12 @@ def normalize_text(value):
     return " ".join(value.split())
 
 
+NORMALIZED_ALLOWED_PRODUCTS = [
+    normalize_text(product)
+    for product in ALLOWED_PRODUCTS
+]
+
+
 def parse_price(value):
     value = fix_encoding(value)
     value = value.replace("TL", "")
@@ -68,7 +72,19 @@ def parse_price(value):
 
 def is_allowed_product(name):
     normalized_name = normalize_text(name)
-    return any(product in normalized_name for product in ALLOWED_PRODUCTS)
+
+    return any(
+        allowed_product in normalized_name
+        for allowed_product in NORMALIZED_ALLOWED_PRODUCTS
+    )
+
+
+def get_display_product_name(normalized_name):
+    for product in ALLOWED_PRODUCTS:
+        if normalize_text(product) == normalized_name:
+            return product
+
+    return normalized_name
 
 
 def fetch_daily_hal_prices(target_date=None):
@@ -81,7 +97,7 @@ def fetch_daily_hal_prices(target_date=None):
         URL,
         params=params,
         headers={"User-Agent": "Mozilla/5.0"},
-        timeout=20,
+        timeout=5,
     )
     response.raise_for_status()
     response.encoding = response.apparent_encoding or "utf-8"
@@ -101,12 +117,13 @@ def fetch_daily_hal_prices(target_date=None):
         re.DOTALL,
     )
 
-    prices = []
+    found_prices = {}
 
     for match in pattern.finditer(text):
         product_type = fix_encoding(match.group(1)).strip()
         product_name = fix_encoding(match.group(2)).strip()
         unit = fix_encoding(match.group(3)).strip()
+        normalized_product_name = normalize_text(product_name)
 
         if not is_allowed_product(product_name):
             continue
@@ -118,14 +135,47 @@ def fetch_daily_hal_prices(target_date=None):
         except ValueError:
             continue
 
-        prices.append({
+        matched_allowed_product = None
+
+        for allowed_product in NORMALIZED_ALLOWED_PRODUCTS:
+            if allowed_product in normalized_product_name:
+                matched_allowed_product = allowed_product
+                break
+
+        if matched_allowed_product is None:
+            continue
+
+        found_prices[matched_allowed_product] = {
             "type": product_type,
-            "product_name": product_name,
+            "product_name": get_display_product_name(matched_allowed_product),
+            "market_product_name": product_name,
             "unit": unit,
             "min_price": min_price,
             "max_price": max_price,
             "average_price": average_price,
-        })
+            "price_found": True,
+            "is_current": True,
+            "note": "Güncel hal fiyatı",
+        }
+
+    prices = []
+
+    for allowed_product in NORMALIZED_ALLOWED_PRODUCTS:
+        if allowed_product in found_prices:
+            prices.append(found_prices[allowed_product])
+        else:
+            prices.append({
+                "type": "-",
+                "product_name": get_display_product_name(allowed_product),
+                "market_product_name": None,
+                "unit": "-",
+                "min_price": None,
+                "max_price": None,
+                "average_price": None,
+                "price_found": False,
+                "is_current": False,
+                "note": "Bugünkü hal fiyatı bulunamadı.",
+            })
 
     return {
         "source": "İzmir Büyükşehir Belediyesi - Şeffaf İzmir",
