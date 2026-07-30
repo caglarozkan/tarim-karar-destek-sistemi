@@ -5,6 +5,7 @@ function Statistics() {
   const [arama, setArama] = useState("");
   const [yukleniyor, setYukleniyor] = useState(true);
   const [hata, setHata] = useState("");
+  const [veriTarihi, setVeriTarihi] = useState("");
 
   const isFetched = useRef(false);
 
@@ -29,9 +30,8 @@ function Statistics() {
         const data = await res.json();
         const gelenFiyatlar = Array.isArray(data.prices) ? data.prices : [];
 
-        if (gelenFiyatlar.length > 0) {
-          setFiyatlar(gelenFiyatlar);
-        }
+        setFiyatlar(gelenFiyatlar);
+        setVeriTarihi(data.date || "");
       } catch {
         setHata("Hal fiyatları yüklenemedi.");
       } finally {
@@ -77,6 +77,12 @@ function Statistics() {
       <div className="analysis-header">
         <span className="eyebrow">İstatistikler</span>
         <h2>Günlük Hal Fiyatları</h2>
+
+        {veriTarihi && (
+          <p className="statistics-date">
+            Veri tarihi: <strong>{veriTarihi}</strong>
+          </p>
+        )}
       </div>
 
       <div className="statistics-toolbar">
@@ -102,18 +108,29 @@ function Statistics() {
             </tr>
           </thead>
 
-          <tbody>
-            {filtrelenmisFiyatlar.map((item, index) => (
-              <tr key={`${item.product_name}-${index}`}>
-                <td>{item.type}</td>
-                <td>{item.product_name}</td>
-                <td>{item.unit}</td>
-                <td>{Number(item.min_price).toFixed(2)} TL</td>
-                <td>{Number(item.max_price).toFixed(2)} TL</td>
-                <td>{Number(item.average_price).toFixed(2)} TL</td>
-              </tr>
-            ))}
-          </tbody>
+<tbody>
+  {filtrelenmisFiyatlar.map((item, index) => (
+    <tr key={`${item.product_name}-${index}`}>
+      <td>{item.type}</td>
+      <td>{item.product_name}</td>
+      <td>{item.unit}</td>
+      <td>
+        {item.min_price !== null ? `${Number(item.min_price).toFixed(2)} TL` : "-"}
+      </td>
+      <td>
+        {item.max_price !== null ? `${Number(item.max_price).toFixed(2)} TL` : "-"}
+      </td>
+      <td>
+        {item.average_price !== null ? `${Number(item.average_price).toFixed(2)} TL` : "-"}
+      </td>
+      <td>
+        <span className={item.price_found ? "price-status current" : "price-status missing"}>
+          {item.note}
+        </span>
+      </td>
+    </tr>
+  ))}
+</tbody>
         </table>
 
         {filtrelenmisFiyatlar.length === 0 && (

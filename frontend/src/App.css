@@ -918,12 +918,18 @@ button {
 
 .price-table th,
 .price-table td {
-  padding: 14px 16px;
+  height: auto;
+  min-height: 0;
+  padding: 8px 12px;
   border-bottom: 1px solid #e4dcc5;
   text-align: left;
+  vertical-align: middle;
   white-space: normal;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  line-height: 1.2;
+  font-size: 15px;
 }
+
 
 .price-table th:nth-child(1),
 .price-table td:nth-child(1) {
@@ -971,4 +977,36 @@ button {
 
 .secondary-button:hover {
   background: #285237;
+}
+.statistics-date {
+  margin: 8px 0 0;
+  color: #5a4433;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.statistics-date strong {
+  color: #1f3d2b;
+  font-weight: 800;
+}
+.price-status {
+  display: inline-block;
+  padding: 1px 1px;
+  border-radius: 99px;
+  font-size: 6px;
+  font-weight: 70;
+}
+
+.price-status.current {
+  background: #e7f3e4;
+  color: #247a3c;
+}
+
+.price-status.missing {
+  background: #fff3cd;
+  color: #856404;
+}
+.price-table tbody tr {
+  height: auto;
+  min-height: 0;
 }
