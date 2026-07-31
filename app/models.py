@@ -21,6 +21,7 @@ class Kullanici(Base):
     cinsiyet=Column(String(20),nullable=True)
     telefon=Column(String(20),nullable=True)
     kayit_tarihi=Column(DateTime,server_default=func.now())
+    is_admin=Column(Boolean,default=False)#admin
 
 #ürün modeli
 class Urun(Base):
@@ -28,6 +29,7 @@ class Urun(Base):
 
     urun_id = Column(Integer, primary_key=True, autoincrement=True)
     urun_adi = Column(String(50), nullable=False)
+    aktif= Column(Boolean,default=False,nullable=False)
 
 #ilce modeli
 class Ilce(Base):

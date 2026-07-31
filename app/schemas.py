@@ -114,3 +114,18 @@ class OnerıOnaylaRequest(BaseModel):
     tarla_id:int
     hesaplanan_toplam_kar:float
     urunler: list[OneriOnaylaUrun]
+
+class AdminKullaniciResponse(BaseModel):
+    kullanici_id: int
+    ad_soyad: str
+    email: str
+    telefon: str | None = None
+    yas: int | None = None
+    cinsiyet: str | None = None
+    is_admin: bool
+
+
+class AdminUrunResponse(BaseModel):
+    urun_id: int
+    urun_adi: str
+    aktif: bool

@@ -36,6 +36,12 @@ def get_db():
     finally:
         db.close()
 
+def admin_kontrol(kullanici_id:int ,db : Session):
+    kullanici=db.query(models.Kullanici).filter(models.Kullanici.kullanici_id==kullanici_id).first()
+    if not kullanici  or not kullanici.is_admin:
+        raise HTTPException(status_code=403,detail="Bu işlem için yetkin yok.")
+    return kullanici
+
 
 #KULLANICI KAYIT ENDPOINT i
 @router.post("/kullanici/kayit", response_model=schemas.KullaniciResponse)
@@ -93,7 +99,8 @@ def giris(kullanici: schemas.KullaniciLogin, db:Session=Depends(get_db)):
           "ad_soyad": dbUser.ad_soyad,
           "yas": dbUser.yas,
           "cinsiyet": dbUser.cinsiyet,
-          "telefon": dbUser.telefon
+          "telefon": dbUser.telefon,
+          "is_admin": dbUser.is_admin
 
     }
 
@@ -331,7 +338,7 @@ def tahmin_fiyat(veri: schemas.FiyatTahminRequest,db: Session=Depends(get_db)):
         "urun":veri.urun,
         "tahmini_fiyat": sonuc["predicted_price"]
     }
-    
+
 #urunler
 @router.get("/urunlerim/{kullanici_id}")
 def kullanici_urunleri(kullanici_id:int,db:Session=Depends(get_db)):
@@ -505,9 +512,66 @@ def get_daily_hal_prices():
         data = fetch_daily_hal_prices()
 
         return data
-       
+
     except Exception as error:
         raise HTTPException(
             status_code=500,
             detail=f"Hal fiyatları alınamadı: {str(error)}",
         )
+
+#admin endpointleri
+#kullanıcıları listeliyor
+@router.get("/admin/kullanicilar",response_model=list[schemas.AdminKullaniciResponse])
+def admin_kullanicilari_getir(admin_id:int,db:Session=Depends(get_db)):
+    admin_kontrol(admin_id,db)
+    kullanicilar=db.query(models.Kullanici).all()
+    return kullanicilar
+
+#admin kullanıcı yetkilendiriyor
+@router.put("/admin/kullanicilar/{kullanici_id}/admin")
+def admin_yetkisi(kullanici_id:int,admin_id:int,db:Session=Depends(get_db)):
+    admin_kontrol(admin_id,db)
+    kullanici=db.query(models.Kullanici).filter(models.Kullanici.kullanici_id==kullanici_id).first()
+
+    if not kullanici:
+        raise HTTPException(status_code=404,detail="Kullanici bulunamadı.")
+
+    kullanici.is_admin= not kullanici.is_admin
+    db.commit()
+    db.refresh(kullanici)
+    return {
+        "mesaj":"Admin yetkisi güncellendi",
+        "kullanici_id":kullanici.kullanici_id,
+        "ad_soyad": kullanici.ad_soyad,
+        "rol":"Admin" if kullanici.is_admin else "Kullanici",
+        "is_admin": kullanici.is_admin
+    }
+
+#ürünleri listeleme
+@router.get("/admin/urunler",response_model=list[schemas.AdminUrunResponse])
+def admin_urunleri_geti(admin_id:int,db:Session=Depends(get_db)):
+    admin_kontrol(admin_id,db)
+    urunler= db.query(models.Urun).all()
+    return urunler
+
+#ürünü aktif pasif yapma
+@router.put("/admin/urunler/{urun_id}/adurum")
+def admin_urun_durum(urun_id:int,admin_id:int,db:Session=Depends(get_db)):
+    admin_kontrol(admin_id,db)
+
+    urun=db.query(models.Urun).filter(models.Urun.urun_id==urun_id).first()
+
+    if not urun:
+        raise HTTPException(status_code=404,detail="Ürün buluamadı.")
+
+    urun.aktif=not urun.aktif
+    db.commit()
+    db.refresh(urun)
+
+    return{
+        "mesaj":"ürün durumu güncellendi",
+        "urun_id":urun.urun_id,
+        "urun_adi": urun.urun_adi,
+        "durum": "Aktif" if urun.aktif else "Pasif",
+        "aktif":urun.aktif
+    }
