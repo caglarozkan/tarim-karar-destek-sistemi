@@ -18,3 +18,11 @@ export const URUN_GORUNEN_ADLAR = {
 };
 
 export const URUNLER = Object.keys(URUN_GORUNEN_ADLAR);
+export async function aktifUrunleriGetir() {
+  const res = await fetch("http://localhost:8000/urun/liste");
+  const data = await res.json();
+
+  return data
+    .filter((u) => u.aktif)
+    .map((u) => u.urun_adi);
+}

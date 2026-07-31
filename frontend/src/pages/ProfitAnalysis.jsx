@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "../App.css";
-import { URUNLER, URUN_GORUNEN_ADLAR } from "../constants/urunler";
+import { aktifUrunleriGetir, URUN_GORUNEN_ADLAR } from "../constants/urunler";
 
 const ILCELER = ["Bayındır","Bergama","Menderes","Tire","Torbalı","Ödemiş"];
 const SEZONLAR = ["İlkbahar", "Yaz", "Sonbahar", "Kış"];
@@ -19,11 +19,15 @@ function ProfitAnalysis() {
   const [sonuc, setSonuc] = useState(null);
   const [yukleniyor, setYukleniyor] = useState(false);
   const [hata, setHata] = useState("");
+  const [urunler, setUrunler] = useState([]);
 
   useEffect(() => {
       const kayit = localStorage.getItem("kullanici");
       if ( kayit) setKullanici(JSON.parse(kayit));
       },[]);
+  useEffect(() => {
+  aktifUrunleriGetir().then(setUrunler);
+}, []);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -89,7 +93,7 @@ function ProfitAnalysis() {
             <label>Ürün Seçimi</label>
             <select name="urun" value={form.urun} onChange={handleChange}>
               <option value="">Ürün seç</option>
-              {URUNLER.map((u) => (
+              {urunler.map((u) => (
                 <option key={u} value={u}>
                   {URUN_GORUNEN_ADLAR[u]}
                 </option>

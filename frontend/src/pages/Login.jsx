@@ -71,6 +71,7 @@ function Login() {
               yas: data.yas ?? null,
               cinsiyet: data.cinsiyet ?? null,
               telefon: data.telefon ?? null,
+              is_admin: data.is_admin ?? false,
             })
           );
           setMesaj({ text: "Giriş başarılı!", type: "success" });

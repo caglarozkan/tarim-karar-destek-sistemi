@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "../App.css";
-import { URUNLER, URUN_GORUNEN_ADLAR } from "../constants/urunler";
+import { aktifUrunleriGetir, URUN_GORUNEN_ADLAR } from "../constants/urunler";
 
 const ILCELER = ["Bayındır", "Bergama", "Menderes", "Tire", "Torbalı", "Ödemiş"];
 const SEZONLAR = ["İlkbahar", "Yaz", "Sonbahar", "Kış"];
@@ -20,6 +20,7 @@ function Recommendations() {
   const [secilenUrunler, setSecilenUrunler] = useState([]);
   const [onaylaniyor, setOnaylaniyor] = useState(false);
   const [basariMesaji, setBasariMesaji] = useState("");
+  const [urunler, setUrunler] = useState([]);
 
   useEffect(() => {
     if (aktifKullanici?.id) {
@@ -29,6 +30,10 @@ function Recommendations() {
         .catch(() => setTarlalar([]));
     }
   }, [aktifKullanici?.id]);
+
+  useEffect(() => {
+  aktifUrunleriGetir().then(setUrunler);
+  }, []);
 
   const tarlaSec = (tarlaId) => {
     setSecilenTarla(tarlaId);
@@ -281,7 +286,7 @@ function Recommendations() {
     }}
   >
     <option value="">Ürün Seç</option>
-    {URUNLER.map((u) => (
+    {urunler.map((u) => (
       <option key={u} value={u}>
         {URUN_GORUNEN_ADLAR[u]}
       </option>

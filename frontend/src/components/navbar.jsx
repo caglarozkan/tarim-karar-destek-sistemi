@@ -54,6 +54,18 @@ function Navbar() {
                 <Link to="/tarlalarim">Tarlalarım</Link>
                 <Link to="/Risk-gecmisim">Risk Log</Link>
                 <Link to ="/urunlerim"> Ürünlerim</Link>
+
+                {aktifKullanici.is_admin && (
+                    <>
+                    <div className="menu-divider" />
+                    <Link
+                        to="/Admin"
+                        className="amin-menu-item"
+                    >
+                     🛠️ Admin Paneli
+                    </Link>
+                    </>
+                )}
                 <div className="menu-divider" />
                 <button className="logout-item" onClick={cikisYap}>
                   Çıkış Yap

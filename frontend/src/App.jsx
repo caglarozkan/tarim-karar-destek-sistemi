@@ -12,6 +12,7 @@ import "./App.css";
 import RiskLog from "./pages/RiskLog";
 import Products from "./pages/my_products";
 import Statistics from "./pages/Statistics";
+import Admin from "./pages/Admin"
 
 function Layout({ children }) {
   return (
@@ -105,6 +106,14 @@ function App() {
             element={
             <Layout>
                 <Products />
+            </Layout>
+            }
+        />
+        <Route
+            path="/Admin"
+            element={
+            <Layout>
+                <Admin/>
             </Layout>
             }
         />

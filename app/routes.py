@@ -154,7 +154,7 @@ def ilce_liste(db: Session = Depends(get_db)):
 #formdaki select için ürün list
 @router.get("/urun/liste")
 def urun_liste(db: Session = Depends(get_db)):
-    return db.query(models.Urun).filter(models.Urun.urun_adi!="SOGAN KURU").all()
+    return db.query(models.Urun).filter(models.Urun.aktif==True,models.Urun.urun_adi!="SOGAN KURU").all()
 
 #tarla ekleme
 @router.post("/tarla/ekle")
@@ -296,7 +296,7 @@ def risk_gecmisi(kullanici_id: int, db: Session = Depends(get_db)):
 @router.post("/kar/hesapla")
 def kar_hesapla(veri: schemas.KarHesabiRequest, db: Session = Depends(get_db)):
     ilce_kaydi = db.query(models.Ilce).filter(models.Ilce.ilce_adi == veri.ilce).first()
-    urun_kaydi = db.query(models.Urun).filter(models.Urun.urun_adi == veri.urun).first()
+    urun_kaydi = db.query(models.Urun).filter(models.Urun.aktif==True,models.Urun.urun_adi == veri.urun).first()
 
     if not ilce_kaydi or not urun_kaydi:
         raise HTTPException(status_code=404, detail="İlçe veya ürün bulunamadı.")
@@ -325,7 +325,7 @@ def kar_hesapla(veri: schemas.KarHesabiRequest, db: Session = Depends(get_db)):
 #fiyat tahmini
 @router.post("/tahmin/fiyat")
 def tahmin_fiyat(veri: schemas.FiyatTahminRequest,db: Session=Depends(get_db)):
-    urun_kaydi = db.query(models.Urun).filter(models.Urun.urun_adi == veri.urun).first()
+    urun_kaydi = db.query(models.Urun).filter(models.Urun.aktif==True,models.Urun.urun_adi == veri.urun).first()
     if not urun_kaydi:
         raise HTTPException(status_code=404,detail="Urun bulanamdi..")
 
